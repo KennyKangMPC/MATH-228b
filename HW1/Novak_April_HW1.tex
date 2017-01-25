@@ -1,0 +1,131 @@
+\documentclass[10pt]{article}
+\usepackage[letterpaper]{geometry}
+\geometry{verbose,tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in}
+\usepackage{setspace}
+\usepackage{ragged2e}
+\usepackage{color}
+\usepackage{titlesec}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{mathtools}
+\usepackage{amsmath}
+\usepackage[font=small,labelfont=bf,labelsep=period]{caption}
+\usepackage[english]{babel}
+\usepackage{indentfirst}
+\usepackage{array}
+\usepackage{makecell}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{arydshln}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{xfrac}
+\usepackage{etoolbox}
+\usepackage{cite}
+\usepackage{url}
+\usepackage{dcolumn}
+\usepackage{hyperref}
+\usepackage{courier}
+\usepackage{url}
+\usepackage{esvect}
+\usepackage{commath}
+\usepackage{verbatim} % for block comments
+\usepackage{enumitem}
+\usepackage{hyperref} % for clickable table of contents
+\usepackage{braket}
+\usepackage{titlesec}
+\usepackage{booktabs}
+\usepackage{gensymb}
+\usepackage{longtable}
+\usepackage{listings}
+\usepackage{cancel}
+\usepackage{tcolorbox}
+\usepackage[mathscr]{euscript}
+\lstset{
+    frame=single,
+    breaklines=true,
+    postbreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\color{red}\hookrightarrow\space}}
+}
+
+% for circled numbers
+\usepackage{tikz}
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+            \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+
+
+\titleclass{\subsubsubsection}{straight}[\subsection]
+
+% define new command for triple sub sections
+\newcounter{subsubsubsection}[subsubsection]
+\renewcommand\thesubsubsubsection{\thesubsubsection.\arabic{subsubsubsection}}
+\renewcommand\theparagraph{\thesubsubsubsection.\arabic{paragraph}} % optional; useful if paragraphs are to be numbered
+
+\titleformat{\subsubsubsection}
+  {\normalfont\normalsize\bfseries}{\thesubsubsubsection}{1em}{}
+\titlespacing*{\subsubsubsection}
+{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+
+\makeatletter
+\renewcommand\paragraph{\@startsection{paragraph}{5}{\z@}%
+  {3.25ex \@plus1ex \@minus.2ex}%
+  {-1em}%
+  {\normalfont\normalsize\bfseries}}
+\renewcommand\subparagraph{\@startsection{subparagraph}{6}{\parindent}%
+  {3.25ex \@plus1ex \@minus .2ex}%
+  {-1em}%
+  {\normalfont\normalsize\bfseries}}
+\def\toclevel@subsubsubsection{4}
+\def\toclevel@paragraph{5}
+\def\toclevel@paragraph{6}
+\def\l@subsubsubsection{\@dottedtocline{4}{7em}{4em}}
+\def\l@paragraph{\@dottedtocline{5}{10em}{5em}}
+\def\l@subparagraph{\@dottedtocline{6}{14em}{6em}}
+\makeatother
+
+\newcommand{\volume}{\mathop{\ooalign{\hfil$V$\hfil\cr\kern0.08em--\hfil\cr}}\nolimits}
+
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{4}
+\begin{document}
+
+\title{MATH 228b: HW1 ..... 1, 2, 3, 4}
+\author{April Novak}
+
+\maketitle
+
+\section{}
+
+Transfinite Interpolation (TFI) is used to map from a master domain (defined in 2-D over \(0\leq\xi\leq1\) and \(0\leq\eta\leq1\)) to the physical domain by expressing the boundary of the physical domain in terms of \(\xi,\eta\) coordinates. This then constrains the master grid to lie within the physical domain boundaries. TFI does not guarantee a one-to-one mapping or orthogonality of the mesh, however, but is useful for directly controlling the grid spacing in a computationally efficient and easy manner. The mapping from the master domain to the physical domain is given by \(\textbf{X}(\xi,\eta)\):
+
+\begin{equation}
+\textbf{X}(\xi,\eta)=\left\lbrack x(\xi,\eta), y(\xi,\eta)\right\rbrack^T
+\end{equation}
+
+where \(x(\xi,\eta)\) and \(y(\xi,\eta)\) are the mappings from the individual coordinates in the master domain (\(\xi,\eta\)) to those in the physical domain (\(x,y\)). For \textit{linear} TFI, we construct 1-D, \textit{linear} interpolants in the \(x\) and \(y\) directions:
+
+\begin{equation}
+\begin{aligned}
+\textbf{U}(\xi,\eta)=& (1-\xi_i)\textbf{X}(0,\eta_j)+\xi_i\textbf{X}(1,\eta_j)\\
+\textbf{V}(\xi,\eta)=& (1-\eta_j)\textbf{X}(\xi_i,0)+\eta_j\textbf{X}(\xi_i,1)\\
+\end{aligned}
+\end{equation}
+
+where \(\textbf{U}\) is the 1-D interpolant in the \(x\)-direction and \(\textbf{V}\) the 1-D interpolant in the \(y\)-direction. For a 2-D domain, \(x\) and \(y\) are functions of \(\xi\) and \(\eta\). The 2-D interpolant is constructed from the 1-D interpolants above by performing a Boolean sum.
+
+\begin{equation}
+\begin{aligned}
+\textbf{X}(\xi,\eta)=& (1-\xi_i)\textbf{X}(0,\eta_j)+\xi_i\textbf{X}(1,\eta_j) + (1-\eta_j)\textbf{X}(\xi_i,0)+\eta_j\textbf{X}(\xi_i,1) - \\
+& \left\lbrack(1-\xi_i)(1-\eta_j)\textbf{X}(0,0)+(1-\xi_i)\eta_j\textbf{X}(0,1)+\xi_i(1-\eta_j)\textbf{X}(1,0)+\xi_i\eta_j\textbf{X}(1,1)\right\rbrack
+\end{aligned}
+\end{equation}
+
+The \(\textbf{X}\) that appear on the right-hand side of the equation above are assumed to be known, and is how the physical domain boundary enters the meshing algorithm. 
+
+\section{}
+
+\section{}
+
+\section{}
+
+\end{document}
