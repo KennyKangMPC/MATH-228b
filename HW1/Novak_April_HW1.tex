@@ -120,7 +120,38 @@ where \(\textbf{U}\) is the 1-D interpolant in the \(x\)-direction and \(\textbf
 \end{aligned}
 \end{equation}
 
-The \(\textbf{X}\) that appear on the right-hand side of the equation above are assumed to be known, and is how the physical domain boundary enters the meshing algorithm. 
+The \(\textbf{X}\) that appear on the right-hand side of the equation above are assumed to be known, and is how the physical domain boundary enters the meshing algorithm. For a straight-sided domain, with corner coordinates \((x_1,y_1), (x_2,y_2), (x_3,y_3), (x_4, y_4)\), where the first coordinate pair is in the lower left corner, the interpolation along the sides is given by:
+
+\begin{equation}
+\begin{aligned}
+\textbf{X}(0,\eta_j)=\begin{bmatrix}(1-\eta_j)x_1+\eta x_4\\ (1-\eta_j)y_0+\eta y_4\end{bmatrix}\\
+\textbf{X}(1,\eta_j)=\begin{bmatrix}(1-\eta_j)x_2+\eta x_3\\ (1-\eta_j)y_2+\eta y_3\end{bmatrix}\\
+\textbf{X}(\xi_i,0)=\begin{bmatrix}(1-\xi_i)x_1+\xi_i x_2\\ (1-\xi_i)y_1+\xi_i y_2\end{bmatrix}\\
+\textbf{X}(\xi_i,1)=\begin{bmatrix}(1-\xi_i)x_4+\xi_i x_3\\ (1-\xi_i)y_4+\xi_i y_3\end{bmatrix}\\
+\end{aligned}
+\end{equation}
+
+where a 2-D domain is used for simplicity - the results would equally extend to 3-D. Then, inserting these into the Boolean sum above gives:
+
+\begin{equation}
+\begin{aligned}
+x(\xi,\eta)=& (1-\xi_i)\left((1-\eta_j)x_1+\eta_j x_4\right)+\xi_i\left((1-\eta_j)x_2+\eta x_3\right) + \\
+&(1-\eta_j)\left((1-\xi_i)x_1+\xi_i x_2\right)+\eta_j\left((1-\xi_i)x_4+\xi_i x_3\right) - \\
+& \left\lbrack(1-\xi_i)(1-\eta_j)x_1+(1-\xi_i)\eta_jx_4+\xi_i(1-\eta_j)x_2+\xi_i\eta_jx_3\right\rbrack\\
+=& \cancel{(1-\xi_i)(1-\eta_j)x_1}+\cancel{(1-\xi_i)\eta_j x_4}+\cancel{\xi_i(1-\eta_j)x_2}+\cancel{\eta_j x_3\xi_i} +\\
+&(1-\eta_j)(1-\xi_i)x_1+\xi_i x_2(1-\eta_j)+\eta_j(1-\xi_i)x_4+\xi_i x_3\eta_j-\\
+& \left\lbrack\cancel{(1-\xi_i)(1-\eta_j)x_1}+\cancel{(1-\xi_i)\eta_jx_4}+\cancel{\xi_i(1-\eta_j)x_2}+\cancel{\xi_i\eta_jx_3}\right\rbrack\\
+=& (1-\eta_j)(1-\xi_i)x_1+\xi_i x_2(1-\eta_j)+\eta_j(1-\xi_i)x_4+x_3\eta_j\xi_i\\
+\end{aligned}
+\end{equation}
+
+From the last line above, it is seen that, for the transformation from \(\xi\) to \(x\), the linear TFI is equivalent to bilinear interpolation between the four corner points. Similarly, bilinear interpolation between the \(y\)-coordinates of the four corner points is also equivalent to a bilinear interpolation (work follows the same steps shown above).
+
+\begin{equation}
+\begin{aligned}
+y(\xi,\eta)= (1-\eta_j)(1-\xi_i)y_1+\xi_i y_2(1-\eta_j)+\eta_j(1-\xi_i)y_4+ y_3\eta_j\xi_i\\
+\end{aligned}
+\end{equation}
 
 \section{}
 
