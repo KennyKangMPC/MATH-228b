@@ -1,7 +1,11 @@
-function [new_pts] = initial_mesh(pv, hmax)
+function [new_pts, markers] = initial_mesh(pv, hmax, sides)
 % place points on the domain boundaries according to hmax
 
 k = 1;
+l = 1;
+p = 1;
+markers = [];
+
 for i = 1:(size(pv(:,1)) - 1)
     x0 = pv(i, 1);
     x_next = pv(i + 1, 1);
@@ -23,11 +27,20 @@ for i = 1:(size(pv(:,1)) - 1)
                 y0 = y;
             end
             new_pts(k, :) = [x0, y];
+            
+            % if point is on a marked side, record point number
+            for n = 1:length(sides)
+                if i == sides(n)
+                    markers(p) = k;
+                    p = p + 1;
+                end
+            end
+            
             k = k + 1;
         end
     else
         % not a vertical line
-        m = (y_next - y0) / (x_next - x0);
+        m(l) = (y_next - y0) / (x_next - x0);
         
         % determine number of points to place to get close to hmax
         dist = sqrt((y_next - y0)^2 + (x_next - x0)^2);
@@ -37,17 +50,27 @@ for i = 1:(size(pv(:,1)) - 1)
         % compute the new points
         for j = 1:(num_divs - 1)
             if x_next > x0
-                x = x0 + sqrt(spacing^2 / (m^2 + 1));
+                x = x0 + sqrt(spacing^2 / (m(l)^2 + 1));
             else
-                x = x0 - sqrt(spacing^2 / (m^2 + 1));
+                x = x0 - sqrt(spacing^2 / (m(l)^2 + 1));
             end
-                y = m * x - m * x0 + y0;
+                y = m(l) * x - m(l) * x0 + y0;
                 x0 = x;
                 y0 = y;
                 new_pts(k, :) = [x, y];
+                
+                % if point is on a marked side, record point number
+                for n = 1:length(sides)
+                    if i == sides(n)
+                        markers(p) = k;
+                        p = p + 1;
+                    end
+                end
+                
                 k = k + 1;
         end
     end
+    l = l + 1;
 end
 
 
