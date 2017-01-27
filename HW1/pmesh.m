@@ -2,17 +2,15 @@
 clear all
 
 hmax = 0.2;
+
 % number of uniform refinements
 nref = 0;
+
+% original polygon
 pv = [0,0; 1,0; .5,.5; 1,1; 0,1; 0,0];
 
-% put nodes along the original edges of the polygon
-%plot(pv(:,1), pv(:,2))
-
-% find line slope
-%for i = 1:(size(pv(:,1)) - 1)
 k = 1;
-for i = 1:5
+for i = 1:(size(pv(:,1)) - 1)
     x0 = pv(i, 1);
     x_next = pv(i + 1, 1);
     y0 = pv(i, 2);
@@ -20,9 +18,8 @@ for i = 1:5
     
     if x_next == x0
         % vertical line
-        disp('vertical line')
         dist = abs(y_next - y0);
-        num_divs = ceil(dist/hmax)
+        num_divs = ceil(dist/hmax);
         spacing = dist/num_divs;
         
         for j = 1:(num_divs - 1)
@@ -60,6 +57,36 @@ for i = 1:5
         end
     end
 end
+
+% assemble all of the starting node points
+pv_orig = pv(1:end-1, :);
+pv = [pv_orig; new_pts; 2,2];
 plot(pv(:,1), pv(:,2), 'o')
-hold on
-plot(new_pts(:,1), new_pts(:,2), 'x')
+
+% triangulate the domain
+T = delaunayn(pv);
+
+% plot the domain
+tplot(pv, T)
+
+j = 1;
+% find which points are outside the domain, then delete them
+for i = 1:size(pv(:,1))
+    in = inpolygon(pv(i,1), pv(i,2), pv_orig(:,1), pv_orig(:,2));
+    
+    if in == 0
+        % generic point outside the domain
+    else
+        % inside the domain
+        pv_inside(j,:) = pv(i, :);
+        j = j + 1;
+    end
+end
+
+pv = pv_inside;
+
+% triangulate the domain
+T = delaunayn(pv);
+
+% plot the domain
+tplot(pv, T)
