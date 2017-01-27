@@ -32,7 +32,8 @@ for r = 1:10
     tplot(pv, T)
 
     % find which triangles are outside the domain, then delete them from T
-
+    [T] = delete_outside_triangles(T, pv, pv_orig);
+    
     % find the circumcenter of the largest triangle
     [pt, max_area] = circumcenter(T, pv);
 
