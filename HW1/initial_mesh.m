@@ -1,12 +1,11 @@
-function [new_pts, markers] = initial_mesh(pv, hmax, sides)
+function [new_pts] = initial_mesh(pv, hmax)
 % place points on the domain boundaries according to hmax
 
 k = 1;
 l = 1;
-p = 1;
-markers = [];
 
 for i = 1:(size(pv(:,1)) - 1)
+    p = 1;
     x0 = pv(i, 1);
     x_next = pv(i + 1, 1);
     y0 = pv(i, 2);
@@ -27,15 +26,6 @@ for i = 1:(size(pv(:,1)) - 1)
                 y0 = y;
             end
             new_pts(k, :) = [x0, y];
-            
-            % if point is on a marked side, record point number
-            for n = 1:length(sides)
-                if i == sides(n)
-                    markers(p) = k;
-                    p = p + 1;
-                end
-            end
-            
             k = k + 1;
         end
     else
@@ -58,21 +48,11 @@ for i = 1:(size(pv(:,1)) - 1)
                 x0 = x;
                 y0 = y;
                 new_pts(k, :) = [x, y];
-                
-                % if point is on a marked side, record point number
-                for n = 1:length(sides)
-                    if i == sides(n)
-                        markers(p) = k;
-                        p = p + 1;
-                    end
-                end
-                
                 k = k + 1;
         end
     end
     l = l + 1;
 end
-
 
 end
 
