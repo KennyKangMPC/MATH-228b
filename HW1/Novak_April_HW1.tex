@@ -89,7 +89,7 @@
 \setcounter{tocdepth}{4}
 \begin{document}
 
-\title{MATH 228b: HW1 ..... 1, 2, 3, 4}
+\title{MATH 228b: HW1 ..... 2, 3, 4}
 \author{April Novak}
 
 \maketitle
@@ -155,8 +155,45 @@ y(\xi,\eta)= (1-\eta_j)(1-\xi_i)y_1+\xi_i y_2(1-\eta_j)+\eta_j(1-\xi_i)y_4+ y_3\
 
 \section{}
 
-\section{}
+TFI is used to generate a structured mesh of the given domain. The 1-D interpolations in the \(x\) and \(y\) directions now include four terms, two to account for control of the 1-D boundary values, and two to control for the 1-D boundary derivatives.
+
+\begin{equation}
+\begin{aligned}
+\textbf{U}(\xi,\eta)=(2\xi_i^3-3\xi_i^2+1)\textbf{X}(0,\eta_j)+(3\xi_i^2-2\xi_i^3)\textbf{X}(1,\eta_j)+(\xi_i^3-2\xi_i^2+1)\frac{\partial\textbf{X}(0,\eta_j)}{\partial\xi}+(\xi_i^3-\xi_i^2)\frac{\partial\textbf{X}(1,\eta_j)}{\partial\xi}\\
+\textbf{V}(\xi,\eta)=(2\eta_j^3-3\eta_j^2+1)\textbf{X}(\xi_i,0)+(3\eta_j^2-2\eta_j^3)\textbf{X}(\xi_i,1)+(\eta_j^3-2\eta_j^2+1)\frac{\partial\textbf{X}(\xi_i,0)}{\partial\eta}+(\eta_j^3-\eta_j^2)\frac{\partial\textbf{X}(\xi_i,1)}{\partial\eta}\\
+\end{aligned}
+\end{equation}
+
+The 2-D interpolant is constructed from the 1-D interpolants by performing a Boolean sum:
+
+\begin{equation}
+\begin{aligned}
+\textbf{X}(\xi,\eta)=& (2\xi_i^3-3\xi_i^2+1)\textbf{X}(0,\eta_j)+(3\xi_i^2-2\xi_i^3)\textbf{X}(1,\eta_j)+(\xi_i^3-2\xi_i^2+1)\frac{\partial\textbf{X}(0,\eta_j)}{\partial\xi}+(\xi_i^3-\xi_i^2)\frac{\partial\textbf{X}(1,\eta_j)}{\partial\xi}+\\
+& (2\eta_j^3-3\eta_j^2+1)\textbf{X}(\xi_i,0)+(3\eta_j^2-2\eta_j^3)\textbf{X}(\xi_i,1)+(\eta_j^3-2\eta_j^2+1)\frac{\partial\textbf{X}(\xi_i,0)}{\partial\eta}+(\eta_j^3-\eta_j^2)\frac{\partial\textbf{X}(\xi_i,1)}{\partial\eta}-\\
+& \left\lbrack(2\xi_i^3-3\xi_i^2+1)(2\eta_j^3-3\eta_j^2+1)\textbf{X}(0,0)+(3\xi_i^2-2\xi_i^3)(2\eta_j^3-3\eta_j^2+1)\textbf{X}(1,0)\right\rbrack-\\
+& \left\lbrack(2\xi_i^3-3\xi_i^2+1)(3\eta_j^2-2\eta_j^3)\textbf{X}(0,1)+(3\xi_i^2-2\xi_i^3)(3\eta_j^2-2\eta_j^3)\textbf{X}(1,1)\right\rbrack\\
+\end{aligned}
+\end{equation}
 
 \section{}
+
+For a conformal map, an analytic function 
+
+\begin{equation}
+w=\frac{2e^z-3}{3e^z-2}
+\end{equation}
+
+\begin{equation}
+\begin{aligned}
+w=& \frac{2e^{x+iy}-3}{3e^{x+iy}-2}\\
+=& \frac{2e^xe^{iy}-3}{3e^xe^{iy}-2}\\
+=& \frac{2e^x(cos(y)+i\ sin(y))-3}{3e^x(cos(y)+i\ sin(y))-2}\\
+=& \frac{2e^xcos(y)+2e^xi\ sin(y)-3}{3e^xcos(y)+3e^xi\ sin(y)-2}\\
+\end{aligned}
+\end{equation}
+
+\section{}
+
+
 
 \end{document}
