@@ -5,10 +5,12 @@ clear all
 nref = 2;
 
 % maximum element size
-hmax = 0.2;
+hmax = 0.4;
 
 % original polygon boundary points
 pv = [0,0; 1,0; .5,.5; 1,1; 0,1; 0,0];
+pv = [0,0; 1,0; 2,1; 2,2; 1,3; 0,3; -1,2; -1,1; 0,0];
+%plot(pv(:,1), pv(:,2))
 
 % place points on the domain boundaries according to hmax
 [new_pts] = initial_mesh(pv, hmax);
@@ -21,6 +23,7 @@ max = hmax^2 / 2;
 max_area = max + 1; % dummy initial value
 while max_area > max
     % find which points are outside the domain, then delete them
+    pv = unique(pv, 'rows');
     [pv] = delete_outside(pv, pv_orig);
     
     % triangulate the domain
@@ -60,7 +63,7 @@ end
 pv = pv(1:(end-1), :);
 
 tplot(pv, T)
-saveas(gcf, 'refine0', 'png')
+saveas(gcf, 'refine-A0', 'png')
 
 % perform any uniform refinements
 for uf = 1:nref
@@ -83,9 +86,8 @@ for uf = 1:nref
     % find which triangles are outside the domain, then delete them from T
     [T] = delete_outside_triangles(T, pv, pv_orig);
     
-    figure
     tplot(pv, T)
-    saveas(gcf, sprintf('refine%i',nref), 'png');
+    saveas(gcf, sprintf('refine-A%i',nref), 'png');
 
 end
 
