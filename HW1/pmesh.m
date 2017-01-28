@@ -16,7 +16,6 @@ pv = [0,0; 1,0; .5,.5; 1,1; 0,1; 0,0];
 % assemble all of the starting node points
 pv_orig = pv(1:end-1, :);
 pv = [pv_orig; new_pts; 2,2];
-plot(pv(:,1), pv(:,2), 'o')
 
 max = hmax^2 / 2;
 max_area = max + 1; % dummy initial value
@@ -57,9 +56,39 @@ while max_area > max
     pv = [pv; pt];
 end
 
+% remove last triangulation (not needed since we just broke from loop)
+pv = pv(1:(end-1), :);
+
+figure
+tplot(pv, T)
+hold on
+
 % perform any uniform refinements
 for uf = 1:nref
     sprintf('Performing uniform refinement %i', uf)
+
+    for i = 1:length(T(:,1))
+         A = [pv(T(i, 1), 1), pv(T(i, 1), 2)];
+         B = [pv(T(i, 2), 1), pv(T(i, 2), 2)];
+         C = [pv(T(i, 3), 1), pv(T(i, 3), 2)];
+        
+        % add the three midpoints
+        pv = [pv; (A(1) + B(1))/2, (A(2) + B(2))/2];
+        pv = [pv; (A(1) + C(1))/2, (A(2) + C(2))/2];
+        pv = [pv; (C(1) + B(1))/2, (C(2) + B(2))/2];
+    end
     
+    pv = unique(pv, 'rows');
+    T = delaunayn(pv);
+    
+    % find which triangles are outside the domain, then delete them from T
+    [T] = delete_outside_triangles(T, pv, pv_orig);
+    
+    plot(pv(:,1), pv(:,2),'o')
+    
+    figure
+    tplot(pv, T)
+
 end
+
 
