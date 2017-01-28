@@ -20,8 +20,8 @@ pv = [pv_orig; new_pts; 2,2];
 plot(pv(:,1), pv(:,2), 'o')
 
 max = hmax^2 / 2;
-area = max + 1;
-for r = 1:10
+max_area = max + 1; % dummy initial value
+for r = 1:30
     % find which points are outside the domain, then delete them
     [pv] = delete_outside(pv, pv_orig);
     
@@ -33,6 +33,7 @@ for r = 1:10
 
     % find which triangles are outside the domain, then delete them from T
     [T] = delete_outside_triangles(T, pv, pv_orig);
+    tplot(pv, T)
     
     % find the circumcenter of the largest triangle
     [pt, max_area] = circumcenter(T, pv);
@@ -40,8 +41,4 @@ for r = 1:10
     % add the circumcenter to the list of points
     pv = [pv; pt];
 end
-
-
-
-
 
