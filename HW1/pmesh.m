@@ -2,7 +2,7 @@
 clear all
 
 % number of uniform refinements
-nref = 1;
+nref = 2;
 
 % maximum element size
 hmax = 0.2;
@@ -59,9 +59,8 @@ end
 % remove last triangulation (not needed since we just broke from loop)
 pv = pv(1:(end-1), :);
 
-figure
 tplot(pv, T)
-hold on
+saveas(gcf, 'refine0', 'png')
 
 % perform any uniform refinements
 for uf = 1:nref
@@ -84,10 +83,9 @@ for uf = 1:nref
     % find which triangles are outside the domain, then delete them from T
     [T] = delete_outside_triangles(T, pv, pv_orig);
     
-    plot(pv(:,1), pv(:,2),'o')
-    
     figure
     tplot(pv, T)
+    saveas(gcf, sprintf('refine%i',nref), 'png');
 
 end
 
