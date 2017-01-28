@@ -9,8 +9,8 @@ hmax = 0.4;
 
 % original polygon boundary points
 pv = [0,0; 1,0; .5,.5; 1,1; 0,1; 0,0];
-pv = [0,0; 1,0; 2,1; 2,2; 1,3; 0,3; -1,2; -1,1; 0,0];
-%plot(pv(:,1), pv(:,2))
+%pv = [0,0; 1,0; 2,1; 2,2; 1,3; 0,3; -1,2; -1,1; 0,0];
+pv = [2,0; 3,1; 2,2; 0,2; 2,0];
 
 % place points on the domain boundaries according to hmax
 [new_pts] = initial_mesh(pv, hmax);
@@ -63,7 +63,7 @@ end
 pv = pv(1:(end-1), :);
 
 tplot(pv, T)
-saveas(gcf, 'refine-A0', 'png')
+saveas(gcf, 'refine-B0', 'png')
 
 % perform any uniform refinements
 for uf = 1:nref
@@ -87,7 +87,7 @@ for uf = 1:nref
     [T] = delete_outside_triangles(T, pv, pv_orig);
     
     tplot(pv, T)
-    saveas(gcf, sprintf('refine-A%i',nref), 'png');
+    saveas(gcf, sprintf('refine-B%i',uf), 'png');
 
 end
 
