@@ -62,9 +62,9 @@ for uf = 1:nref
     sprintf('Performing uniform refinement %i', uf)
 
     for i = 1:length(T(:,1))
-         A = [pv(T(i, 1), 1), pv(T(i, 1), 2)];
-         B = [pv(T(i, 2), 1), pv(T(i, 2), 2)];
-         C = [pv(T(i, 3), 1), pv(T(i, 3), 2)];
+        A = [pv(T(i, 1), 1), pv(T(i, 1), 2)];
+        B = [pv(T(i, 2), 1), pv(T(i, 2), 2)];
+        C = [pv(T(i, 3), 1), pv(T(i, 3), 2)];
         
         % add the three midpoints
         pv = [pv; (A(1) + B(1))/2, (A(2) + B(2))/2];
@@ -79,13 +79,13 @@ for uf = 1:nref
     [T] = delete_outside_triangles(T, pv, pv_orig);
     
     tplot(pv, T)
+    hold on
     %saveas(gcf, sprintf('refine-B%i',uf), 'png');
-
 end
 
 p = pv;
 t = T;
-e = 1; % change this
+e = boundary_nodes(T);
 
 end
 
