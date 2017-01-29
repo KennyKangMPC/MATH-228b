@@ -89,7 +89,7 @@
 \setcounter{tocdepth}{4}
 \begin{document}
 
-\title{MATH 228b: HW1 ..... 2, 3, 4}
+\title{MATH 228b: HW1 ..... 2, 3, 4 (submit code)}
 \author{April Novak}
 
 \maketitle
@@ -263,6 +263,51 @@ Two more examples of different polygons are shown in Figs. \ref{fig:stop} and \r
         \label{fig:2}
 \end{figure}
 
-\end{document}
+Finally, the {\tt boundary\_nodes} function is used to find the indices of all the nodes on the boundary, which is required for later numerical methods such as the finite element method. All of the code used for this problem is included in the Appendix and submitted online. 
+
+\section{Appendix}
+\subsection{Question 4 Code}
+\subsubsection{{\tt pmesh.n}}
+
+This function is the main function asked for in this problem, and returns the node coordinates, triangulation, and boundary nodes. This function calls several sub-functions that were developed, which are described in the next sections. 
+
+\lstinputlisting[language=Matlab]{pmesh.m}
+
+\subsubsection{{\tt initial\_mesh.m}}
+
+This function places the initial boundary nodes on the boundary according to the requirement that the element side lengths along the boundary be as close as possible to \(h_{max}\), but not exceed this maximum value.
+
+\lstinputlisting[language=Matlab]{initial_mesh.m}
+
+\subsubsection{{\tt delete\_outside.m}}
+
+This function deletes any points that are outside the domain using the {\tt inpolygon} command.
+
+\lstinputlisting[language=Matlab]{delete_outside.m}
+
+\subsubsection{{\tt delete\_outside\_triangles.m}}
+
+This function deletes any triangles that are outside the domain using the {\tt inpolygon} command. A point is placed on each triangle edge at the midpoint, and the {\tt inpolygon} command is used to test whether or not that point is outside the domain. If that point is outside the domain, then the triangle is assumed to be entirely outside the domain, and it is removed from the triangulation.
+
+\lstinputlisting[language=Matlab]{delete_outside_triangles.m}
+
+\subsubsection{{\tt circumcenter.m}}
+
+This function computes the circumcenter of three points. 
+
+\lstinputlisting[language=Matlab]{circumcenter.m}
+
+\subsubsection{{\tt tplot.m}}
+
+This function plots the Delaunay triangulation.
+
+\lstinputlisting[language=Matlab]{tplot.m}
+
+\subsubsection{{\tt boundary\_nodes.m}}
+
+This function returns the indices of nodes on the boundary.
+
+\lstinputlisting[language=Matlab]{boundary_nodes.m}
 
 \end{document}
+

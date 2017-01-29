@@ -46,18 +46,14 @@ while max_area > max
     C = [pv(T(refine, 3), 1), pv(T(refine, 3), 2)];
     
     [pt] = circumcenter(A, B, C, pv);
-
-    % add the circumcenter to the list of points
     pv = [pv; pt];
 end
 
 % remove last triangulation (not needed since we just broke from loop)
 pv = pv(1:(end-1), :);
-
 tplot(pv, T)
-%saveas(gcf, 'refine-B0', 'png')
 
-% perform any uniform refinements
+% perform uniform refinements
 for uf = 1:nref
     sprintf('Performing uniform refinement %i', uf)
 
@@ -80,7 +76,6 @@ for uf = 1:nref
     
     tplot(pv, T)
     hold on
-    %saveas(gcf, sprintf('refine-B%i',uf), 'png');
 end
 
 p = pv;
