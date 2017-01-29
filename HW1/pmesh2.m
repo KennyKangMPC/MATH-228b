@@ -1,8 +1,16 @@
-function [p, t, e] = pmesh(pv, hmax, nref)
-% Uses Delaunay triangulation and refinement to mesh a polygon with
-% vertices pv, maximum element side length hmax, and number of uniform
-% refinements nref. The return values of this function are the node points
-% p, the triangle indices t, and the indices of the boundary points e.
+% MATH 228b - HW1, question 4
+clear all
+
+% number of uniform refinements
+nref = 2;
+
+% maximum element size
+hmax = 0.4;
+
+% original polygon boundary points
+pv = [0,0; 1,0; .5,.5; 1,1; 0,1; 0,0];
+%pv = [0,0; 1,0; 2,1; 2,2; 1,3; 0,3; -1,2; -1,1; 0,0];
+%pv = [2,0; 3,1; 2,2; 0,2; 2,0];
 
 % place points on the domain boundaries according to hmax
 [new_pts] = initial_mesh(pv, hmax);
@@ -83,9 +91,4 @@ for uf = 1:nref
 
 end
 
-p = pv;
-t = T;
-e = 1; % change this
-
-end
 
