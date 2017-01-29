@@ -89,7 +89,7 @@
 \setcounter{tocdepth}{4}
 \begin{document}
 
-\title{MATH 228b: HW1 ..... 2, 3, 4 (submit code)}
+\title{MATH 228b: HW1 ..... 2, 3}
 \author{April Novak}
 
 \maketitle
@@ -170,8 +170,44 @@ The 2-D interpolant is constructed from the 1-D interpolants by performing a Boo
 \begin{aligned}
 \textbf{X}(\xi,\eta)=& (2\xi_i^3-3\xi_i^2+1)\textbf{X}(0,\eta_j)+(3\xi_i^2-2\xi_i^3)\textbf{X}(1,\eta_j)+(\xi_i^3-2\xi_i^2+1)\frac{\partial\textbf{X}(0,\eta_j)}{\partial\xi}+(\xi_i^3-\xi_i^2)\frac{\partial\textbf{X}(1,\eta_j)}{\partial\xi}+\\
 & (2\eta_j^3-3\eta_j^2+1)\textbf{X}(\xi_i,0)+(3\eta_j^2-2\eta_j^3)\textbf{X}(\xi_i,1)+(\eta_j^3-2\eta_j^2+1)\frac{\partial\textbf{X}(\xi_i,0)}{\partial\eta}+(\eta_j^3-\eta_j^2)\frac{\partial\textbf{X}(\xi_i,1)}{\partial\eta}-\\
-& \left\lbrack(2\xi_i^3-3\xi_i^2+1)(2\eta_j^3-3\eta_j^2+1)\textbf{X}(0,0)+(3\xi_i^2-2\xi_i^3)(2\eta_j^3-3\eta_j^2+1)\textbf{X}(1,0)\right\rbrack-\\
-& \left\lbrack(2\xi_i^3-3\xi_i^2+1)(3\eta_j^2-2\eta_j^3)\textbf{X}(0,1)+(3\xi_i^2-2\xi_i^3)(3\eta_j^2-2\eta_j^3)\textbf{X}(1,1)\right\rbrack\\
+& \left\lbrack(2\xi_i^3-3\xi_i^2+1)(2\eta_j^3-3\eta_j^2+1)\textbf{X}(0,0)+(2\xi_i^3-3\xi_i^2+1)(3\eta_j^2-2\eta_j^3)\textbf{X}(0,1)\right\rbrack-\\
+& \left\lbrack(2\xi_i^3-3\xi_i^2+1)(\eta_j^3-2\eta_j^2+1)\textbf{X}(0,0)\frac{\partial\textbf{X}(0,0)}{\partial\eta}+(2\xi_i^3-3\xi_i^2+1)(\eta_j^3-\eta_j^2)\textbf{X}(0,1)\frac{\partial\textbf{X}(0,1)}{\partial\eta}\right\rbrack-\\
+& \left\lbrack(3\xi_i^2-2\xi_i^3)(2\eta_j^3-3\eta_j^2+1)\textbf{X}(1,0)+(3\xi_i^2-2\xi_i^3)(3\eta_j^2-2\eta_j^3)\textbf{X}(1,1)\right\rbrack-\\
+& \left\lbrack(3\xi_i^2-2\xi_i^3)(\eta_j^3-2\eta_j^2+1)\textbf{X}(1,0)\frac{\partial\textbf{X}(1,0)}{\partial\eta}+(3\xi_i^2-2\xi_i^3)(\eta_j^3-\eta_j^2)\textbf{X}(1,1)\frac{\partial\textbf{X}(1,1)}{\partial\eta}\right\rbrack-\\
+& \left\lbrack(\xi_i^3-2\xi_i^2+1)(2\eta_j^3-3\eta_j^2+1)\textbf{X}(0,0)\frac{\partial\textbf{X}(0,0)}{\partial\xi}+(\xi_i^3-2\xi_i^2+1)(3\eta_j^2-2\eta_j^3)\textbf{X}(0,1)\frac{\partial\textbf{X}(0,1)}{\partial\xi}\right\rbrack-\\
+& \left\lbrack(\xi_i^3-2\xi_i^2+1)(\eta_j^3-2\eta_j^2+1)\frac{\partial\textbf{X}(0,0)}{\partial\xi\partial\eta}+(\xi_i^3-2\xi_i^2+1)(\eta_j^3-\eta_j^2)\frac{\partial\textbf{X}(0,1)}{\partial\xi\partial\eta}\right\rbrack-\\
+& \left\lbrack(\xi_i^3-\xi_i^2)(2\eta_j^3-3\eta_j^2+1)\textbf{X}(1,0)\frac{\partial\textbf{X}(1,0)}{\partial\xi}+(\xi_i^3-\xi_i^2)(3\eta_j^2-2\eta_j^3)\textbf{X}(1,1)\frac{\partial\textbf{X}(1,1)}{\partial\xi}\right\rbrack-\\
+& \left\lbrack(\xi_i^3-\xi_i^2)(eta_j^3-2\eta_j^2+1)\frac{\partial\textbf{X}(1,0)}{\partial\xi\partial\eta}+(\xi_i^3-\xi_i^2)(\eta_j^3-\eta_j^2)\frac{\partial\textbf{X}(1,1)}{\partial\xi\partial\eta}\right\rbrack
+\end{aligned}
+\end{equation}
+
+For the given domain, the \textbf{X} functions along the sides are given by:
+
+\begin{equation}
+\begin{aligned}
+\textbf{X}(\xi, 0)=& \left\lbrack\xi, (1-cos(2\pi\xi))/5\right\rbrack^T\\
+\textbf{X}(\xi, 1)=& \left\lbrack\xi, 1+(1-cos(\pi x))/5\right\rbrack^T\\
+\textbf{X}(0, \eta)=& \left\lbrack0, \eta\right\rbrack^T\\
+\textbf{X}(1, \eta)=& \left\lbrack1, 1.4\eta\right\rbrack^T\\
+\end{aligned}
+\end{equation}
+
+where the values at the corners are:
+
+\begin{equation}
+\begin{aligned}
+\textbf{X}(0, 0)=& \left\lbrack0, 0\right\rbrack^T\\
+\textbf{X}(0, 1)=& \left\lbrack0, 1\right\rbrack^T\\
+\textbf{X}(0, 1)=& \left\lbrack0, 1\right\rbrack^T\\
+\textbf{X}(1, 1)=& \left\lbrack1, 1.4\right\rbrack^T\\
+\end{aligned}
+\end{equation}
+
+And the derivatives of these functions with respect to \(\xi\) and \(\eta\) are:
+
+\begin{equation}
+\begin{aligned}
+\frac{\partial\textbf{X}(\xi, 0)}{\partial\eta}=& \left\lbrack\right\rbrack^T
 \end{aligned}
 \end{equation}
 
