@@ -17,29 +17,20 @@ b2 = 3*ETA^2 -2*ETA^3;
 b3 = ETA^3 - 2*ETA^2 + 1;
 b4 = ETA^3 - ETA^2;
 
-%x_0_eta = [0; ETA];
-%x_1_eta = [1; 1.4*ETA];
-%dx_0_eta_dxi = 1;
-%dx_1_eta_dxi = 1;
-
-%x_xi_0 = [XI; (1 - cos(2*pi*XI))/5];
-%x_xi_1 = [XI; 1 + (1 - cos(pi*XI))/5];
-%dx_xi_0_deta = 1;
-%dx_xi_1_deta = 1;
-
-%x_0_0 = [0; 0];
-%x_0_1 = [0; 1];
-%x_1_0 = [0; 1];
-%x_1_1 = [1; 1.4];
-
 % conformal map without the boolean sum terms
-x = (a1 * 0) + (a2 * 1) + (a3 * 1) + (a4 * 1);
-x = x + (b1 * XI) + (b2 * XI) + (b3 * 1) + (b4 * 1);
-%x = x - a2 * b2 * 1.0;
+x = (a1*0) + (a2*1) + (a3*T*1) + (a4*T*1);              % fixed eta
+x = x + (b1*XI) + (b2*XI) + (b3*0) + (b4*0);            % fixed xi
+x = x - (a1*b1*0) - (a1*b2*0) - (a2*b1*1) - (a2*b2*1);  % subtract corners
 
-y = (a1 * ETA) + (a2 * 1.4 * ETA) + (a3 * 1) + (a4 * 1);
-y = y + (b1 * (1 - cos(2*pi*XI))/5) + b2 * (1 + (1 - cos(pi*XI))/5) + (b3 * 1) + (b4 * 1);
-%y = y - a1 * b2 * 1 - a2 * b1 * 1 - a2 * b2 * 1.4;
+x = x - (a1*b3*0*0) - (a1*b4*0*0) - (a2*b3*1*0) - (a2*b4*1*0); % subtract mixed
+x = x - (b1*a3*0*T) - (b1*a4*1*T) - (b2*a3*0*T) - (b2*a4*1*T); % subtract mixed
+
+y = (a1*ETA) + (a2*1.4*ETA) + (a3*0) + (a4*0);                            % fixed eta
+y = y + (b1*(1 - cos(2*pi*XI))/5) + (b2*(1 + (1 - cos(pi*XI))/5)) + (b3*T) + (b4*T); % fixed xi
+y = y - (a1*b1*0) - (a1*b2*1) - (a2*b1*0) - (a2*b2*1.4);
+
+y = y - (a1*b3*0*T) - (a1*b4*1*T) - (a2*b3*0*T) - (a2*b4*1.4*ETA*T);
+y = y - (b1*a3*0*0) - (b1*a4*0*0) - (b2*a3*1*0) - (b2*a4*1.4*ETA*0);
 
 
 
