@@ -170,11 +170,11 @@ The 2-D interpolant is constructed from the 1-D interpolants by performing a Boo
 \begin{aligned}
 \textbf{X}(\xi,\eta)=& (2\xi_i^3-3\xi_i^2+1)\textbf{X}(0,\eta_j)+(3\xi_i^2-2\xi_i^3)\textbf{X}(1,\eta_j)+(\xi_i^3-2\xi_i^2+1)\frac{\partial\textbf{X}(0,\eta_j)}{\partial\xi}+(\xi_i^3-\xi_i^2)\frac{\partial\textbf{X}(1,\eta_j)}{\partial\xi}+\\
 & (2\eta_j^3-3\eta_j^2+1)\textbf{X}(\xi_i,0)+(3\eta_j^2-2\eta_j^3)\textbf{X}(\xi_i,1)+(\eta_j^3-2\eta_j^2+1)\frac{\partial\textbf{X}(\xi_i,0)}{\partial\eta}+(\eta_j^3-\eta_j^2)\frac{\partial\textbf{X}(\xi_i,1)}{\partial\eta}-\\
-& \left\lbrack(2\xi_i^3-3\xi_i^2+1)(2\eta_j^3-3\eta_j^2+1)\textbf{X}(0,0)+(2\xi_i^3-3\xi_i^2+1)(3\eta_j^2-2\eta_j^3)\textbf{X}(0,1)\right\rbrack-\\
-& \left\lbrack(2\xi_i^3-3\xi_i^2+1)(\eta_j^3-2\eta_j^2+1)\textbf{X}(0,0)\frac{\partial\textbf{X}(0,0)}{\partial\eta}+(2\xi_i^3-3\xi_i^2+1)(\eta_j^3-\eta_j^2)\textbf{X}(0,1)\frac{\partial\textbf{X}(0,1)}{\partial\eta}\right\rbrack-\\
+& \left\lbrack\cancel{(2\xi_i^3-3\xi_i^2+1)(2\eta_j^3-3\eta_j^2+1)\textbf{X}(0,0)}+(2\xi_i^3-3\xi_i^2+1)(3\eta_j^2-2\eta_j^3)\textbf{X}(0,1)\right\rbrack-\\
+& \left\lbrack\cancel{(2\xi_i^3-3\xi_i^2+1)(\eta_j^3-2\eta_j^2+1)\textbf{X}(0,0)\frac{\partial\textbf{X}(0,0)}{\partial\eta}}+(2\xi_i^3-3\xi_i^2+1)(\eta_j^3-\eta_j^2)\textbf{X}(0,1)\frac{\partial\textbf{X}(0,1)}{\partial\eta}\right\rbrack-\\
 & \left\lbrack(3\xi_i^2-2\xi_i^3)(2\eta_j^3-3\eta_j^2+1)\textbf{X}(1,0)+(3\xi_i^2-2\xi_i^3)(3\eta_j^2-2\eta_j^3)\textbf{X}(1,1)\right\rbrack-\\
 & \left\lbrack(3\xi_i^2-2\xi_i^3)(\eta_j^3-2\eta_j^2+1)\textbf{X}(1,0)\frac{\partial\textbf{X}(1,0)}{\partial\eta}+(3\xi_i^2-2\xi_i^3)(\eta_j^3-\eta_j^2)\textbf{X}(1,1)\frac{\partial\textbf{X}(1,1)}{\partial\eta}\right\rbrack-\\
-& \left\lbrack(\xi_i^3-2\xi_i^2+1)(2\eta_j^3-3\eta_j^2+1)\textbf{X}(0,0)\frac{\partial\textbf{X}(0,0)}{\partial\xi}+(\xi_i^3-2\xi_i^2+1)(3\eta_j^2-2\eta_j^3)\textbf{X}(0,1)\frac{\partial\textbf{X}(0,1)}{\partial\xi}\right\rbrack-\\
+& \left\lbrack\cancel{(\xi_i^3-2\xi_i^2+1)(2\eta_j^3-3\eta_j^2+1)\textbf{X}(0,0)\frac{\partial\textbf{X}(0,0)}{\partial\xi}}+(\xi_i^3-2\xi_i^2+1)(3\eta_j^2-2\eta_j^3)\textbf{X}(0,1)\frac{\partial\textbf{X}(0,1)}{\partial\xi}\right\rbrack-\\
 & \left\lbrack(\xi_i^3-2\xi_i^2+1)(\eta_j^3-2\eta_j^2+1)\frac{\partial\textbf{X}(0,0)}{\partial\xi\partial\eta}+(\xi_i^3-2\xi_i^2+1)(\eta_j^3-\eta_j^2)\frac{\partial\textbf{X}(0,1)}{\partial\xi\partial\eta}\right\rbrack-\\
 & \left\lbrack(\xi_i^3-\xi_i^2)(2\eta_j^3-3\eta_j^2+1)\textbf{X}(1,0)\frac{\partial\textbf{X}(1,0)}{\partial\xi}+(\xi_i^3-\xi_i^2)(3\eta_j^2-2\eta_j^3)\textbf{X}(1,1)\frac{\partial\textbf{X}(1,1)}{\partial\xi}\right\rbrack-\\
 & \left\lbrack(\xi_i^3-\xi_i^2)(eta_j^3-2\eta_j^2+1)\frac{\partial\textbf{X}(1,0)}{\partial\xi\partial\eta}+(\xi_i^3-\xi_i^2)(\eta_j^3-\eta_j^2)\frac{\partial\textbf{X}(1,1)}{\partial\xi\partial\eta}\right\rbrack
@@ -198,7 +198,7 @@ where the values at the corners are:
 \begin{aligned}
 \textbf{X}(0, 0)=& \left\lbrack0, 0\right\rbrack^T\\
 \textbf{X}(0, 1)=& \left\lbrack0, 1\right\rbrack^T\\
-\textbf{X}(0, 1)=& \left\lbrack0, 1\right\rbrack^T\\
+\textbf{X}(1, 0)=& \left\lbrack1, 0\right\rbrack^T\\
 \textbf{X}(1, 1)=& \left\lbrack1, 1.4\right\rbrack^T\\
 \end{aligned}
 \end{equation}
