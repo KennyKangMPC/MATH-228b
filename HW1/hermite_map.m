@@ -4,51 +4,47 @@ clear all
 xi = linspace(0, 1, 41);
 eta = linspace(0, 1, 41);
 T = 0.5;
-Topp = 0.;
 
 [XI, ETA] = meshgrid(xi, eta);
 
-a1 = 2*XI^3 - 3*XI^2 + 1;
-a2 = 3*XI^2 -2*XI^3;
-a3 = XI^3 - 2*XI^2 + 1;
-a4 = XI^3 - XI^2;
+a1 = @(xi) 2*xi^3 - 3*xi^2 + 1;
+a2 = @(xi) 3*xi^2 -2*xi^3;
+a3 = @(xi) xi^3 - 2*xi^2 + 1;
+a4 = @(xi) xi^3 - xi^2;
 
-b1 = 2*ETA^3 - 3*ETA^2 + 1;
-b2 = 3*ETA^2 -2*ETA^3;
-b3 = ETA^3 - 2*ETA^2 + 1;
-b4 = ETA^3 - ETA^2;
+b1 = @(eta) 2*eta^3 - 3*eta^2 + 1;
+b2 = @(eta) 3*eta^2 -2*eta^3;
+b3 = @(eta) eta^3 - 2*eta^2 + 1;
+b4 = @(eta) eta^3 - eta^2;
 
-x00 = [0, 0];
-x01 = [0, 1];
-x10 = [1, 0];
-x11 = [1, 1.4]; % y-value defined separately
+leftx = @(xi,eta) 0;
+lefty = @(xi,eta) eta;
+rightx = @(xi,eta) 1;
+righty = @(xi,eta) 1.4*eta;
+bottomx = @(xi,eta) xi;
+bottomy = @(xi,eta) (1-cos(2*pi*xi))/5;
+topx = @(xi,eta) xi;
+topy = @(xi,eta) 1 + (1-cos(pi*xi))/5;
 
-x_xi_0 = [XI, (1-cos(2*pi*XI))/5];
-x_xi_1 = [XI, 1 + (1-cos(pi*XI))/5];
-x_0_eta = [0*ETA, ETA];
-x_1_eta = [0*ETA + 1, 1.4*ETA];
-n_0_eta = [1, 0];
-n_1_eta = [1, 0];
-n_xi_0 = [0, 1];
-n_xi_1 = [0, 1];
+k = 1;
+for dxi = linspace(0, 1, 41)
+    for deta = linspace(0, 1, 41)
+        x(k) = a1(dxi)*leftx(dxi, deta) + a2(dxi)*rightx(dxi, deta) +...
+            b1(deta)*bottomx(dxi, deta) + b2(deta)*topx(dxi, deta) - ...
+            (a1(dxi)*b1(deta)*leftx(0, 0) + a1(dxi)*b2(deta)*leftx(0, 1) ...
+            + a2(dxi)*b1(deta)*rightx(1,0) + a2(dxi)*b2(deta)*rightx(1,1));
+        y(k) = a1(dxi)*lefty(dxi, deta) + a2(dxi)*righty(dxi, deta) +...
+            b1(deta)*bottomy(dxi, deta) + b2(deta)*topy(dxi, deta) - ...
+            (a1(dxi)*b1(deta)*lefty(0, 0) + a1(dxi)*b2(deta)*lefty(0, 1) ...
+            + a2(dxi)*b1(deta)*righty(1,0) + a2(dxi)*b2(deta)*righty(1,1));
+        k = k + 1;
+    end
+end
 
-x = (a1*x_0_eta(1)) + (a2*x_1_eta(1)) + (a3*T*n_0_eta(1)) + (a4*T*n_1_eta(1));
-x = x + (b1*x_xi_0(1)) + (b2*x_xi_1(1)) + (b3*T*n_xi_0(1)) + (b4*T*n_xi_1(1));
-x = x - (a1*b1*x00(1)) - (a1*b2*x01(1)) - (a2*b1*x10(1)) - (a2*b2*x11(1));
-
-x = x - (a1*b3*x00(1)*T*n_xi_0(1)) - (a1*b4*x01(1)*T*n_xi_1(1)) - (a2*b3*x10(1)*T*n_xi_0(1)) - (a2*b4*x11(1)*n_xi_1(1));
-x = x - (b1*a3*x00(1)*T*n_0_eta(1)) - (b1*a4*x10(1)*T*n_1_eta(1)) - (b2*a3*x01(1)*T*n_0_eta(1)) - (b2*a4*x11(1)*T*n_1_eta(1));
-
-
-
-y = (a1*x_0_eta(2)) + (a2*x_1_eta(2)) + (a3*T*n_0_eta(2)) + (a4*T*n_1_eta(2));                           % fixed eta
-y = y + (b1*x_xi_0(2)) + (b2*x_xi_1(2)) + (b3*T*n_xi_0(2)) + (b4*T*n_xi_1(2));
-y = y - (a1*b1*x00(2)) - (a1*b2*x01(2)) - (a2*b1*x10(2)) - (a2*b2*x11(2));
-
-y = y - (a1*b3*x00(2)*T*n_xi_0(2)) - (a1*b4*x01(2)*T*n_xi_1(2)) - (a2*b3*x10(2)*T*n_xi_0(2)) - (a2*b4*x11(2)*n_xi_1(2));
-y = y - (b1*a3*x00(2)*T*n_0_eta(2)) - (b1*a4*x10(2)*T*n_1_eta(2)) - (b2*a3*x01(2)*T*n_0_eta(2)) - (b2*a4*x11(2)*T*n_1_eta(2));
+%x = unique(x);
+%y = unique(y);
+plot(x, y, 'o')
 
 
 
 
-surf(x, y, zeros.*x)
