@@ -1,11 +1,7 @@
 % Question 2, MATH-228b HW 1
 clear all
 
-xi = linspace(0, 1, 41);
-eta = linspace(0, 1, 41);
 T = 0.5;
-
-[XI, ETA] = meshgrid(xi, eta);
 
 a1 = @(xi) 2*xi^3 - 3*xi^2 + 1;
 a2 = @(xi) 3*xi^2 -2*xi^3;
@@ -17,14 +13,24 @@ b2 = @(eta) 3*eta^2 -2*eta^3;
 b3 = @(eta) eta^3 - 2*eta^2 + 1;
 b4 = @(eta) eta^3 - eta^2;
 
-leftx = @(xi,eta) 0;
-lefty = @(xi,eta) eta;
-rightx = @(xi,eta) 1;
-righty = @(xi,eta) 1.4*eta;
-bottomx = @(xi,eta) xi;
-bottomy = @(xi,eta) (1-cos(2*pi*xi))/5;
-topx = @(xi,eta) xi;
-topy = @(xi,eta) 1 + (1-cos(pi*xi))/5;
+leftx =     @(xi,eta) 0;
+lefty =     @(xi,eta) eta;
+rightx =    @(xi,eta) 1;
+righty =    @(xi,eta) 1.4*eta;
+bottomx =   @(xi,eta) xi;
+bottomy =   @(xi,eta) (1-cos(2*pi*xi))/5;
+topx =      @(xi,eta) xi;
+topy =      @(xi,eta) 1 + (1-cos(pi*xi))/5;
+
+leftnx =    @(xi,eta) 1;
+leftny =    @(xi,eta) 0;
+rightnx =   @(xi,eta) 1;
+rightny =   @(xi,eta) 0;
+bottomnx =  @(xi,eta) 0;
+bottomny =  @(xi,eta) 1;
+topnx =     @(xi,eta) 0;
+topny =     @(xi,eta) 1;
+
 
 k = 1;
 for dxi = linspace(0, 1, 41)
@@ -32,11 +38,21 @@ for dxi = linspace(0, 1, 41)
         x(k) = a1(dxi)*leftx(dxi, deta) + a2(dxi)*rightx(dxi, deta) +...
             b1(deta)*bottomx(dxi, deta) + b2(deta)*topx(dxi, deta) - ...
             (a1(dxi)*b1(deta)*leftx(0, 0) + a1(dxi)*b2(deta)*leftx(0, 1) ...
-            + a2(dxi)*b1(deta)*rightx(1,0) + a2(dxi)*b2(deta)*rightx(1,1));
+            + a2(dxi)*b1(deta)*rightx(1,0) + a2(dxi)*b2(deta)*rightx(1,1));...
+            + a3(dxi)*T*leftnx(dxi,deta) + a4(dxi)*T*rightnx(dxi,deta) - ...
+            (a1(dxi)*b3(deta)*leftx(0,0)*T*bottomnx(0,0) + a1(dxi)*b4(deta)*leftx(0,0)*T*topnx(0,1)) - ...
+            (a2(dxi)*b3(deta)*rightx(1,0)*T*bottomnx(1,0) + a2(dxi)*b4(deta)*rightx(1,0)*T*topnx(1,1)) - ...
+            (b1(deta)*a3(dxi)*bottomx(0,0)*T*leftnx(0,0) + b1(deta)*a4(dxi)*bottomx(1,0)*rightnx(1,0)) - ...
+            (b2(deta)*a3(dxi)*topx(0,1)*T*leftnx(0,1) + b2(deta)*a4(dxi)*topx(1,1)*rightnx(1,1));
         y(k) = a1(dxi)*lefty(dxi, deta) + a2(dxi)*righty(dxi, deta) +...
             b1(deta)*bottomy(dxi, deta) + b2(deta)*topy(dxi, deta) - ...
             (a1(dxi)*b1(deta)*lefty(0, 0) + a1(dxi)*b2(deta)*lefty(0, 1) ...
-            + a2(dxi)*b1(deta)*righty(1,0) + a2(dxi)*b2(deta)*righty(1,1));
+            + a2(dxi)*b1(deta)*righty(1,0) + a2(dxi)*b2(deta)*righty(1,1));...
+            + b3(deta)*leftny(dxi,deta) + b4(deta)*rightny(dxi,deta) - ...
+            (a1(dxi)*b3(deta)*lefty(0,0)*T*bottomny(0,0) + a1(dxi)*b4(deta)*lefty(0,0)*T*topny(0,1)) - ...
+            (a2(dxi)*b3(deta)*righty(1,0)*T*bottomny(1,0) + a2(dxi)*b4(deta)*righty(1,0)*T*topny(1,1)) - ...
+            (b1(deta)*a3(dxi)*bottomy(0,0)*T*leftny(0,0) + b1(deta)*a4(dxi)*bottomy(1,0)*rightny(1,0)) - ...
+            (b2(deta)*a3(dxi)*topy(0,1)*T*leftny(0,1) + b2(deta)*a4(dxi)*topy(1,1)*rightny(1,1));
         k = k + 1;
     end
 end
