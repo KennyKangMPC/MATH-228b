@@ -214,7 +214,7 @@ And the normals along the boundaries, to be used in the specification of the der
 \end{aligned}
 \end{equation}
 
-Fig. \ref{fig:hermite} shows the mesh generated using \(T=0.5\). As can be seen, boundary orthogonality is achieved on all sides. For simplicity, the second derivative terms were all assumed to be zero, since they would be zero on the left and right edges, and all corners points can be expressed as either belonging to the right and left edges, or either to the top and bottom edges.
+Fig. \ref{fig:hermite} shows the mesh generated using \(T=0.5\). As can be seen, boundary orthogonality is achieved on all sides. For simplicity, the second derivative terms were all assumed to be zero, since they would be zero on the left and right edges, and all corners points can be expressed as either belonging to the right and left edges, or either to the top and bottom edges. The code used for this problem is given in the Appendix.
 
 \begin{figure}[H]
 \centering
@@ -404,6 +404,13 @@ Two more examples of different polygons are shown in Figs. \ref{fig:stop} and \r
 Finally, the {\tt boundary\_nodes} function is used to find the indices of all the nodes on the boundary, which is required for later numerical methods such as the finite element method. All of the code used for this problem is included in the Appendix and submitted online. 
 
 \section{Appendix}
+
+\subsection{Question 2 Code}
+\subsubsection{{\tt hermite\_map.m}}
+
+This function plots the hermite map in Question 2.
+
+\lstinputlisting[language=Matlab]{hermite_map.m}
 
 \subsection{Question 3 Code}
 \subsubsection{{\tt conformal\_map.m}}

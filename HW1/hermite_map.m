@@ -54,8 +54,6 @@ for dxi = linspace(0, 1, 41)
     end
 end
 
-%x = unique(x);
-%y = unique(y);
 scatter(x, y, 'o')
 saveas(gcf, 'hermite_plot', 'png')
 
