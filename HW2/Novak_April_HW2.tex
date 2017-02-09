@@ -93,7 +93,7 @@
 \setcounter{tocdepth}{4}
 \begin{document}
 
-\title{MATH 228b: HW2 ... 2bc, 3, 4}
+\title{MATH 228b: HW2 ... 3, 4}
 \author{April Novak}
 
 \maketitle
@@ -261,10 +261,10 @@ Eq. \eqref{eq:4} is identical to central difference approximation of the origina
 It is clear to see that the above represents a forward Euler method, since the slope at node \(i\) depends only on the solution value at \(i-1\). The \(h/2\) appears from the tessellation of the element load vector in \textbf{f}, and hence if that part is neglected for the time begin, then the above is exactly equivalent to stating that:
 
 \beq
-u'(1)\approx\frac{u_5-u_4}{h}=g
+u'(1)\approx\frac{u_5-u_4}{h}=g+\frac{h}{2}f(x_{i-1})
 \eeq
 
-So, this shows that, for linear Lagrange elements in 1-D, the finite element method is equivalent to a central difference method on the interior nodes with an Euler method enforcing Neumann conditions on the boundaries.
+where the additional term on the right-hand side has been added as a correction term that results in a second-order approximation to the first derivative. So, this shows that, for linear Lagrange elements in 1-D, the finite element method is equivalent to a central difference method on the interior nodes with a second order finite difference method enforcing Neumann conditions on the boundaries through the use of a correction factor. So, for this simple case, the finite element method is equivalent to a second order finite difference approximation of the governing equation.
 
 \section{}
 
@@ -314,6 +314,7 @@ Now that differentiation has been modified to act equally (to the extent possibl
 Over a particular element, the solution is specified as a summation of coefficients \(a\) multiplied by basis functions \(\varphi\), where \(N\) is the number of shape functions per element (which for linear Lagrange elements is equivalent to the number of nodes per element):
 
 \beq
+\label{eq:11}
 u_h^e(x)=\sum_{i=1}^{N}a_i\varphi_i(x)
 \eeq
 
@@ -413,25 +414,39 @@ c_4 \\d_4 \\e_4 \\f_4
 \quad\quad \textrm{for } H_4
 \eeq
 
-Then, this process is repeated for all the elements in the triangulation, where \(a\) and \(b\) will change corresponding to the endpoints of the domain. This system of equations is solved in Python, where the code is provided in the Appendix. This solution, for the two-element triangulation given, is, for element 1:
+Then, this process is repeated for all the elements in the triangulation, where \(a\) and \(b\) will change corresponding to the endpoints of the domain. This system of equations is solved in Python, where the code is provided in the Appendix. This solution, for the two-element triangulation given, for superscripts that indicate the element number, is:
 
 \beqa
-H_1(x)=&16x^3-12x^2+1\\
-H_2(x)=&-16x^3+12x^2\\
-H_3(x)=&4x^3-4x^2+x\\
-H_4(x)=&4x^3-2x^2\\
+H_1^1(x)=&16x^3-12x^2+1\\
+H_2^1(x)=&-16x^3+12x^2\\
+H_3^1(x)=&4x^3-4x^2+x\\
+H_4^1(x)=&4x^3-2x^2\\
 \eeqa
-
-And for element 2:
 
 \beqa
-H_1(x)=&16x^3-36x^2+24x-4\\
-H_2(x)=&-16x^3+36x^2-24x+5\\
-H_3(x)=&4x^3-10x^2+8x-2\\
-H_4(x)=&4x^3-8x^2+5x-1\\
+H_1^2(x)=&16x^3-36x^2+24x-4\\
+H_2^2(x)=&-16x^3+36x^2-24x+5\\
+H_3^2(x)=&4x^3-10x^2+8x-2\\
+H_4^2(x)=&4x^3-8x^2+5x-1\\
 \eeqa
 
-Fig. \ref{fig:1} shows the shape functions over the two-element domain.
+The second derivatives of these functions are needed for the finite element formulation, so they are computed as:
+
+\beqa
+\frac{d^2H_1^1(x)}{dx^2}=& 96x-24\\
+\frac{d^2H_2^1(x)}{dx^2}=& -96x+24\\
+\frac{d^2H_3^1(x)}{dx^2}=& 24x-8\\
+\frac{d^2H_4^1(x)}{dx^2}=& 24x-4\\
+\eeqa
+
+\beqa
+\frac{d^2H_1^2(x)}{dx^2}=& 96x-72\\
+\frac{d^2H_2^2(x)}{dx^2}=& -96x+72\\
+\frac{d^2H_3^2(x)}{dx^2}=& 24-20\\
+\frac{d^2H_4^2(x)}{dx^2}=& 24-16\\
+\eeqa
+
+Fig. \ref{fig:1} shows the shape functions over the two-element domain. The basis over the domain is therefore these eight Hermite functions. These functions correspond to eight degrees of freedom, which are reduced to two when considering that the values and first derivatives at the single shared node must be continuous. Then, the four boundary conditions specify four of the degrees of freedom, leaving two degrees of freedom that are to be solved for using the finite element method. Because there are two degrees of freedom, the solution can be uniquely expressed as the sum of only two of these eight Hermite functions (this is specific to this particular problem). 
 
 \begin{figure}[H]
 \centering
@@ -440,5 +455,137 @@ Fig. \ref{fig:1} shows the shape functions over the two-element domain.
 \label{fig:1}
 \end{figure}
 
-\end{document}
+\subsection{}
 
+The elemental stiffness matrix is given by:
+
+\beq
+A_{ij}^k=\int_0^1\frac{d^2H_i^k(x)}{dx^2}\frac{d^2H_j^k(x)}{dx^2}dx
+\eeq
+
+The elemental load vector is given by:
+
+\beq
+f_j=\int_{0}^{1}f(x)H_j^k(x)dx
+\eeq
+
+For element 1:
+
+\beq
+\textbf{A}^1=\begin{bmatrix}
+\int_{0}^{0.5}\frac{d^2H_1^1(x)}{dx^2}\frac{d^2H_1^1(x)}{dx^2}dx & \int_{0}^{0.5}\frac{d^2H_1^1(x)}{dx^2}\frac{d^2H_2^1(x)}{dx^2}dx & \int_{0}^{0.5}\frac{d^2H_1^1(x)}{dx^2}\frac{d^2H_3^1(x)}{dx^2}dx & \int_{0}^{0.5}\frac{d^2H_1^1(x)}{dx^2}\frac{d^2H_4^1(x)}{dx^2}dx\\
+\int_{0}^{0.5}\frac{d^2H_2^1(x)}{dx^2}\frac{d^2H_1^1(x)}{dx^2}dx & \int_{0}^{0.5}\frac{d^2H_2^1(x)}{dx^2}\frac{d^2H_2^1(x)}{dx^2}dx & \int_{0}^{0.5}\frac{d^2H_2^1(x)}{dx^2}\frac{d^2H_3^1(x)}{dx^2}dx & \int_{0}^{0.5}\frac{d^2H_2^1(x)}{dx^2}\frac{d^2H_4^1(x)}{dx^2}dx\\
+\int_{0}^{0.5}\frac{d^2H_3^1(x)}{dx^2}\frac{d^2H_1^1(x)}{dx^2}dx & \int_{0}^{0.5}\frac{d^2H_3^1(x)}{dx^2}\frac{d^2H_2^1(x)}{dx^2}dx & \int_{0}^{0.5}\frac{d^2H_3^1(x)}{dx^2}\frac{d^2H_3^1(x)}{dx^2}dx & \int_{0}^{0.5}\frac{d^2H_3^1(x)}{dx^2}\frac{d^2H_4^1(x)}{dx^2}dx\\
+\int_{0}^{0.5}\frac{d^2H_4^1(x)}{dx^2}\frac{d^2H_1^1(x)}{dx^2}dx & \int_{0}^{0.5}\frac{d^2H_4^1(x)}{dx^2}\frac{d^2H_2^1(x)}{dx^2}dx & \int_{0}^{0.5}\frac{d^2H_4^1(x)}{dx^2}\frac{d^2H_3^1(x)}{dx^2}dx & \int_{0}^{0.5}\frac{d^2H_4^1(x)}{dx^2}\frac{d^2H_4^1(x)}{dx^2}dx\\
+\end{bmatrix}
+\eeq
+
+The local stiffness matrix is computed in the same method for element 2, except that the integration bounds change from \([0, 0.5]\) to \([0.5, 1.0]\). It should be noted that the elemental basis functions are only nonzero over the particular element, so \(\textbf{A} ^k\) is the same for both elements 1 and 2. Performing the computation shown above, the elemental stiffness matrices are (where the numbering given previously for the Hermite shape functions is changed so that 1 and 2 correspond to functions that obtain values and derivatives of unity at the left side, whereas 3 and 4 are reserved for the right side):
+
+\beq
+\textbf{A}^1=\textbf{A}^2=\begin{bmatrix}
+96 & 24 & -96 & 24\\
+24 & 8 & -24 & 4\\
+-96 & -24 & 96 & -24\\
+24 & 4 & -24 & 8\\
+\end{bmatrix}
+\eeq
+
+And the elemental load vectors are:
+
+\beqa
+\textbf{f}^{\ 1}=\begin{bmatrix}-12 -0.5 12 -0.5\end{bmatrix}^T\\
+\textbf{f}^{\ 2}=\begin{bmatrix}48 &4.5 & 72 & -5.5\end{bmatrix}^T
+\eeqa
+
+And the global system to be solved is:
+
+\beq
+\begin{bmatrix}
+96 & 24 & -96 & 24 & 0 & 0\\
+24 & 8 & -24 & 4 & 0 & 0\\
+-96 & -24 & 96+96 & -24+24 & -96 & 24\\
+24 & 4 & -24+24 & 8+8 &-24 & 4\\
+0 & 0 & -96 & -24 & 96 & -24\\
+0 & 0 & 24 & 4 & -24 & 8
+\end{bmatrix}
+\begin{bmatrix}
+u_1\\u_2\\u_3\\u_4\\ u_5\\ u_6
+\end{bmatrix}
+=
+\begin{bmatrix}
+-12 \\-0.5 \\12+48 \\-0.5+4.5\\ 72\\-5.5
+\end{bmatrix}
+\eeq
+
+This is not the final system that is solved, however, since the essential boundary conditions must be taken into account in this formulation. The matrix system to be solved can be broken up into:
+
+\beq
+\begin{bmatrix}
+A_{uu} & A_{uk}\\
+A_{ku} & A_{kk}
+\end{bmatrix}
+\begin{bmatrix}
+u_u \\ u_k
+\end{bmatrix} =
+\begin{bmatrix}
+f_u \\ f_k
+\end{bmatrix}
+\eeq
+
+where the \(u\) and \(k\) subscripts indicate unknown (non-essential boundary condition locations) and known (essential boundary condition locations) values. So, instead of solving \(\textbf{A}\textbf{u}=\textbf{f}\) using the full matrices above, the following system must be solved:
+
+\beq
+A_{uu}u_u=f_u-A_{uk}x_k
+\eeq
+
+where \(x_k=\textbf{0}\) because all of the essential boundary conditions are homogeneous. From the boundary conditions, \(u_1=u_2=u_5=u_6=0\). So, the actual matrix system to be solved is:
+
+\beq
+\begin{bmatrix} 192 & 0\\
+0 & 16
+\end{bmatrix}
+\begin{bmatrix} u_3\\u_4
+\end{bmatrix}
+=\begin{bmatrix} 60\\ 4\end{bmatrix}
+\eeq
+
+Solving this system gives \(u_3=5/16, u_4=1/4\), which then specifies the solution over the two elements according to Eq. \eqref{eq:11}:
+
+\beqa
+u_h^1(x)=& u_3(-16x^3-12x^2+1)+u_4*4x^3-2x^2\\
+u_h^2(x)=& u_3(16x^3-36x^2+24x-4)+u_4(4x^3-10x^2+8x-2)\\
+\eeqa
+
+The analytical solution to the governing equation is given by:
+
+\beqa
+u(x)=&C_4x^3+C_3x^2+C_2x+C_1+4x^5-5x^4\\
+u'(x)=&3C_4x^2+2C_3x+C_2+20x^4-20x^3\\
+\eeqa
+
+Applying the boundary conditions to determine the unknown coefficients gives \(C_1=0, C_2=0, C_3=3, C_4=-2\), so the analytical solution is:
+
+\beq
+u(x)=-2x^3+3x^2+4x^5-5x^4
+\eeq
+
+Fig. \ref{fig:2} shows a comparison between the analytical solution above and the finite element solution. As can be seen, the finite element solution is a fairly good approximation to the true solution, and had there been more elements, would have much better approximated the true solution. The code developed for this section is included in the Appendix.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.75\textwidth]{q3_soln.png}
+\caption{Comparison between the analytical and finite element solutions for the given problem statement.}
+\label{fig:2}
+\end{figure}
+
+\section{Appendix}
+
+\subsection{Code, Question 2}
+
+This Python script was used to determine the appropriate Hermite polynomials and the elemental stiffness matrix and elemental load vectors. Because the matrix system reduced to a simple \(2\times 2\) system, the actual solution was performed by hand.
+
+\lstinputlisting[language=Python]{q2.py}
+
+
+\end{document}
