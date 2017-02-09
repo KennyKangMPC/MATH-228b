@@ -278,29 +278,24 @@ with boundary conditions \(u(0)=u'(0)=u(1)=u'(1)=0\).
 
 \subsection{}
 
-The Galerkin formulation seeks a solution \(u_h\) in the function space \(V_h\), which is the same function space as the weight function \(v(x)\):
+The Galerkin formulation seeks a solution \(u_h\) in the function space \(V_h\), which is the same function space as the weight function \(v\):
 
 \beq
 V_h=\{v\in C^1([0,1]):v\rvert_K\in P_3(K) \forall K\in T_h, v(0)=v(1)=0=v'(0)=v'(1)\}
 \eeq
 
-The only requirement on the function space \(V_h\) is that it satisfy the homogeneous form of the Dirichlet conditions and the homogeneous form of the Neumann conditions (it is irrelevant that \(u(0)=u'(0)=u(1)=u'(1)\) all happen to equal zero). Note that this is only required if the basis functions have coefficients that are strongly imposed by the functions chosen - because Hermite shape functions specify a derivative at the boundaries, so then must the function space also specify a derivative there. On the other hand, if linear Lagrange elements were used, then it would be incorrect to require \(v'(0)=v'(1)=0\), even if \(u'(0)=u'(1)=0\), since imposing both Dirichlet and Neumann conditions on a shape function that does not have degrees of freedom related to derivatives would not necessarily lead to a piecewise-continuous solution over the entire domain. Multiplying the governing equation by a weight function \(v(x)\) and integrating over the domain:
+The only requirement on the function space \(V_h\) is that it satisfy the homogeneous form of the essential boundary conditions. For a fourth-order governing equation, the essential boundary conditions are represented by the values of \(u\) and \(u'\) on the boundaries, while the natural boundary conditions in this case are the values of \(u'''\) and \(u''\) on the boundaries. In order for \(v\) to be able to satisfy the essential boundary conditions, \(v\) must be of sufficiently high order to specify \(v\) and \(v'\) on the boundaries (which for a 1-D element requires four degrees of freedom per element, neglecting continuity and boundary conditions requirements for the time being). Multiplying the governing equation by a weight function \(v(x)\) and integrating over the domain gives the weighted residual formulation of the governing equation:
 
 \beq
 \int_{0}^{1}u''''(x)v(x)dx=\int_{0}^{1}f(x)v(x)dx
 \eeq
 
-Integrating by parts once:
+Integrating by parts two times:
 
-\beq
--\int_{0}^{1}u'''(x)v'(x)dx+\left\lbrack u'''(x)v(x)\right\rbrack_0^1=\int_{0}^{1}f(x)v(x)dx
-\eeq
-
-Integrating by parts a second time:
-
-\beq
-\int_{0}^{1}u''(x)v''(x)dx+\left\lbrack u'''(x)v(x)\right\rbrack_0^1-\left\lbrack u''(x)v'(x)\right\rbrack_0^1=\int_{0}^{1}f(x)v(x)dx
-\eeq
+\beqa
+-\int_{0}^{1}u'''(x)v'(x)dx+\left\lbrack u'''(x)v(x)\right\rbrack_0^1=& \int_{0}^{1}f(x)v(x)dx\\
+\int_{0}^{1}u''(x)v''(x)dx+\left\lbrack u'''(x)v(x)\right\rbrack_0^1-\left\lbrack u''(x)v'(x)\right\rbrack_0^1=& \int_{0}^{1}f(x)v(x)dx
+\eeqa
 
 Then, applying the boundary conditions:
 
@@ -308,7 +303,7 @@ Then, applying the boundary conditions:
 \int_{0}^{1}u''(x)v''(x)dx=\int_{0}^{1}f(x)v(x)dx \quad\forall v\in V_h
 \eeq
 
-Now that differentiation has been modified to act equally on \(u\) and \(v\), the above represents the weak form. The above equation holds for both the true solution \(u\) and the finite element solution \(u_h\), and hence the above could also be written as follows, which matches that shown in this homework assignment:
+Now that differentiation has been modified to act equally (to the extent possible based on the governing equation) on \(u\) and \(v\), the above represents the weak form. The above equation holds for both the true solution \(u\) and the finite element solution \(u_h\), and hence the above could also be written as follows, which matches that shown in this homework assignment:
 
 \beq
 \int_{0}^{1}u_h''(x)v''(x)dx=\int_{0}^{1}f(x)v(x)dx \quad\forall v\in V_h
@@ -322,7 +317,128 @@ Over a particular element, the solution is specified as a summation of coefficie
 u_h^e(x)=\sum_{i=1}^{N}a_i\varphi_i(x)
 \eeq
 
-The number of nodes per element is equivalent to the number of degrees of freedom per element. The above expression uses an \(e\) in the superscript of \(u_h\) to refer to the fact that \(u_h^e\) is the solution only over a particular element \(e\) - we must find the solution over every element. Because the space is defined to contain cubic polynomials over each element, and because we must choose basis functions that allow us to specify derivatives at the nodes, the cubic Hermite shape functions are used. 
+The above expression uses an \(e\) in the superscript of \(u_h\) to refer to the fact that \(u_h^e\) is the solution only over a particular element \(e\) - we must find the solution over every element. Because the space is defined to contain cubic polynomials over each element, since we require four degrees of freedom per element (not yet assuming continuity between elements), the shape functions for this problem must be functions that can specify both types of essential boundary conditions - the value and the first derivative on the two boundary nodes for each element. This requires four shape functions per element. Hermite shape functions allow specification of both the value and derivative at edge nodes. There are four shape functions per element. These shape functions are defined over an element defined on \([a, b]\) as:
+
+\beqa
+\label{eq:5}
+H_1(a)=1, H_1(b)=0, \frac{dH_1(a)}{dx}=0, \frac{dH_1(b)}{dx}=0\\
+H_2(a)=0, H_2(b)=1, \frac{dH_2(a)}{dx}=0, \frac{dH_2(b)}{dx}=0\\
+H_3(a)=0, H_3(b)=0, \frac{dH_3(a)}{dx}=1, \frac{dH_3(b)}{dx}=0\\
+H_4(a)=0, H_4(b)=0, \frac{dH_4(a)}{dx}=0, \frac{dH_4(b)}{dx}=1\\
+\eeqa
+
+where \(H\) is used to represent the fact that these shape functions \(\psi\) are Hermite shape functions. For each of these shape functions, because they are cubic, they are uniquely represented by four coefficients \(c, d, e, f\) for a polynomial of the form:
+
+\beqa
+H_1(x)=&c_1x^3+d_1x^2+e_1x+f_1\\
+H_2(x)=&c_2x^3+d_2x^2+e_2x+f_2\\
+H_3(x)=&c_3x^3+d_3x^2+e_3x+f_3\\
+H_4(x)=&c_4x^3+d_4x^2+e_4x+f_4\\
+\eeqa
+
+\beqa
+\frac{dH_1(x)}{dx}=&3c_1x^2+2d_1x+e_1\\
+\frac{dH_2(x)}{dx}=&3c_2x^2+2d_2x+e_2\\
+\frac{dH_3(x)}{dx}=&3c_3x^2+2d_3x+e_3\\
+\frac{dH_4(x)}{dx}=&3c_4x^2+2d_4x+e_4\\
+\eeqa
+
+So, for each element in the triangulation, these 16 coefficients must be determined by solving the following linear system for \textit{each} of the functions \(H_i\):
+
+\beq
+\begin{bmatrix}
+a^3 & a^2 & a & 1\\
+b^3 & b^2 & b & 1\\
+3a^2 & 2a & 1 & 0\\
+3b^2 & 2b & 1 & 0
+\end{bmatrix}
+\begin{bmatrix}
+c_1 \\d_1 \\e_1 \\f_1
+\end{bmatrix}
+=
+\begin{bmatrix}
+1 \\ 0 \\ 0 \\ 0
+\end{bmatrix}
+\quad\quad \textrm{for } H_1
+\eeq
+
+\beq
+\begin{bmatrix}
+a^3 & a^2 & a & 1\\
+b^3 & b^2 & b & 1\\
+3a^2 & 2a & 1 & 0\\
+3b^2 & 2b & 1 & 0
+\end{bmatrix}
+\begin{bmatrix}
+c_2 \\d_2 \\e_2 \\f_2
+\end{bmatrix}
+=
+\begin{bmatrix}
+0 \\ 1 \\ 0 \\ 0
+\end{bmatrix}
+\quad\quad \textrm{for } H_2
+\eeq
+
+\beq
+\begin{bmatrix}
+a^3 & a^2 & a & 1\\
+b^3 & b^2 & b & 1\\
+3a^2 & 2a & 1 & 0\\
+3b^2 & 2b & 1 & 0
+\end{bmatrix}
+\begin{bmatrix}
+c_3 \\d_3 \\e_3 \\f_3
+\end{bmatrix}
+=
+\begin{bmatrix}
+0 \\ 0 \\ 1 \\ 0
+\end{bmatrix}
+\quad\quad \textrm{for } H_3
+\eeq
+
+\beq
+\begin{bmatrix}
+a^3 & a^2 & a & 1\\
+b^3 & b^2 & b & 1\\
+3a^2 & 2a & 1 & 0\\
+3b^2 & 2b & 1 & 0
+\end{bmatrix}
+\begin{bmatrix}
+c_4 \\d_4 \\e_4 \\f_4
+\end{bmatrix}
+=
+\begin{bmatrix}
+0 \\ 0 \\ 0 \\ 4
+\end{bmatrix}
+\quad\quad \textrm{for } H_4
+\eeq
+
+Then, this process is repeated for all the elements in the triangulation, where \(a\) and \(b\) will change corresponding to the endpoints of the domain. This system of equations is solved in Python, where the code is provided in the Appendix. This solution, for the two-element triangulation given, is, for element 1:
+
+\beqa
+H_1(x)=&16x^3-12x^2+1\\
+H_2(x)=&-16x^3+12x^2\\
+H_3(x)=&4x^3-4x^2+x\\
+H_4(x)=&4x^3-2x^2\\
+\eeqa
+
+And for element 2:
+
+\beqa
+H_1(x)=&16x^3-36x^2+24x-4\\
+H_2(x)=&-16x^3+36x^2-24x+5\\
+H_3(x)=&4x^3-10x^2+8x-2\\
+H_4(x)=&4x^3-8x^2+5x-1\\
+\eeqa
+
+Fig. \ref{fig:1} shows the shape functions over the two-element domain.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.75\textwidth]{q2_Hermite_functions.png}
+\caption{Hermite shape functions over the two-element domain.}
+\label{fig:1}
+\end{figure}
 
 \end{document}
 
