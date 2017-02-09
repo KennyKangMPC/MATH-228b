@@ -53,6 +53,10 @@
 \newcommand*\circled[1]{\tikz[baseline=(char.base)]{
             \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
 
+\newcommand{\beq}{\begin{equation}}
+\newcommand{\eeq}{\end{equation}}
+\newcommand{\beqa}{\begin{equation}\begin{aligned}}
+\newcommand{\eeqa}{\end{aligned}\end{equation}}
 
 \titleclass{\subsubsubsection}{straight}[\subsection]
 
@@ -95,6 +99,165 @@
 \maketitle
 
 \section{}
+
+The solution of the following problem with linear Lagrange elements for \(u(0)=0\) and \(u^{'}(1)=g\) is equivalent to a second order central difference approximation of the problem. 
+
+\beq
+\label{eq:1}
+-u''(x)=f(x)
+\eeq
+
+The function space for the weight function \(v\) is in the space \(V_h\) such that \(v\) is \(C^0\) continuous over the entire domain (the zeroth derivative is the highest continuous derivative), where over each element \(K\), \(v\) is a linear function. \(v\) satisfies the homogeneous form of the Dirichlet boundary condition.
+
+\beq
+V_h=\{v\in C^0([0,1]): v\rvert_K\in P_1(K) \forall K\in T_h, v(0)=0\}
+\eeq
+
+The weak form is obtained by multiplying Eq. \eqref{eq:1} by \(v\) and integrating over the domain:
+
+\beq
+-\int_0^1 u''(x)v(x)dx=\int_0^1 f(x)v(x)dx
+\eeq
+
+The first term on the left-hand side can be rewritten using the divergence rule:
+
+\beq
+\int_0^1 u'(x)v'(x)dx-\left\lbrack u'(x)v(x)\right\rbrack_0^1=\int_0^1 f(x)v(x)dx
+\eeq
+
+At this point, the weak form contains no information about the boundary conditions. By applying the boundary conditions, the above reduces to:
+
+\beq
+\int_0^1 u'(x)v'(x)dx=\int_0^1 f(x)v(x)dx+gv(1)
+\eeq
+
+Using a linear Lagrange basis, defined on a mesh with element sizes \(h\), the elements are defined on \(e^1: [0, h]; e^2: [h, 2h]; e^3: [3h, 4h]; \cdots; e^n: [1-h, h]\), where \(n\) is the number of elements. The left and right coordinates of each element will be denoted as \(x_i\) and \(x_{i+1}\) for simplicity. Then, over an arbitrary element, the linear Lagrange shape functions \(\psi\) are:
+
+\beqa
+\psi_i(x)=& \frac{x_{i+1}-x}{x_{i+1}-x_i}=\frac{x_{i+1}-x}{h}\\
+\psi_{i+1}(x) =& \frac{x-x_i}{x_{i+1}-x_i}=\frac{x-x_i}{h}\\
+\eeqa
+
+And their derivatives with respect to \(x\) are:
+
+\beqa
+\psi_i'(x)=&\frac{-1}{h}\\
+\psi_{i+1}'(x) =&\frac{1}{h}\\
+\eeqa
+
+For equal-sized elements without edges on the Neumann boundary, the element stiffness matrix and element load vector are given as:
+
+\beqa
+A_{ij}^k=&\int_{x_i}^{x_{i+1}}\psi_i'(x)v_j'(x)dx\\
+f_j^k=&\int_{x_i}^{x_{i+1}}f(x)v_j(x)dx\\
+\eeqa
+
+By inserting the shape functions given above, \(\textbf{A}^k\) becomes:
+
+\beqa
+\textbf{A}^k=& \begin{bmatrix}	\int_{x_i}^{x_{i+1}}\frac{-1}{h}\frac{-1}{h}dx & 
+										\int_{x_i}^{x_{i+1}}\frac{-1}{h}\frac{1}{h}dx\\
+										\int_{x_i}^{x_{i+1}}\frac{1}{h}\frac{-1}{h}dx &
+										\int_{x_i}^{x_{i+1}}\frac{1}{h}\frac{1}{h}dx
+					\end{bmatrix}\\
+			   =& \begin{bmatrix}	\frac{1}{h} & 
+										\frac{-1}{h}\\
+										\frac{-1}{h} &
+										\frac{1}{h}
+					\end{bmatrix}
+\eeqa
+
+And the load vector becomes, with \(f=1\) chosen for simplicity:
+
+\beqa
+\textbf{f}^{\ k}=& \begin{bmatrix}	\int_{x_i}^{x_{i+1}}\frac{x_{i+1}-x}{h}dx \\
+										\int_{x_i}^{x_{i+1}}\frac{x-x_i}{h}dx
+					\end{bmatrix}\\
+			   =& \begin{bmatrix}	\frac{(x_{i+1}-x_i)^2}{2h}\\
+										\frac{(x_{i+1}-x_i)^2}{2h}
+					\end{bmatrix}\\
+				=& \begin{bmatrix}	h/2\\ 
+										h/2
+					\end{bmatrix}
+\eeqa
+
+Then, by the connectivity matrix relating how the nodes touch each other, the above matrices are ``tesselated'' along the diagonal of the global \textbf{A} and \textbf{f}. Suppose for the time being that \(u(1)=0\), i.e. both ends have homogeneous Dirichlet conditions. Then, the matrix system before application of the Dirichlet conditions is:
+
+\beqa
+\label{eq:3}
+\begin{bmatrix}
+1/h & -1/h & & & & &\\
+-1/h & 2/h & -1/h & & & & \\
+ & -1/h & 2/h & -1/h & & & \\
+ & & -1/h & 2/h & -1/h & & \\
+ & & & & & &\\
+\end{bmatrix}
+\begin{bmatrix}u_1\\u_2\\\vdots\\u_{n+1}\end{bmatrix} = 
+\begin{bmatrix}
+h/2\\ h\\h\\\vdots\\h\\h/2
+\end{bmatrix}
+\eeqa
+
+Now, to apply the Neumann condition at \(x=1\), the load vector for the last element (the element spanning \(1-h\leq x\leq1\) must be modified:
+
+\beqa
+\textbf{f}^{\ e=n}=& \begin{bmatrix}	\int_{x_i}^{x_{i+1}}\frac{x_{i+1}-x}{h}dx \\
+										\int_{x_i}^{x_{i+1}}\frac{x-x_i}{h}dx+g
+					\end{bmatrix}\\
+			   =& \begin{bmatrix}	\frac{(x_{i+1}-x_i)^2}{2h}\\
+										\frac{(x_{i+1}-x_i)^2}{2h}+g
+					\end{bmatrix}\\
+				=& \begin{bmatrix}	h/2\\ 
+										h/2+g
+					\end{bmatrix}
+\eeqa
+
+Then, the last equation in Eq. \eqref{eq:3} must be modified. To strongly apply the homogeneous Dirichlet condition at \(x=0\), the first row and column of \textbf{A} is eliminated, and post-processing will assign the value \(u_1=0\). The full matrix system, with boundary conditions \(u(0)=0, u'(1)=g\), is, for a four-element system (purely for illustration):
+
+\beqa
+\label{eq:3}
+\begin{bmatrix}
+ 2/h & -1/h & 0 & 0 \\
+ -1/h & 2/h & -1/h & 0 \\
+ 0 & -1/h & 2/h & -1/h\\
+ 0 & 0 & -1/h & 1/h\\
+\end{bmatrix}
+\begin{bmatrix}u_2\\u_3\\u_4\\u_5\end{bmatrix} = 
+\begin{bmatrix}
+h\\h\\h\\h/2+g
+\end{bmatrix}
+\eeqa
+
+Divide both sides by \(h\) for future insight into our choice of \(f(x)=1\):
+
+\beqa
+\label{eq:3}\frac{1}{h^2}
+\begin{bmatrix}
+ 2 & -1 & 0 & 0 \\
+ -1 & 2 & -1 & 0 \\
+ 0 & -1 & 2 & -1\\
+ 0 & 0 & -1 & 1\\
+\end{bmatrix}
+\begin{bmatrix}u_2\\u_3\\u_4\\u_5\end{bmatrix} = 
+\begin{bmatrix}
+1\\1\\1\\(h/2+g)/h
+\end{bmatrix}
+\eeqa
+
+The central difference approximation to a second derivative is:
+
+\beq
+u''(x)\approx \frac{u_{i+1}-2u_i+u_{i-1}}{h^2}
+\eeq
+
+Looking at the equation for node 3, for instance, we can express this equation for \(i=3\) in terms of the values on either side (\(u_2=u_{i-1}\) and \(u_4=u_{i+1}\)):
+
+\beq
+\label{eq:4}
+-\frac{1}{h^2}\left(u_{i-1}-2u_i+u_{i+1}\right)=1
+\eeq
+
+Eq. \eqref{eq:4} is identical to central difference approximation of the original equation in Eq. \eqref{eq:1} - the second derivative is approximated as a central difference, while the right-hand-side reflects the (arbitrary) choice of setting \(f(x)=1\). The above equation holds for all nodes on the interior. 
 
 
 \end{document}
