@@ -93,14 +93,14 @@
 \setcounter{tocdepth}{4}
 \begin{document}
 
-\title{MATH 228b: HW2 ... 1, 2, 3, 4}
+\title{MATH 228b: HW2 ... 2bc, 3, 4}
 \author{April Novak}
 
 \maketitle
 
-\section{}
+\section{} 
 
-The solution of the following problem with linear Lagrange elements for \(u(0)=0\) and \(u^{'}(1)=g\) is equivalent to a second order central difference approximation of the problem. 
+The solution of the following problem with linear Lagrange elements for \(u(0)=0\) and \(u'(1)=g\) is equivalent to a second order central difference approximation of the problem. 
 
 \beq
 \label{eq:1}
@@ -113,19 +113,14 @@ The function space for the weight function \(v\) is in the space \(V_h\) such th
 V_h=\{v\in C^0([0,1]): v\rvert_K\in P_1(K) \forall K\in T_h, v(0)=0\}
 \eeq
 
-The weak form is obtained by multiplying Eq. \eqref{eq:1} by \(v\) and integrating over the domain:
+The weighted residual form is obtained by multiplying Eq. \eqref{eq:1} by \(v\) and integrating over the domain. The first term on the left-hand side can be rewritten using the divergence rule:
 
-\beq
--\int_0^1 u''(x)v(x)dx=\int_0^1 f(x)v(x)dx
-\eeq
+\beqa
+-\int_0^1 u''(x)v(x)dx=& \int_0^1 f(x)v(x)dx
+\int_0^1 u'(x)v'(x)dx-\left\lbrack u'(x)v(x)\right\rbrack_0^1=& \int_0^1 f(x)v(x)dx
+\eeqa
 
-The first term on the left-hand side can be rewritten using the divergence rule:
-
-\beq
-\int_0^1 u'(x)v'(x)dx-\left\lbrack u'(x)v(x)\right\rbrack_0^1=\int_0^1 f(x)v(x)dx
-\eeq
-
-At this point, the weak form contains no information about the boundary conditions. By applying the boundary conditions, the above reduces to:
+At this point, the weighted residual form has been reduced to the weak form. The weak form above contains no information about the boundary conditions. By applying the boundary conditions, the above reduces to:
 
 \beq
 \int_0^1 u'(x)v'(x)dx=\int_0^1 f(x)v(x)dx+gv(1)
@@ -141,7 +136,7 @@ Using a linear Lagrange basis, defined on a mesh with element sizes \(h\), the e
 And their derivatives with respect to \(x\) are:
 
 \beqa
-\psi_i'(x)=&\frac{-1}{h}\\
+\psi_i'(x)=&-\frac{1}{h}\\
 \psi_{i+1}'(x) =&\frac{1}{h}\\
 \eeqa
 
@@ -160,10 +155,10 @@ By inserting the shape functions given above, \(\textbf{A}^k\) becomes:
 										\int_{x_i}^{x_{i+1}}\frac{1}{h}\frac{-1}{h}dx &
 										\int_{x_i}^{x_{i+1}}\frac{1}{h}\frac{1}{h}dx
 					\end{bmatrix}\\
-			   =& \begin{bmatrix}	\frac{1}{h} & 
-										\frac{-1}{h}\\
-										\frac{-1}{h} &
-										\frac{1}{h}
+			   =& \begin{bmatrix}	1/h & 
+										-1/h\\
+										-1/h &
+										1/h
 					\end{bmatrix}
 \eeqa
 
@@ -257,8 +252,77 @@ Looking at the equation for node 3, for instance, we can express this equation f
 -\frac{1}{h^2}\left(u_{i-1}-2u_i+u_{i+1}\right)=1
 \eeq
 
-Eq. \eqref{eq:4} is identical to central difference approximation of the original equation in Eq. \eqref{eq:1} - the second derivative is approximated as a central difference, while the right-hand-side reflects the (arbitrary) choice of setting \(f(x)=1\). The above equation holds for all nodes on the interior. 
+Eq. \eqref{eq:4} is identical to central difference approximation of the original equation in Eq. \eqref{eq:1} - the second derivative is approximated as a central difference, while the right-hand-side reflects the (arbitrary) choice of setting \(f(x)=1\). The above equation holds for all nodes on the interior. The enforcement of the Neumann condition can also be seen analogous to a finite difference approximation. The equation for the node on the Neumann boundary (node 5, where \(i=5\)), is:
 
+\beq
+\frac{1}{h}(-u_{i-1}+u_i)=\frac{h}{2}+g
+\eeq
+
+It is clear to see that the above represents a forward Euler method, since the slope at node \(i\) depends only on the solution value at \(i-1\). The \(h/2\) appears from the tessellation of the element load vector in \textbf{f}, and hence if that part is neglected for the time begin, then the above is exactly equivalent to stating that:
+
+\beq
+u'(1)\approx\frac{u_5-u_4}{h}=g
+\eeq
+
+So, this shows that, for linear Lagrange elements in 1-D, the finite element method is equivalent to a central difference method on the interior nodes with an Euler method enforcing Neumann conditions on the boundaries.
+
+\section{}
+
+This question will solve the following boundary value problem on \(x\in[0,1]\):
+
+\beq
+u''''(x)=f(x)=480x-120
+\eeq
+
+with boundary conditions \(u(0)=u'(0)=u(1)=u'(1)=0\). 
+
+\subsection{}
+
+The Galerkin formulation seeks a solution \(u_h\) in the function space \(V_h\), which is the same function space as the weight function \(v(x)\):
+
+\beq
+V_h=\{v\in C^1([0,1]):v\rvert_K\in P_3(K) \forall K\in T_h, v(0)=v(1)=0=v'(0)=v'(1)\}
+\eeq
+
+The only requirement on the function space \(V_h\) is that it satisfy the homogeneous form of the Dirichlet conditions and the homogeneous form of the Neumann conditions (it is irrelevant that \(u(0)=u'(0)=u(1)=u'(1)\) all happen to equal zero). Note that this is only required if the basis functions have coefficients that are strongly imposed by the functions chosen - because Hermite shape functions specify a derivative at the boundaries, so then must the function space also specify a derivative there. On the other hand, if linear Lagrange elements were used, then it would be incorrect to require \(v'(0)=v'(1)=0\), even if \(u'(0)=u'(1)=0\), since imposing both Dirichlet and Neumann conditions on a shape function that does not have degrees of freedom related to derivatives would not necessarily lead to a piecewise-continuous solution over the entire domain. Multiplying the governing equation by a weight function \(v(x)\) and integrating over the domain:
+
+\beq
+\int_{0}^{1}u''''(x)v(x)dx=\int_{0}^{1}f(x)v(x)dx
+\eeq
+
+Integrating by parts once:
+
+\beq
+-\int_{0}^{1}u'''(x)v'(x)dx+\left\lbrack u'''(x)v(x)\right\rbrack_0^1=\int_{0}^{1}f(x)v(x)dx
+\eeq
+
+Integrating by parts a second time:
+
+\beq
+\int_{0}^{1}u''(x)v''(x)dx+\left\lbrack u'''(x)v(x)\right\rbrack_0^1-\left\lbrack u''(x)v'(x)\right\rbrack_0^1=\int_{0}^{1}f(x)v(x)dx
+\eeq
+
+Then, applying the boundary conditions:
+
+\beq
+\int_{0}^{1}u''(x)v''(x)dx=\int_{0}^{1}f(x)v(x)dx \quad\forall v\in V_h
+\eeq
+
+Now that differentiation has been modified to act equally on \(u\) and \(v\), the above represents the weak form. The above equation holds for both the true solution \(u\) and the finite element solution \(u_h\), and hence the above could also be written as follows, which matches that shown in this homework assignment:
+
+\beq
+\int_{0}^{1}u_h''(x)v''(x)dx=\int_{0}^{1}f(x)v(x)dx \quad\forall v\in V_h
+\eeq
+
+\subsection{}
+
+Over a particular element, the solution is specified as a summation of coefficients \(a\) multiplied by basis functions \(\varphi\), where \(N\) is the number of shape functions per element (which for linear Lagrange elements is equivalent to the number of nodes per element):
+
+\beq
+u_h^e(x)=\sum_{i=1}^{N}a_i\varphi_i(x)
+\eeq
+
+The number of nodes per element is equivalent to the number of degrees of freedom per element. The above expression uses an \(e\) in the superscript of \(u_h\) to refer to the fact that \(u_h^e\) is the solution only over a particular element \(e\) - we must find the solution over every element. Because the space is defined to contain cubic polynomials over each element, and because we must choose basis functions that allow us to specify derivatives at the nodes, the cubic Hermite shape functions are used. 
 
 \end{document}
 
