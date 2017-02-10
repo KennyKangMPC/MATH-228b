@@ -21,12 +21,12 @@ while max_area > max
     
     % triangulate the domain
     T = delaunayn(pv);
-    tplot(pv, T)
+    %tplot(pv, T)
     
     % find which triangles are outside the domain, then delete them from T
     [T] = delete_outside_triangles(T, pv, pv_orig);
-    tplot(pv, T)
-    hold on
+    %tplot(pv, T)
+    %hold on
     
     previous_refine = refine;
     
@@ -67,7 +67,7 @@ end
 
 % remove last triangulation (not needed since we just broke from loop)
 pv = pv(1:(end-1), :);
-tplot(pv, T)
+%tplot(pv, T)
 
 % perform uniform refinements
 for uf = 1:nref
@@ -90,8 +90,8 @@ for uf = 1:nref
     % find which triangles are outside the domain, then delete them from T
     [T] = delete_outside_triangles(T, pv, pv_orig);
     
-    tplot(pv, T)
-    hold on
+    %tplot(pv, T)
+    %hold on
 end
 
 p = pv;
