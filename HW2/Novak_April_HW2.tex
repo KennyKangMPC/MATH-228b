@@ -654,10 +654,12 @@ Then, noting that the dot product of two vectors can be written as \(\textbf{a}\
 where \textbf{v} has essentially been cancelled from every term (the above could be rearranged such that \textbf{v} acts on an integrand, where the entire term equals zero such that the integrand must therefore equal zero). The above is essentially equivalent to the 1-D form, where \textbf{B} would reduce to \(d\psi_i/dx\) and \textbf{N} to \(\psi_i\). The elemental stiffness matrix and elemental load vector are:
 
 \beq
+\label{eq:20}
 \textbf{A}^k=\int_{\Omega_k} \textbf{B}^T\textbf{B}d\Omega
 \eeq
 
 \beq
+\label{eq:21}
 \textbf{F}^k=\int_{\Omega_k} \textbf{N}d\Omega
 \eeq
 
@@ -668,12 +670,81 @@ In order to apply over an individual element, the shape functions that appear in
 \begin{bmatrix}a\\ b\\ c\end{bmatrix}=\begin{bmatrix}1\\ 0\\ 0\end{bmatrix};\ \begin{bmatrix}0\\ 1\\ 0\end{bmatrix};\ \begin{bmatrix}0\\ 0\\ 1\end{bmatrix}
 \eeq
 
-where \(x_i, y_i\) is the \(i\) coordinate of the triangle, for \(i=1, 2, 3\).
+where \(x_i, y_i\) is the \(i\) coordinate of the triangle, for \(i=1, 2, 3\). Performing this for every triangle individually is tedious, and likewise determining the appropriate bounds of integration for each triangle is problematic and difficult when only the coordinate points are known. To overcome this, a mapping is performed from a master triangle with corners at \((0,0), (1,0), (0,1)\) in a coordinate system defined in terms of variables \(\xi\) and \(\eta\). The shape functions in this master domain will therefore be the same over each element in the physical domain, and the only thing that differs for each element is the Jacobian of the transformation. With \((x_1=0, y_1=0, (x_2=1, y_2=0), (x_3=0,y_3=1)\), the shape functions in the master domain are:
 
+\beqa
+\psi_1(\xi,\eta)=&1-\xi-\eta\\
+\psi_2(\xi,\eta)=&\xi\\
+\psi_3(\xi,\eta)=&\eta\\
+\eeqa
 
+The mapping from the master to physical domain is performed using an isoparametric mapping that relates the physical coordinates \((X_i,Y_i)\) to the master domain coordinates \((\xi,\eta)\)
 
+\beqa
+x(\xi,\eta)=&\sum_{i=1}^{n_{en}}X_i\psi_i(\xi,\eta)\\
+y(\xi,\eta)=&\sum_{i=1}^{n_{en}}Y_i\psi_i(\xi,\eta)\\
+\eeqa
 
+To transform the integrals appearing in Eq. \eqref{eq:20} and \eqref{eq:21} to integrals over the master domain requires the use of the derivatives with respect to \(\xi\) and \(\eta\), rather than with respect to \(x\) and \(y\). The domain of integration changes according to:
 
+\beqa
+d\vv{x}=&\textbf{D}d\vv{\xi}\\
+\begin{bmatrix}dx\\dy\end{bmatrix}=&
+\begin{bmatrix}dx/d\xi & dx/d\eta\\ dy/d\xi & dy/d\eta\end{bmatrix}
+\begin{bmatrix}d\xi\\d\eta\end{bmatrix}
+\eeqa
+
+where \textbf{D} is the transformation matrix that describes how the coordinate transformation is performed. The derivatives appearing in \textbf{D} are computed based on the definitions of the isoparametric mapping:
+
+\beqa
+\frac{dx(\xi,\eta)}{d\xi}=&\sum_{i=1}^{n_{en}}X_i\frac{d\psi_i(\xi,\eta)}{d\xi}\\
+\frac{dx(\xi,\eta)}{d\eta}=&\sum_{i=1}^{n_{en}}X_i\frac{d\psi_i(\xi,\eta)}{d\eta}\\
+\frac{dy(\xi,\eta)}{d\xi}=&\sum_{i=1}^{n_{en}}Y_i\frac{d\psi_i(\xi,\eta)}{d\xi}\\
+\frac{dy(\xi,\eta)}{d\eta}=&\sum_{i=1}^{n_{en}}Y_i\frac{d\psi_i(\xi,\eta)}{d\eta}\\
+\eeqa
+
+With these definitions, the local stiffness matrix and local load vector transform to integrals over \(\xi, \eta\):
+
+\beq
+\label{eq:20}
+\textbf{A}^k=\int_{0}^{1} \int_{0}^{1-\xi}(\textbf{D}^{-1}\textbf{C})^T(\textbf{D}^{-1}\textbf{C})|\textbf{D}| d\eta d\xi
+\eeq
+
+\beq
+\label{eq:21}
+\textbf{F}^k=\int_{0}^{1} \int_{0}^{1-\xi}\textbf{N}|\textbf{D}| d\eta d\xi
+\eeq
+
+where \textbf{C} is the same as \textbf{B}, except that derivatives are taken with respect to \(\xi\) and \(\eta\) instead of \(x\) and \(y\):
+
+\beq
+\textbf{C}=\begin{bmatrix}
+\frac{\partial\psi_1}{d\xi} & \frac{\partial\psi_2}{d\xi} & \cdots & \frac{\partial\psi_{n_en}}{d\xi}\\
+\frac{\partial\psi_1}{d\eta} & \frac{\partial\psi_2}{d\eta} & \cdots & \frac{\partial\psi_{n_en}}{d\eta}\\
+\end{bmatrix}
+\eeq
+
+Note that the integrals in Eq. \eqref{eq:20} and \eqref{eq:21} are no longer over the domain of an element in the physical domain - they are over a triangle in the master domain. To allow easy calculation of these integrals without the need to use symbolic integration or the need to hard-code in the integrals given that all of the shape functions are linear in \(x\) and \(y\) (to permit faster extension to higher-order elements), quadrature rules are used to numerically evaluate the integrals above. A second motivation to using the transformation to the master domain is the ability to use the same quadrature rule over every element. Quadrature rules for the standard triangle defined with corners at \((0,0), (1,0), (0,1)\) are attempting to determine the weights \(w_i\) and quadrature points \(\xi_i,\eta_i\) so that the following summation is as accurate as possible for a polynomial of some given order:
+
+\beq
+\int_{0}^{1} \int_{0}^{1-\xi}f(\xi,\eta)d\eta d\xi\approx\sum_{i=1}^{n_{qp}}w_if(\xi_i,\eta_i)
+\eeq
+
+For \(n_{qp}=1\), the following one-point rule exactly integrates linear integrands:
+
+\beqa
+w=&[1/2]\\
+(\xi_i,\eta_i)=&[1/3, 1/3]
+\eeqa
+
+For \(n_{qp}=3\), the following one-point rule exactly integrates quadratic integrands:
+
+\beqa
+w=&[1/6; 1/6; 1/6]\\
+(\xi_i,\eta_i)=&[1/6, 1/6; 2/3, 1/6; 1/6, 2/3]
+\eeqa
+
+Because the highest order expected in the integrands for this problem occurs in \textbf{F}, which has an integrand that is at most order 1, the one-point quadrature rule is used. 
 
 
 

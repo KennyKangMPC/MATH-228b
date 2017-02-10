@@ -1,6 +1,7 @@
 clear all
 
 num_nodes_per_elem = 3;         % linear triangular elements
+qp_order = 1;                   % order of the quadrature rule
 
 % form the permutation matrix for assembling the global matrices
 [permutation] = permutation(num_nodes_per_elem);
@@ -9,20 +10,20 @@ num_nodes_per_elem = 3;         % linear triangular elements
 % t represents the Location Matrix (LM)
 
 % case 1
-% pv = [0,0; 1,0; 1,1; 0,1; 0,0]; hmax = 0.15;
-% [p, LM, e] = pmesh(pv, hmax, 0);
-% dirichlet_nodes(1,:) = e(p(e,1) < 1e-6 | p(e,2) < 1e-6);
+pv = [0,0; 1,0; 1,1; 0,1; 0,0]; hmax = 0.15;
+[p, LM, e] = pmesh(pv, hmax, 0);
+dirichlet_nodes(1,:) = e(p(e,1) < 1e-6 | p(e,2) < 1e-6);
 
 % case 2
-n = 32; phi = 2*pi*(0:n)'/n; hmax = 2*pi/n;
-pv = [cos(phi), sin(phi)];
-[p, LM, e] = pmesh(pv, hmax, 0);
-dirichlet_nodes(1,:) = e;
+% n = 32; phi = 2*pi*(0:n)'/n; hmax = 2*pi/n;
+% pv = [cos(phi), sin(phi)];
+% [p, LM, e] = pmesh(pv, hmax, 0);
+% dirichlet_nodes(1,:) = e;
 
 % % case 3
-% x = (0:0.1:1)'; y = 0.1 * cos(10*pi*x);
+% x = (0:0.1:1)'; y = 0.1 * cos(10*pi*x); hmax = 0.04;
 % pv = [x, y; 0.5, 0.6; 0, 0.1];
-% [p, LM, e] = pmesh(pv, 0.04, 0);
+% [p, LM, e] = pmesh(pv, hmax, 0);
 % dirichlet_nodes(1,:) = e(p(e,2) > 0.6 - abs(p(e,1) - 0.5) - 1e-6);
 
 num_elem = length(LM(:,1)); 
@@ -33,7 +34,7 @@ a_k = dirichlet_nodes(2,:);
 num_nodes = length(p(:,1));
 
 % define the quadrature rule
-[wt, qp] = quadrature(num_nodes_per_elem);
+[wt, qp] = quadrature(qp_order);
 
 % assemble the elemental k and elemental f
 K = zeros(num_nodes);
