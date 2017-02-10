@@ -8,9 +8,12 @@ function [p, t, e] = pmesh(pv, hmax, nref)
 pv_orig = pv(1:end-1, :);
 [pv] = initial_mesh(pv, hmax, pv_orig);
 
+tol = 1e-18;
 
 max = hmax^2 / 2;
 max_area = max + 1; % dummy initial value
+refine = 0;         % dummy initial value
+flag = 0;           
 while max_area > max
     % find which points are outside the domain, then delete them
     pv = unique(pv, 'rows');
@@ -18,12 +21,14 @@ while max_area > max
     
     % triangulate the domain
     T = delaunayn(pv);
-    %tplot(pv, T)
+    tplot(pv, T)
     
     % find which triangles are outside the domain, then delete them from T
     [T] = delete_outside_triangles(T, pv, pv_orig);
-    %tplot(pv, T)
-    %hold on
+    tplot(pv, T)
+    hold on
+    
+    previous_refine = refine;
     
     % compute triangle areas using Heron's formula
     for i = 1:length(T(:,1))
@@ -40,18 +45,29 @@ while max_area > max
             refine = i;
         end
     end
+    
+    new_refine = refine;
+    if (previous_refine == new_refine)
+        flag = flag + 1;
+        
+        if flag == 100
+            disp('Tried to refine the same triangle 100 times')
+            tol = tol * 10.0;
+            flag = 0;
+        end
+    end
 
     A = [pv(T(refine, 1), 1), pv(T(refine, 1), 2)];
     B = [pv(T(refine, 2), 1), pv(T(refine, 2), 2)];
     C = [pv(T(refine, 3), 1), pv(T(refine, 3), 2)];
     
-    [pt] = circumcenter(A, B, C, pv);
+    [pt] = circumcenter(A, B, C, pv, tol);
     pv = [pv; pt];
 end
 
 % remove last triangulation (not needed since we just broke from loop)
 pv = pv(1:(end-1), :);
-%tplot(pv, T)
+tplot(pv, T)
 
 % perform uniform refinements
 for uf = 1:nref
@@ -74,13 +90,13 @@ for uf = 1:nref
     % find which triangles are outside the domain, then delete them from T
     [T] = delete_outside_triangles(T, pv, pv_orig);
     
-    %tplot(pv, T)
-    %hold on
+    tplot(pv, T)
+    hold on
 end
 
 p = pv;
 t = T;
 e = boundary_nodes(T);
-
+sprintf('Finished meshing...')
 end
 

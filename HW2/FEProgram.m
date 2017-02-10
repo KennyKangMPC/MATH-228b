@@ -7,24 +7,28 @@ qp_order = 1;                   % order of the quadrature rule
 [permutation] = permutation(num_nodes_per_elem);
 
 % perform meshing using unstructured triangles
-% t represents the Location Matrix (LM)
+% t represents the Location Matrix (LM) - put in desired case number
 
-% case 1
-% pv = [0,0; 1,0; 1,1; 0,1; 0,0]; hmax = 0.15;
-% [p, LM, e] = pmesh(pv, hmax, 0);
-% dirichlet_nodes(1,:) = e(p(e,1) < 1e-6 | p(e,2) < 1e-6);
+test_case = 1;
 
-% case 2
-% n = 32; phi = 2*pi*(0:n)'/n; hmax = 2*pi/n;
-% pv = [cos(phi), sin(phi)];
-% [p, LM, e] = pmesh(pv, hmax, 0);
-% dirichlet_nodes(1,:) = e;
-
-% % case 3
-x = (0:0.1:1)'; y = 0.1 * cos(10*pi*x); hmax = 0.1;
-pv = [x, y; 0.5, 0.6; 0, 0.1];
-[p, LM, e] = pmesh(pv, hmax, 0);
-dirichlet_nodes(1,:) = e(p(e,2) > 0.6 - abs(p(e,1) - 0.5) - 1e-6);
+switch(test_case)
+    case 1
+        pv = [0,0; 1,0; 1,1; 0,1; 0,0]; hmax = 0.15;
+        [p, LM, e] = pmesh(pv, hmax, 0);
+        dirichlet_nodes(1,:) = e(p(e,1) < 1e-6 | p(e,2) < 1e-6);
+    case 2
+        n = 32; phi = 2*pi*(0:n)'/n; hmax = 2*pi/n;
+        pv = [cos(phi), sin(phi)];
+        [p, LM, e] = pmesh(pv, hmax, 0);
+        dirichlet_nodes(1,:) = e;
+    case 3
+        x = (0:0.1:1)'; y = 0.1 * cos(10*pi*x); hmax = 0.1;
+        pv = [x, y; 0.5, 0.6; 0, 0.1];
+        [p, LM, e] = pmesh(pv, hmax, 0);
+        dirichlet_nodes(1,:) = e(p(e,2) > 0.6 - abs(p(e,1) - 0.5) - 1e-6);
+    otherwise
+        disp('Select an appropriate case number to run!')
+end
 
 num_elem = length(LM(:,1)); 
 
@@ -95,6 +99,3 @@ for a_row = 1:num_nodes
 end
 
 tplot(p, LM, a)
-
-
-
