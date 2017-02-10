@@ -8,7 +8,6 @@ LM = t;
 dirichlet_nodes(1,:) = e;
 
 num_nodes_per_elem = 3;         % linear triangular elements
-qp_order = 1;                   % order of the quadrature rule
 
 % form the permutation matrix for assembling the global matrices
 [perm] = permutation(num_nodes_per_elem);
@@ -21,7 +20,8 @@ a_k = dirichlet_nodes(2,:);
 num_nodes = length(p(:,1));
 
 % define the quadrature rule
-[wt, qp] = quadrature(qp_order);
+wt = [0.5];
+qp = [1/6];
 
 % assemble the elemental k and elemental f
 K = zeros(num_nodes);

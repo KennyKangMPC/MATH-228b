@@ -801,13 +801,34 @@ In addition, Fig. \ref{fig:10} shows the solution for a user-defined polygon.
 \label{fig:10}
 \end{figure}
 
+All of the code developed for this section is shown in the Appendix. Not shown are the meshing files developed from the previous homework, since they are largely the same and are still included in the zip file.
+
 \section{Appendix}
 
-\subsection{Code, Question 2}
+\subsection{Codge, Question 2}
 
 This Python script was used to determine the appropriate Hermite polynomials and the elemental stiffness matrix and elemental load vectors. Because the matrix system reduced to a simple \(2\times 2\) system, the actual solution was performed by hand.
 
 \lstinputlisting[language=Python]{q2.py}
 
+\subsection{Code, Question 3}
+
+Not shown in this document are the meshing files that were submitted with the previous assignment. They are still submitted with this assignment, but there is no reason to include them again.
+
+\subsubsection{\tt fempoi.m}
+This function implements the solution of the Poisson equation on an unstructured triangular mesh. 
+\lstinputlisting[language=Matlab]{fempoi.m}
+
+\subsubsection{\tt condensation.m}
+This function performs static condensation by removing the Dirichlet nodes from the solution so that the correct matrix system can be solved.
+\lstinputlisting[language=Matlab]{condensation.m}
+
+\subsubsection{\tt permutation.m}
+This function permutes the numbers \(i=1, 2, \cdots, n_{en}\) to be used in filling in the global matrix and vector by the local element matrices and vectors.
+\lstinputlisting[language=Matlab]{permutation.m}
+
+\subsubsection{\tt shapefunctions.m}
+This function defines the shape functions, \textbf{B}, and other parameters used within the local element matrices and vectors.
+\lstinputlisting[language=Matlab]{shapefunctions.m}
 
 \end{document}
