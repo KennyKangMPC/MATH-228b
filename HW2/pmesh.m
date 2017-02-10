@@ -5,11 +5,12 @@ function [p, t, e] = pmesh(pv, hmax, nref)
 % p, the triangle indices t, and the indices of the boundary points e.
 
 % place points on the domain boundaries according to hmax
-[new_pts] = initial_mesh(pv, hmax);
+pv_orig = pv(1:end-1, :);
+[pv] = initial_mesh(pv, hmax, pv_orig);
 
 % assemble all of the starting node points
-pv_orig = pv(1:end-1, :);
-pv = [pv_orig; new_pts; 2,2];
+%pv_orig = pv(1:end-1, :);
+%pv = [pv_orig; new_pts];
 
 max = hmax^2 / 2;
 max_area = max + 1; % dummy initial value

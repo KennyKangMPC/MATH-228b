@@ -1,8 +1,9 @@
-function [new_pts] = initial_mesh(pv, hmax)
+function [pv] = initial_mesh(pv, hmax, pv_orig)
 % place points on the domain boundaries according to hmax
 
 k = 1;
 l = 1;
+new_pts = [];
 
 for i = 1:(size(pv(:,1)) - 1)
     p = 1;
@@ -51,5 +52,12 @@ for i = 1:(size(pv(:,1)) - 1)
     end
     l = l + 1;
 end
+
+if(isempty(new_pts))
+    pv = pv(1:end-1, :);
+else
+    pv = [pv_orig; new_pts];
+end
+
 end
 
