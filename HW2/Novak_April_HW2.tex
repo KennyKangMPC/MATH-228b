@@ -579,6 +579,104 @@ Fig. \ref{fig:2} shows a comparison between the analytical solution above and th
 \label{fig:2}
 \end{figure}
 
+\section{}
+
+This question solves the Poisson equation on an unstructured, triangular grid, subject to homogeneous Dirichlet and Neumann boundary conditions:
+
+\beqa
+-\nabla^2u(x,y)=1\\
+u\rvert_{\Gamma_d}=0,\quad \hat{n}\cdot\nabla u\rvert_{\Gamma_t}=0\\
+\eeqa
+
+where \(\Gamma_d\) indicates the Dirichlet portion of the boundary and \(\Gamma_t\) the Neumann portion of the boundary, and \(\Gamma_d\cup\Gamma_t=\Gamma\). The weighted residual form is obtained by multiplying the above by a weight function \(v\):
+
+\beq
+-\int_\Omega \nabla^2u(x,y)v(x,y)d\Omega=\int_\Omega v(x,y)d\Omega
+\eeq
+
+The weak form is obtained by integrating by parts:
+
+\beq
+\int_\Omega \nabla u(x,y)\cdot\nabla v(x,y)d\Omega-\int_\Gamma\hat{n}\cdot\nabla u(x,y)v(x,y)d\Gamma=\int_\Omega v(x,y)d\Omega
+\eeq
+
+Homogeneous Neumann conditions allow the boundary term above to simply be dropped, since \(\hat{n}\cdot\nabla u(x,y)=0\) on \(\Gamma_t\) and the weight function \(v(x,y)\) satisfies the homogeneous form of the essential boundary conditions on the essential boundaries such that \(v(x,y)=0\) for all remaining parts of the boundary (since \(\Gamma_d\cap\Gamma_t=\emptyset\)). After removing this term, the following represents the weak form for the problem, where processing of the global stiffness matrix and global load vector are required to ensure that the solution obtains the specified values on the Dirichlet boundaries.
+
+\beq
+\int_\Omega \nabla u(x,y)\cdot\nabla v(x,y)d\Omega=\int_\Omega v(x,y)d\Omega
+\eeq
+
+\(u\) is approximated as \(u_h\) by expanding it in a series of basis functions \(\psi\):
+
+\beq
+u_h=\sum_{i=1}^{N}a_j\psi_j(x,y)
+\eeq
+
+where \(N\) is the total number of basis functions, which for Lagrange elements is equivalent to the number of nodes in the domain. Instead of defining basis functions that exist over the entire domain, to improve the sparsity of the matrices involved, expand \(u_h\) in \(n_{en}\) basis functions over each finite element, where \(n_{en}\) are the number of nodes per element. 
+
+\beq
+u_h^k=\sum_{i=1}^{n_{en}}a_j\psi_j(x,y)=\textbf{N}\textbf{u}
+\eeq
+
+The right-hand side can be represented as two vectors, one containing the shape functions, and the other containing the expansion coefficients. 
+
+\beq
+\textbf{N}=\begin{bmatrix} \psi_1(x,y) & \psi_2(x,y) & \cdots & \psi_{n_{en}}\end{bmatrix}
+\eeq
+
+\beq
+\textbf{u}=\begin{bmatrix} a_1 & a_2 & \cdots & a_{n_{en}}\end{bmatrix}^T
+\eeq
+
+Likewise, the weight function \(v\) can also be expanded in the same manner, but with different expansion coefficients \textbf{b}. The gradient of \(u_h\) is defined as:
+
+\beq
+\nabla u_h=\frac{\partial u_h}{\partial x}\hat{x}+\frac{\partial u_h}{\partial y}\hat{y}=\textbf{B}\textbf{u}
+\eeq
+
+where \textbf{B} is a deformation matrix that acts on the solution \textbf{u} to produce the effect of the gradient. 
+
+\beq
+\textbf{B}=\begin{bmatrix}
+\frac{\partial\psi_1}{dx} & \frac{\partial\psi_2}{dx} & \cdots & \frac{\partial\psi_{n_en}}{dx}\\
+\frac{\partial\psi_1}{dy} & \frac{\partial\psi_2}{dy} & \cdots & \frac{\partial\psi_{n_en}}{dy}\\
+\end{bmatrix}
+\eeq
+
+Then, noting that the dot product of two vectors can be written as \(\textbf{a}\cdot\textbf{b}=\textbf{a}^T\textbf{b}\), the weak form becomes:
+
+\beqa
+\int_\Omega (\textbf{B}\textbf{u})^T(\textbf{B}\textbf{v})d\Omega=&\int_\Omega \textbf{N}\textbf{v}d\Omega\\
+\int_\Omega \textbf{B}^T\textbf{u}^T(\textbf{B}\textbf{v})d\Omega=&\int_\Omega \textbf{N}\textbf{v}d\Omega\\
+\int_\Omega \textbf{B}^T\textbf{u}\textbf{B}d\Omega=&\int_\Omega \textbf{N}d\Omega\\
+\eeqa
+
+where \textbf{v} has essentially been cancelled from every term (the above could be rearranged such that \textbf{v} acts on an integrand, where the entire term equals zero such that the integrand must therefore equal zero). The above is essentially equivalent to the 1-D form, where \textbf{B} would reduce to \(d\psi_i/dx\) and \textbf{N} to \(\psi_i\). The elemental stiffness matrix and elemental load vector are:
+
+\beq
+\textbf{A}^k=\int_{\Omega_k} \textbf{B}^T\textbf{B}d\Omega
+\eeq
+
+\beq
+\textbf{F}^k=\int_{\Omega_k} \textbf{N}d\Omega
+\eeq
+
+In order to apply over an individual element, the shape functions that appear in \textbf{B} and \textbf{N} must be the shape functions over that particular element. This can be achieved either by determining the shape functions over each element in the physical domain (in which case the shape functions are different for every element) or by using isoparametric elements that are mapped from a master domain, where the integrals above are always the same, and then modify the above terms with a Jacobian of the transformation. If these shape functions are determined individually for each element, they would be determined by solving the following system for the three different right-hand sides shown below to give the coefficients \(a, b, c\) for each of the three shape functions (assuming triangular elements for this problem):
+
+\beq
+\begin{bmatrix} x_1 & y_1 & 1\\x_2 & y_2 & 1\\x_3 & y_3 & 1\end{bmatrix}
+\begin{bmatrix}a\\ b\\ c\end{bmatrix}=\begin{bmatrix}1\\ 0\\ 0\end{bmatrix};\ \begin{bmatrix}0\\ 1\\ 0\end{bmatrix};\ \begin{bmatrix}0\\ 0\\ 1\end{bmatrix}
+\eeq
+
+where \(x_i, y_i\) is the \(i\) coordinate of the triangle, for \(i=1, 2, 3\).
+
+
+
+
+
+
+
+
 \section{Appendix}
 
 \subsection{Code, Question 2}
