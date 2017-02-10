@@ -78,8 +78,6 @@ for a_row = 1:num_nodes
 end
 
 tplot(p, LM, a)
-% % assemble the solution in the physical domain
-% [mat] = postprocess(num_elem, parent_domain, a, LM, num_nodes_per_elem, shape_order, coordinates, physical_domain);
 
 
 
