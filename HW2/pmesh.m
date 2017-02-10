@@ -8,9 +8,6 @@ function [p, t, e] = pmesh(pv, hmax, nref)
 pv_orig = pv(1:end-1, :);
 [pv] = initial_mesh(pv, hmax, pv_orig);
 
-% assemble all of the starting node points
-%pv_orig = pv(1:end-1, :);
-%pv = [pv_orig; new_pts];
 
 max = hmax^2 / 2;
 max_area = max + 1; % dummy initial value
@@ -21,10 +18,12 @@ while max_area > max
     
     % triangulate the domain
     T = delaunayn(pv);
-
+    %tplot(pv, T)
+    
     % find which triangles are outside the domain, then delete them from T
     [T] = delete_outside_triangles(T, pv, pv_orig);
     %tplot(pv, T)
+    %hold on
     
     % compute triangle areas using Heron's formula
     for i = 1:length(T(:,1))
@@ -39,7 +38,7 @@ while max_area > max
         if area(i) > max_area
             max_area = area(i);
             refine = i;
-        end 
+        end
     end
 
     A = [pv(T(refine, 1), 1), pv(T(refine, 1), 2)];

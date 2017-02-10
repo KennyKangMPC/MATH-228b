@@ -10,9 +10,9 @@ qp_order = 1;                   % order of the quadrature rule
 % t represents the Location Matrix (LM)
 
 % case 1
-pv = [0,0; 1,0; 1,1; 0,1; 0,0]; hmax = 0.15;
-[p, LM, e] = pmesh(pv, hmax, 0);
-dirichlet_nodes(1,:) = e(p(e,1) < 1e-6 | p(e,2) < 1e-6);
+% pv = [0,0; 1,0; 1,1; 0,1; 0,0]; hmax = 0.15;
+% [p, LM, e] = pmesh(pv, hmax, 0);
+% dirichlet_nodes(1,:) = e(p(e,1) < 1e-6 | p(e,2) < 1e-6);
 
 % case 2
 % n = 32; phi = 2*pi*(0:n)'/n; hmax = 2*pi/n;
@@ -21,10 +21,10 @@ dirichlet_nodes(1,:) = e(p(e,1) < 1e-6 | p(e,2) < 1e-6);
 % dirichlet_nodes(1,:) = e;
 
 % % case 3
-% x = (0:0.1:1)'; y = 0.1 * cos(10*pi*x); hmax = 0.04;
-% pv = [x, y; 0.5, 0.6; 0, 0.1];
-% [p, LM, e] = pmesh(pv, hmax, 0);
-% dirichlet_nodes(1,:) = e(p(e,2) > 0.6 - abs(p(e,1) - 0.5) - 1e-6);
+x = (0:0.1:1)'; y = 0.1 * cos(10*pi*x); hmax = 0.1;
+pv = [x, y; 0.5, 0.6; 0, 0.1];
+[p, LM, e] = pmesh(pv, hmax, 0);
+dirichlet_nodes(1,:) = e(p(e,2) > 0.6 - abs(p(e,1) - 0.5) - 1e-6);
 
 num_elem = length(LM(:,1)); 
 
