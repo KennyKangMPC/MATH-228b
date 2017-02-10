@@ -8,7 +8,7 @@ function [p, t, e] = pmesh(pv, hmax, nref)
 pv_orig = pv(1:end-1, :);
 [pv] = initial_mesh(pv, hmax, pv_orig);
 
-tol = 1e-18;
+tol = 1e-20;
 
 max = hmax^2 / 2;
 max_area = max + 1; % dummy initial value

@@ -9,7 +9,7 @@ qp_order = 1;                   % order of the quadrature rule
 % perform meshing using unstructured triangles
 % t represents the Location Matrix (LM) - put in desired case number
 
-test_case = 1;
+test_case = 3;
 
 switch(test_case)
     case 1
@@ -26,6 +26,10 @@ switch(test_case)
         pv = [x, y; 0.5, 0.6; 0, 0.1];
         [p, LM, e] = pmesh(pv, hmax, 0);
         dirichlet_nodes(1,:) = e(p(e,2) > 0.6 - abs(p(e,1) - 0.5) - 1e-6);
+    case 4
+        pv = [1,0; 2,0; 3,1; 3,2; 2,3; 1,3; 0,2; 0,1; 1,0]; hmax = 0.25;
+        [p, LM, e] = pmesh(pv, hmax, 0);
+        dirichlet_nodes(1,:) = e;
     otherwise
         disp('Select an appropriate case number to run!')
 end
