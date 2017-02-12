@@ -788,7 +788,7 @@ where \(x_k=\textbf{0}\) because all of the essential boundary conditions are ho
                 \includegraphics[width=\textwidth]{case3.png}
                 \caption{Case 3}
         \end{subfigure}%
-        \caption{Finite element solutions \(u_h\) for theg three geometries provided in the assignment.}
+        \caption{Finite element solutions \(u_h\) for the three geometries provided in the assignment.}
         \label{fig:5}
 \end{figure}
 
@@ -805,10 +805,74 @@ All of the code developed for this section is shown in the Appendix. Not shown a
 
 \section{}
 
+This problem investigates the convergence properties of the finite element method for linear triangular elements. By solving the same problem with a finer and finer mesh, with the exact solution assumed approximated very well by the finest mesh, the error of each solution with respect to the true solution can be estimated as a function of the mesh refinement. The finer the mesh, the more accurate the solution (as expected due to the higher number of degrees of freedom to capture the behavior), and this investigation will show just how much more accurate the solution is for each successive mesh refinement. This is important knowledge if the tradeoff between more accurate results and longer computation times is a significant factor. 
+
+Fig. \ref{fig:30} and \ref{fig:31} shows the solutions obtained for various levels of refinement for the two problem domains specified. 
+
+\begin{figure}[H]
+        \centering
+        \begin{subfigure}[b]{0.45\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{square0.png}
+                \caption{\(n_{ref}=0\)}
+        \end{subfigure}%
+        \begin{subfigure}[b]{0.45\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{square1.png}
+                \caption{\(n_{ref}=1\)}
+        \end{subfigure}\\
+        \begin{subfigure}[b]{0.45\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{square2.png}
+                \caption{\(n_{ref}=2\)}
+        \end{subfigure}%
+                \begin{subfigure}[b]{0.45\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{square3.png}
+                \caption{\(n_{ref}=3\)}
+        \end{subfigure}%
+        \caption{Finite element solutions \(u_h\) for the square geometry provided in the assignment.}
+        \label{fig:30}
+\end{figure}
+
+\begin{figure}[H]
+        \centering
+        \begin{subfigure}[b]{0.45\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{poly0.png}
+                \caption{\(n_{ref}=0\)}
+        \end{subfigure}%
+        \begin{subfigure}[b]{0.45\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{poly1.png}
+                \caption{\(n_{ref}=1\)}
+        \end{subfigure}\\
+        \begin{subfigure}[b]{0.45\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{poly2.png}
+                \caption{\(n_{ref}=2\)}
+        \end{subfigure}%
+                \begin{subfigure}[b]{0.45\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{poly3.png}
+                \caption{\(n_{ref}=3\)}
+        \end{subfigure}%
+        \caption{Finite element solutions \(u_h\) for the polygon geometry provided in the assignment.}
+        \label{fig:31}
+\end{figure}
+
+The error in each solution is computed as the maximum norm of the errors at the nodes - a loop circulates through all the nodes of the most refined mesh and determines which nodes are shared by the coarser meshes. The maximum norm is defined as the maximum of the absolute difference between the solution values at all the nodes. This error is plotted below for the square and polygon meshes. The slope of these lines on the log-log coordinates below is 3.4976 for the square domain and 3.358 for the polygon domain. This can be interpreted in the following manner - by halving the mesh spacing (as is achieved through a single uniform refinement), the error decreases by a factor of about 3.35 - 3.5. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.75\textwidth]{convergence.png}
+\caption{Error as a function of the mesh spacing for (a) the square domain and (b) the polygon domain.}
+\label{fig:10}
+\end{figure}
 
 \section{Appendix}
 
-\subsection{Codge, Question 2}
+\subsection{Code, Question 2}
 
 This Python script was used to determine the appropriate Hermite polynomials and the elemental stiffness matrix and elemental load vectors. Because the matrix system reduced to a simple \(2\times 2\) system, the actual solution was performed by hand.
 
@@ -833,5 +897,8 @@ This function permutes the numbers \(i=1, 2, \cdots, n_{en}\) to be used in fill
 \subsubsection{\tt shapefunctions.m}
 This function defines the shape functions, \textbf{B}, and other parameters used within the local element matrices and vectors.
 \lstinputlisting[language=Matlab]{shapefunctions.m}
+
+
+
 
 \end{document}
