@@ -1,13 +1,7 @@
-clear all
-pv = [0,0; 1,0; 1,1; 0,1; 0,0];
-%pv = [0,0; 1,0; 0.5,0.5; 1,1; 0,1; 0,0];
-hmax = 0.15;
-nrefmax = 3;
+function [errors] = poiconv(pv, hmax, nrefmax)
+
 errors = zeros(1, nrefmax);
-
 tol = 1e-10;
-l = 1;
-
 
 % compute the reference solution
 [p_ref, t, e] = pmesh(pv, hmax, nrefmax);
@@ -41,8 +35,5 @@ for nref = 0:(nrefmax - 1)
     errors(nref + 1) = max(error);
 end
 
-loglog(hmax ./ 2.^ (0:2), errors, '*-')
-rate = log2(errors(end - 1) - log2(errors(end)));
+end
 
-xlabel('log(h/2)')
-ylabel('Max-norm Error of Nodes')
