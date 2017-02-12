@@ -93,7 +93,7 @@
 \setcounter{tocdepth}{4}
 \begin{document}
 
-\title{MATH 228b: HW2 ... 4}
+\title{MATH 228b: HW2}
 \author{April Novak}
 
 \maketitle
@@ -899,6 +899,10 @@ This function defines the shape functions, \textbf{B}, and other parameters used
 \lstinputlisting[language=Matlab]{shapefunctions.m}
 
 
+\subsection{Code, Question 4}
 
+\subsubsection{\tt poiconv.m}
+This function solves a finite element problem for multiple uniform refinement levels and estimates the error as the max-norm of the error at all of the shared nodes between the current refinement level and the maximum refinement level.
+\lstinputlisting[language=Matlab]{poiconv.m}
 
 \end{document}
