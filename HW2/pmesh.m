@@ -1,102 +1,66 @@
-function [p, t, e] = pmesh(pv, hmax, nref)
-% Uses Delaunay triangulation and refinement to mesh a polygon with
-% vertices pv, maximum element side length hmax, and number of uniform
-% refinements nref. The return values of this function are the node points
-% p, the triangle indices t, and the indices of the boundary points e.
+function [p,t,e] = pmesh(pv, hmax, nref)
+%PMESH  Delaunay refinement mesh generator.
 
-% place points on the domain boundaries according to hmax
-pv_orig = pv(1:end-1, :);
-[pv] = initial_mesh(pv, hmax, pv_orig);
+% UC Berkeley Math 228B, Per-Olof Persson <persson@berkeley.edu>
 
-tol = 1e-20;
-
-max = hmax^2 / 2;
-max_area = max + 1; % dummy initial value
-refine = 0;         % dummy initial value
-flag = 0;           
-while max_area > max
-    % find which points are outside the domain, then delete them
-    pv = unique(pv, 'rows');
-    [pv] = delete_outside(pv, pv_orig);
-    
-    % triangulate the domain
-    T = delaunayn(pv);
-    %tplot(pv, T)
-    
-    % find which triangles are outside the domain, then delete them from T
-    [T] = delete_outside_triangles(T, pv, pv_orig);
-    %tplot(pv, T)
-    %hold on
-    
-    previous_refine = refine;
-    
-    % compute triangle areas using Heron's formula
-    for i = 1:length(T(:,1))
-        A = [pv(T(i, 1), 1), pv(T(i, 1), 2)];
-        B = [pv(T(i, 2), 1), pv(T(i, 2), 2)];
-        C = [pv(T(i, 3), 1), pv(T(i, 3), 2)];
-        area(i) = (A(1) * (B(2) - C(2)) + B(1) * (C(2) - A(2)) + C(1) * (A(2) - B(2))) / 2;
-        if i == 1
-            max_area = area(1);
-        end
-        
-        if area(i) > max_area
-            max_area = area(i);
-            refine = i;
-        end
-    end
-    
-    new_refine = refine;
-    if (previous_refine == new_refine)
-        flag = flag + 1;
-        
-        if flag == 100
-            disp('Tried to refine the same triangle 100 times')
-            tol = tol * 10.0;
-            flag = 0;
-        end
-    end
-
-    A = [pv(T(refine, 1), 1), pv(T(refine, 1), 2)];
-    B = [pv(T(refine, 2), 1), pv(T(refine, 2), 2)];
-    C = [pv(T(refine, 3), 1), pv(T(refine, 3), 2)];
-    
-    [pt] = circumcenter(A, B, C, pv, tol);
-    pv = [pv; pt];
+p = [];
+for i = 1:size(pv,1)-1
+  pp = pv(i:i+1,:);
+  L = sqrt(sum(diff(pp,[],1).^2, 2));
+  if L>hmax
+    n = ceil(L / hmax);
+    pp = interp1([0,1], pp, (0:n) / n);
+  end
+  p = [p; pp(1:end-1,:)];
 end
 
-% remove last triangulation (not needed since we just broke from loop)
-pv = pv(1:(end-1), :);
-%tplot(pv, T)
+while 1
+  t = delaunayn(p);
+  t = removeoutsidetris(p, t, pv);
+  %tplot(p,t)
 
-% perform uniform refinements
-for uf = 1:nref
-    sprintf('Performing uniform refinement %i', uf)
-
-    for i = 1:length(T(:,1))
-        A = [pv(T(i, 1), 1), pv(T(i, 1), 2)];
-        B = [pv(T(i, 2), 1), pv(T(i, 2), 2)];
-        C = [pv(T(i, 3), 1), pv(T(i, 3), 2)];
-        
-        % add the three midpoints
-        pv = [pv; (A(1) + B(1))/2, (A(2) + B(2))/2];
-        pv = [pv; (A(1) + C(1))/2, (A(2) + C(2))/2];
-        pv = [pv; (C(1) + B(1))/2, (C(2) + B(2))/2];
-    end
-    
-    pv = unique(pv, 'rows');
-    T = delaunayn(pv);
-    
-    % find which triangles are outside the domain, then delete them from T
-    [T] = delete_outside_triangles(T, pv, pv_orig);
-    
-    %tplot(pv, T)
-    %hold on
+  area = triarea(p,t);
+  [maxarea, ix] = max(area);
+  if maxarea < hmax^2 / 2, break; end
+  pc = circumcenter(p(t(ix,:),:));
+  p(end+1,:) = pc;
 end
 
-p = pv;
-t = T;
-e = boundary_nodes(T);
-sprintf('Finished meshing...')
+for iref = 1:nref
+  p = [p; edgemidpoints(p,t)];
+  t = delaunayn(p);
+  t = removeoutsidetris(p, t, pv);
+  %tplot(p,t)
 end
 
+e = boundary_nodes(t);
+
+function pmid = edgemidpoints(p, t)
+  
+pmid = [(p(t(:,1),:) + p(t(:,2),:)) / 2;
+        (p(t(:,2),:) + p(t(:,3),:)) / 2;
+        (p(t(:,3),:) + p(t(:,1),:)) / 2];
+pmid = unique(pmid, 'rows');
+
+function a = triarea(p, t)
+
+d12 = p(t(:,2),:) - p(t(:,1),:);
+d13 = p(t(:,3),:) - p(t(:,1),:);
+a = abs(d12(:,1).*d13(:,2) - d12(:,2).*d13(:,1)) / 2;
+
+function t = removeoutsidetris(p, t, pv)
+
+pmid = (p(t(:,1),:) + p(t(:,2),:) + p(t(:,3),:)) / 3;
+isinside = inpolygon(pmid(:,1), pmid(:,2), pv(:,1), pv(:,2));
+t = t(isinside,:);
+
+function pc = circumcenter(p)
+
+dp1 = p(2,:) - p(1,:);
+dp2 = p(3,:) - p(1,:);
+
+mid1 = (p(1,:) + p(2,:)) / 2;
+mid2 = (p(1,:) + p(3,:)) / 2;
+  
+s = [-dp1(2),dp2(2); dp1(1),-dp2(1)] \ [-mid1 + mid2]';
+pc = mid1 + s(1) * [-dp1(2),dp1(1)];

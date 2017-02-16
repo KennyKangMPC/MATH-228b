@@ -7,7 +7,6 @@ tol = 1e-10;
 [p_ref, t, e] = pmesh(pv, hmax, nrefmax);
 a_ref = fempoi(p_ref, t, e);
 
-
 for nref = 0:(nrefmax - 1)
     [p, t, e] = pmesh(pv, hmax, nref);
     a = fempoi(p, t, e);

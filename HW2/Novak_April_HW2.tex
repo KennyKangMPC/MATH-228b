@@ -98,6 +98,8 @@
 
 \maketitle
 
+Note: The Professor's version of {\tt pmesh.m} is used for this assignment instead of my own from HW 1 because I got points off (I presume) due to my meshing. 
+
 \section{} 
 
 The solution of the following problem with linear Lagrange elements for \(u(0)=0\) and \(u'(1)=g\) is equivalent to a second order central difference approximation of the problem. 
@@ -769,7 +771,7 @@ Then, similar to the discussion in Problem 2, instead of solving \(\textbf{A}\te
 A_{uu}u_u=f_u-A_{uk}x_k
 \eeq
 
-where \(x_k=\textbf{0}\) because all of the essential boundary conditions are homogeneous. Fig. \ref{fig:5} shows the solutions obtained for the three test cases provided in the assignment. 
+where \(x_k=\textbf{0}\) because all of the essential boundary conditions are homogeneous. The approach just described is, in general, how finite element codes are written. However, for this assignment, because the problem is relatively simple, the integrals over the triangles can be computed directly based on knowledge of the corner nodes. Hence, the integrals are actually hard-coded into the code submitted. Fig. \ref{fig:5} shows the solutions obtained for the three test cases provided in the assignment. 
 
 \begin{figure}[H]
         \centering
@@ -861,14 +863,7 @@ Fig. \ref{fig:30} and \ref{fig:31} shows the solutions obtained for various leve
         \label{fig:31}
 \end{figure}
 
-The error in each solution is computed as the maximum norm of the errors at the nodes - a loop circulates through all the nodes of the most refined mesh and determines which nodes are shared by the coarser meshes. The maximum norm is defined as the maximum of the absolute difference between the solution values at all the nodes. This error is plotted below for the square and polygon meshes. The slope of these lines on the log-log coordinates below is 3.4976 for the square domain and 3.358 for the polygon domain. This can be interpreted in the following manner - by halving the mesh spacing (as is achieved through a single uniform refinement), the error decreases by a factor of about 3.35 - 3.5. 
-
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.75\textwidth]{convergence.png}
-\caption{Error as a function of the mesh spacing for (a) the square domain and (b) the polygon domain.}
-\label{fig:10}
-\end{figure}
+The error in each solution is computed as the maximum norm of the errors at the nodes - a loop circulates through all the nodes of the most refined mesh and determines which nodes are shared by the coarser meshes. The maximum norm is defined as the maximum of the absolute difference between the solution values at all the nodes. The slope of these lines on the log-log coordinates is 2.0267 for the square domain and 1.1097 for the polygon domain. This can be interpreted in the following manner - by halving the mesh spacing (as is achieved through a single uniform refinement), the error decreases by a factor of about 2 for the square domain and 1 for the polygonal domain. For linear elements, the finite element method in most situations can be interpreted as being equivalent to a second order finite difference scheme, and so it is to be expected that a convergence rate of 2 be obtained with the square domain. However, some other effect is distorting this convergence rate for the polygonal domain (which we are to talk about soon in lecture, the professor says!).
 
 \section{Appendix}
 
@@ -893,11 +888,6 @@ This function performs static condensation by removing the Dirichlet nodes from 
 \subsubsection{\tt permutation.m}
 This function permutes the numbers \(i=1, 2, \cdots, n_{en}\) to be used in filling in the global matrix and vector by the local element matrices and vectors.
 \lstinputlisting[language=Matlab]{permutation.m}
-
-\subsubsection{\tt shapefunctions.m}
-This function defines the shape functions, \textbf{B}, and other parameters used within the local element matrices and vectors.
-\lstinputlisting[language=Matlab]{shapefunctions.m}
-
 
 \subsection{Code, Question 4}
 

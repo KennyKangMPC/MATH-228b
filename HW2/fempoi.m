@@ -1,27 +1,21 @@
-function a = fempoi(p, t, e)
+function [a] = fempoi(p, t, e)
 %  p = coordinates in mesh
 %  t = triangulation
 %  e = Dirichlet boundary nodes
 %  --- To use this function, you must have already run pmesh()
 
 LM = t;
+num_elem = length(LM(:,1)); 
 dirichlet_nodes(1,:) = e;
-
 num_nodes_per_elem = 3;         % linear triangular elements
 
 % form the permutation matrix for assembling the global matrices
 [perm] = permutation(num_nodes_per_elem);
 
-num_elem = length(LM(:,1)); 
-
 % specify the boundary conditions - homogeneous neumann and dirichlet
 dirichlet_nodes(2,:) = zeros .* dirichlet_nodes(1,:);
 a_k = dirichlet_nodes(2,:);
 num_nodes = length(p(:,1));
-
-% define the quadrature rule
-wt = [0.5];
-qp = [1/6];
 
 % assemble the elemental k and elemental f
 K = zeros(num_nodes);
@@ -31,20 +25,21 @@ for elem = 1:num_elem
     k = 0;
     f = 0;
 
-    for ll = 1:length(qp) % eta loop
-         for l = 1:length(qp) % xe loop
-            [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(qp(l), qp(ll), num_nodes_per_elem, p, LM, elem);
-            F_mat = transpose([dx_dxe, dx_deta; dy_dxe, dy_deta]);
-            J = det(F_mat);
-
-            % assemble the (elemental) forcing vector
-            f = f + wt(ll) * wt(l) * transpose(N) * J;
-
-            % assemble the (elemental) stiffness matrix - correct
-            k = k + wt(ll) * wt(l) * transpose(inv(F_mat) * B) * inv(F_mat) * B * J;      
-         end
+    X = [p(LM(elem,1),1) p(LM(elem,2),1) p(LM(elem,3),1);
+         p(LM(elem,1),2) p(LM(elem,2),2) p(LM(elem,3),2);
+         1               1               1               ];
+    C = inv(X);
+    
+    % compute area of triangle based on hard-coded formula
+    area = polyarea([p(LM(elem,1),1) p(LM(elem,2),1) p(LM(elem,3),1)], [p(LM(elem,1),2) p(LM(elem,2),2) p(LM(elem,3),2)]);
+    
+    for l = 1:3
+        f(l, 1) = area / 3;
+        for ll = 1:3
+            k(l, ll) = (C(ll, 1)*C(l, 1) + C(l, 2)*C(ll, 2)) * area;
+        end
     end
-
+    
     % place the elemental k matrix into the global K matrix
     for m = 1:length(perm(:,1))
        i = perm(m,1);
@@ -82,4 +77,5 @@ for a_row = 1:num_nodes
 end
 
 tplot(p, LM, a)
+
 end
