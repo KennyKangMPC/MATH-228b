@@ -90,7 +90,7 @@
 \setcounter{tocdepth}{4}
 \begin{document}
 
-\title{MATH 228b: HW3 ... 1gc, 2, 3, 4}
+\title{MATH 228b: HW3 ... 1c, 2bcd, 3abc, 4abc}
 \author{April Novak}
 
 \maketitle
@@ -100,6 +100,7 @@
 This problem solves the following differential equation:
 
 \beq
+\label{eq:prob}
 -\nabla^2 u-k^2u=0
 \eeq
 
@@ -147,7 +148,7 @@ The Galerkin finite element problem is therefore:
 \int_{\Omega}\nabla u_h\cdot\nabla v_h+\int_{\Gamma_{out}}v_hiku_h+\int_{\Gamma_{in}}v_hiku_h-\int_{\Omega}k^2u_hv_h=\int_{\Gamma_{in}}v_h2ik
 \eeq
 
-\section{(b)}
+\subsection{(b)}
 
 \(u_h\) is represented as an expansion of basis functions described by the spaces given above:
 
@@ -214,5 +215,69 @@ Then, the overall matrix system is:
 \eeq
 
 Refer to the definitions of \textbf{N} and \textbf{B} to see these definitions in terms of the basis functions.
+
+\subsection{(c)}
+
+The transmitted intensity, when computed as a function of the finite element solution, is:
+
+\beq
+H(u_h)=\int_{\Gamma_{out}}|\textbf{N}\textbf{u}|^2
+\eeq
+
+where \(|(.)|\) is the complex absolute value of \((.)\). 
+
+\section{}
+
+This problem solves the problem stated in Eq. \eqref{eq:prob} for boundary conditions given in Eq. \eqref{eq:BCs} for the rectangular domain given in the assignment.
+
+\subsection{(a)}
+
+The analytical solution to Eq. \eqref{eq:prob} with boundary conditions Eq. \eqref{eq:BCs} is only a function of \(x\), since the insulation boundary conditions along the top and bottom edges of the domain are symmetric. Hence, the PDE reduces to an ODE:
+
+\beq
+\frac{d^2u}{dx^2}+k^2u=0
+\eeq
+
+This common ODE has the following general solution:
+
+\beqa
+u(x)=&C_1sin(kx)+C_2cos(kx)\\
+u(x)=&C_1\frac{1}{2i}\left(e^{ikx}-e^{-ikx}\right)+\frac{C_2}{2}\left(e^{ikx}+e^{-ikx}\right)\\
+\eeqa
+
+Apply the boundary condition on \(\Gamma_{in}\), where \(\hat{n}=\lbrack -1, 0\rbrack\) and \(x=0\):
+
+\beqa
+\lbrack -1, 0\rbrack\cdot(C_1kcos(kx)-C_2ksin(kx))=&2ik-ik(C_1sin(kx)+C_2cos(kx))\\
+C_1=&-\frac{2ik-ikC_2}{k}\\
+\eeqa
+
+Applying the boundary condition on \(\Gamma_{out}\), where \(\hat{n}=\lbrack 1, 0\rbrack\) and \(x=5\):
+
+\beqa
+\lbrack 1, 0\rbrack\cdot(C_1kcos(5k)-C_2ksin(5k))=&-ik(C_1sin(5k)+C_2cos(5k))\\
+C_1kcos(5k)-C_2ksin(5k)=&-ik(C_1sin(5k)+C_2cos(5k))\\
+\eeqa
+
+\beqa
+u(x)=&-\frac{2-C_2}{2}\left(e^{ikx}-e^{-ikx}\right)+\frac{C_2}{2}\left(e^{ikx}+e^{-ikx}\right)\\
+\eeqa
+
+Applying the boundary condition on \(\Gamma_{out}\), where \(\hat{n}=\lbrack 1, 0\rbrack\) and \(x=5\):
+
+\beqa
+-\frac{2-C_2}{2}\left(e^{ikx}+e^{-ikx}\right)+\frac{C_2}{2}\left(e^{ikx}-e^{-ikx}\right)=&\frac{2-C_2}{2}\left(e^{ikx}-e^{-ikx}\right)-\frac{C_2}{2}\left(e^{ikx}+e^{-ikx}\right)\\
+\frac{C_2}{2}\left\lbrack\left(e^{ikx}-e^{-ikx}+\left(e^{ikx}+e^{-ikx}\right)\right)\right\rbrack=&\frac{2-C_2}{2}\left\lbrack\left(e^{ikx}-e^{-ikx}\right)+\left(e^{ikx}+e^{-ikx}\right)\right\rbrack\\
+\frac{C_2}{2}\left\lbrack e^{ikx}+e^{ikx}\right\rbrack=&\frac{2-C_2}{2}\left\lbrack e^{ikx}+e^{ikx}\right\rbrack\\
+\frac{C_2}{2}=&\frac{2-C_2}{2}\\
+C_2=&1\\
+\eeqa
+
+Then, \(C_1=-i\). Plugging these coefficients into the general solution gives the general solution for these boundaries.
+
+\beqa
+u(x)=&cos(kx)-isin(kx)\\
+u(x)=&e^{-ikx}\\
+\eeqa
 
 \end{document}
