@@ -27,7 +27,6 @@
 \usepackage{dcolumn}
 \usepackage{hyperref}
 \usepackage{courier}
-\usepackage{url}
 \usepackage{esvect}
 \usepackage{commath}
 \usepackage{verbatim} % for block comments
@@ -37,10 +36,8 @@
 \usepackage{titlesec}
 \usepackage{booktabs}
 \usepackage{gensymb}
-\usepackage{longtable}
 \usepackage{listings}
 \usepackage{cancel}
-\usepackage{tcolorbox}
 \usepackage[mathscr]{euscript}
 \lstset{
     frame=single,
@@ -93,7 +90,7 @@
 \setcounter{tocdepth}{4}
 \begin{document}
 
-\title{MATH 228b: HW3 ... 1bc, 2, 3, 4}
+\title{MATH 228b: HW3 ... 1gc, 2, 3, 4}
 \author{April Novak}
 
 \maketitle
@@ -149,5 +146,73 @@ The Galerkin finite element problem is therefore:
 \beq
 \int_{\Omega}\nabla u_h\cdot\nabla v_h+\int_{\Gamma_{out}}v_hiku_h+\int_{\Gamma_{in}}v_hiku_h-\int_{\Omega}k^2u_hv_h=\int_{\Gamma_{in}}v_h2ik
 \eeq
+
+\section{(b)}
+
+\(u_h\) is represented as an expansion of basis functions described by the spaces given above:
+
+\beq
+u_h=\sum_{i=1}^{N}a_i\phi_i
+\eeq
+
+where \(N\) are the number of basis functions over the entire domain. Alternatively, this can be expressed in terms of the solution over each finite element:
+
+\beq
+u_h^e=\sum_{i=1}^{n_{en}}a_i\phi_i
+\eeq
+
+where \(n_{en}\) are the number of nodes per element and the \(e\) superscript indicates that the solution is only over a single element, with piecewise continuity between elements. Inserting these shape functions into the weak form above, where \(v_h\) is likewise expanded in the same set of basis functions as \(u_h\), but with expansion coefficients \(b\):
+
+\beqa
+\int_{\Omega}\nabla \left(\sum_{i=1}^{N}a_i\phi_i\right)\cdot\nabla \left(\sum_{j=1}^{N}b_j\phi_j\right)+\int_{\Gamma_{out}}\left(\sum_{j=1}^{N}b_j\phi_j\right)ik\left(\sum_{i=1}^{N}a_i\phi_i\right)+\int_{\Gamma_{in}}\left(\sum_{j=1}^{N}b_j\phi_j\right)ik\left(\sum_{i=1}^{N}a_i\phi_i\right)\\
+-\int_{\Omega}k^2\left(\sum_{i=1}^{N}a_i\phi_i\right)\left(\sum_{j=1}^{N}b_j\phi_j\right)=\int_{\Gamma_{in}}\left(\sum_{j=1}^{N}b_j\phi_j\right)2ik
+\eeqa
+
+A simpler way of representing this weak form is to recognize that \(u_h\) and \(v_h\) can be represented as:
+
+\beqa
+u_h=&\textbf{N}\textbf{u}=\left\lbrack\phi_1, \phi_2, \cdots, \phi_N\right\rbrack\left\lbrack a_1, a_2, \cdots, a_N\right\rbrack^T\\
+v_h=&\textbf{N}\textbf{v}=\left\lbrack\phi_1, \phi_2, \cdots, \phi_N\right\rbrack\left\lbrack b_1, b_2, \cdots, b_N\right\rbrack^T\\
+\eeqa
+
+The gradient of \(u_h\) is:
+
+\beq
+\nabla u_h=\textbf{B}\textbf{u}=\begin{bmatrix} 
+\frac{\partial \phi_1}{\partial x} & \frac{\partial \phi_2}{\partial x} & \cdots & \frac{\partial \phi_N}{\partial x}\\
+\frac{\partial \phi_1}{\partial y} & \frac{\partial \phi_2}{\partial y} & \cdots & \frac{\partial \phi_N}{\partial y}\\
+\end{bmatrix}\textbf{u}
+\eeq
+
+The weak form can therefore equivalently be expressed as:
+
+\beqa
+\int_{\Omega}(\textbf{B}\textbf{u})\cdot(\textbf{B}\textbf{v})+\int_{\Gamma_{out}}(\textbf{N}\textbf{v})^Tik(\textbf{N}\textbf{u})+\int_{\Gamma_{in}}(\textbf{N}\textbf{v})^Tik(\textbf{N}\textbf{u})-\int_{\Omega}k^2(\textbf{N}\textbf{v})^T(\textbf{N}\textbf{u})=&\int_{\Gamma_{in}}(\textbf{N}\textbf{v})2ik\\
+\int_{\Omega}(\textbf{B}\textbf{v})^T(\textbf{B}\textbf{u})+\int_{\Gamma_{out}}(\textbf{N}\textbf{v})^Tik(\textbf{N}\textbf{u})+\int_{\Gamma_{in}}(\textbf{N}\textbf{v})^Tik(\textbf{N}\textbf{u})-\int_{\Omega}k^2(\textbf{N}\textbf{v})^T(\textbf{N}\textbf{u})=&\int_{\Gamma_{in}}(\textbf{N}\textbf{v})^T2ik\\
+\eeqa
+
+Because \(\textbf{v}^T\) appears in every term, the above could be rearranged such that \(\textbf{v}^T\) multiplies an integrand, which equals zero, which would lead to the conclusion that the integrand itself must equal zero. In other words, \(\textbf{v}^T\) can essentially be canceled from every term.
+
+\beqa
+\int_{\Omega}\textbf{B}^T(\textbf{B}\textbf{u})+\int_{\Gamma_{out}}\textbf{N}^Tik(\textbf{N}\textbf{u})+\int_{\Gamma_{in}}\textbf{N}^Tik(\textbf{N}\textbf{u})-\int_{\Omega}k^2\textbf{N}^T(\textbf{N}\textbf{u})=&\int_{\Gamma_{in}}\textbf{N}^T2ik\\
+\eeqa
+
+To obtain a matrix equation in the form of that in the assignment, define:
+
+\beqa
+\textbf{K}=&\int_{\Omega}\textbf{B}^T\textbf{B}d\Omega\\
+\textbf{M}=&\int_{\Omega}\textbf{N}^T\textbf{N}d\Omega\\
+\textbf{B}_{in}=&\int_{\Gamma_{in}}\textbf{N}^T\textbf{N}d\Gamma\\
+\textbf{B}_{out}=&\int_{\Gamma_{out}}\textbf{N}^T\textbf{N}d\Gamma\\
+\textbf{b}_{in}=&\int_{\Gamma_{in}}\textbf{N}^Td\Gamma\\
+\eeqa
+
+Then, the overall matrix system is:
+
+\beq
+\left(\textbf{K}-k^2\textbf{M}+ik(\textbf{B}_{in}+\textbf{B}_{out})\right)\textbf{u}=2ik\textbf{b}_{in}
+\eeq
+
+Refer to the definitions of \textbf{N} and \textbf{B} to see these definitions in terms of the basis functions.
 
 \end{document}
