@@ -93,13 +93,61 @@
 \setcounter{tocdepth}{4}
 \begin{document}
 
-\title{MATH 228b: HW3 ... 1, 2, 3, 4}
+\title{MATH 228b: HW3 ... 1bc, 2, 3, 4}
 \author{April Novak}
 
 \maketitle
 
 \section{}
 
+This problem solves the following differential equation:
 
+\beq
+-\nabla^2 u-k^2u=0
+\eeq
+
+With boundary conditions:
+
+\beqa
+\label{eq:BCs}
+\hat{n}\cdot\nabla u=&0 & \textrm{ on } \Gamma_{wall}\\
+\hat{n}\cdot\nabla u=&-iku & \textrm{ on } \Gamma_{out}\\
+\hat{n}\cdot\nabla u=&2ik-iku & \textrm{ on } \Gamma_{in}\\
+\eeqa
+
+where the domain boundary is divided into three sections, where \(\Gamma=\Gamma_{wall}\cup\Gamma_{out}\cup\Gamma_{in}\). 
+
+\subsection{(a)}
+
+The weighted residual form is obtained by multiplying the governing equation by a weight function \(v\) and integrating over the domain, applying integration by parts when possible:
+
+\beqa
+-\int_{\Omega}v\nabla^2 u-\int_{\Omega}k^2uv=& 0\\
+\int_{\Omega}\nabla u\cdot\nabla v-\int_{\Gamma}\hat{n}v\cdot\nabla u-\int_{\Omega}k^2uv=&0\\
+\eeqa
+
+Applying the boundary conditions:
+
+\beq
+\int_{\Omega}\nabla u\cdot\nabla v+\int_{\Gamma_{out}}viku-\int_{\Gamma_{in}}v(2ik-iku)-\int_{\Omega}k^2uv=0
+\eeq
+
+\(u\) is expanded in linear continuous polynomials over a series of elements \(K\) defined by a triangulation \(T_h\) such that:
+
+\beq
+u_h=\{u\in C^0(\Omega):u\rvert_K\in P_1(K)\forall K\in T_h, \textrm{for } \hat{n}\cdot\nabla u=0 \textrm{ on } \Gamma_{wall}, \hat{n}\cdot\nabla u=-iku \textrm{ on } \Gamma_{out}, \hat{n}\cdot\nabla u=2ik-iku \textrm{ on } \Gamma_{in}\}
+\eeq
+
+For a Galerkin approximation, \(v\) is chosen from the space \(V_h\), which is the same space as \(u_h\) except that \(V_h\) satisfy the homogeneous form of the essential boundary conditions (of which there are none in this problem):
+
+\beq
+V_h=\{v\in C^0(\Omega):v\rvert_K\in P_1(K)\forall K\in T_h\}
+\eeq
+
+The Galerkin finite element problem is therefore:
+
+\beq
+\int_{\Omega}\nabla u_h\cdot\nabla v_h+\int_{\Gamma_{out}}v_hiku_h+\int_{\Gamma_{in}}v_hiku_h-\int_{\Omega}k^2u_hv_h=\int_{\Gamma_{in}}v_h2ik
+\eeq
 
 \end{document}
