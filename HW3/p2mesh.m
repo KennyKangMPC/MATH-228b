@@ -5,10 +5,7 @@ clear all
 pv = [0,0; 1,0; 1,1; 0,1; 0,0];
 hmax = 0.15;
 nref = 0.0;
-%[p,t,e] = pmesh(pv, hmax, nref);
-p = [0,0; 1,0; 0.5, 1; 1.5,1; 3,0];
-t = [1,2,3; 2,4,3; 2,5,4];
-e = [1, 2, 3, 4, 5];
+[p,t,e] = pmesh(pv, hmax, nref);g
 
 % plot the starting mesh
 tplot(p, t)
@@ -41,9 +38,9 @@ end
 pnew = unique(pnew, 'rows');
 p2 = [p; pnew];
 
-scatter(p(:,1), p(:,2), 'o')
-hold on
-scatter(pnew(:,1), pnew(:,2), 'ro')
+% scatter(p(:,1), p(:,2), 'o')
+% hold on
+% scatter(pnew(:,1), pnew(:,2), 'ro')
 
 % put in the new points to the triangulation (have to wait until you call
 % unique() to make sure the order is consistent
@@ -62,54 +59,50 @@ for i = 1:length(t(:,1))
     T(i, 4) = row_number(pt2, p2);
     T(i, 6) = row_number(pt3, p2);
     
-%     % find the row number of each point in p
-%     for j = 1:length(p2(:,1))
-%         % check pt1
-%         if (abs(pt1(1) - p2(j, 1)) < tol) && (abs(pt1(2) - p2(j, 2)) < tol)
-%             T(i, 2) = j;
-%         end
-%         
-%         % check pt2
-%         if (abs(pt2(1) - p2(j, 1)) < tol) && (abs(pt2(2) - p2(j, 2)) < tol)
-%             T(i, 4) = j;
-%         end
-%         
-%         % check pt3
-%         if (abs(pt3(1) - p2(j, 1)) < tol) && (abs(pt3(2) - p2(j, 2)) < tol)
-%             T(i, 6) = j;
-%         end
-%     end
-    
-    
     % the new boundary nodes are the midpoints between nodes that were
     % previously on the boundary
     
     % check if side 1-2 or 1-3 is on the boundary (both nodes in e)
-%     for j = 1:length(e)
-%         if e(j) == t(i, 1) % the 1-coordinate is on the boundary
-%             for k = 1:length(e)
-%                 % either the 2 or 3-coordinate is on boundary
-%                 if e(k) == t(i, 2)
-%                     enew = [enew; pt1];
-%                 end
-%                 if e(k) == t(i, 3)
-%                     enew = [enew; pt3];
-%                 end
-%             end
-%         end 
-%     end
+    for j = 1:length(e)
+        if e(j) == T(i, 1) % the 1-coordinate is on the boundary
+            for k = 1:length(e)
+                % either the 2 or 3-coordinate is on boundary
+                if e(k) == T(i, 3)
+                    %sprintf('1: %i, 2: %i', T(i, 1), T(i, 3))
+                    enew = [enew; row_number(pt1, p2)];
+                end
+                if e(k) == T(i, 5)
+                    enew = [enew; row_number(pt3, p2)];
+                end
+            end
+        end 
+    end
     
-%     % check if side 2-3 is on the boundary (both nodes in e)
-%     for j = 1:length(e)
-%         if e(j) == t(i, 2) % the 2-coordinate is on the boundary
-%             for k = 1:length(g)
-%                 if e(k) == t(i, 3) % the 3-coordinate is on the boundary
-%                     enew = [enew; pt2];
-%                 end
-%             end
-%         end
-%     end
+    % check if side 2-3 is on the boundary (both nodes in e)
+    for j = 1:length(e)
+        if e(j) == T(i, 3) % the 2-coordinate is on the boundary
+            for k = 1:length(e)
+                if e(k) == T(i, 5) % the 3-coordinate is on the boundary
+                    enew = [enew; row_number(pt2, p2)];
+                end
+            end
+        end
+    end
 end
 
+enew = unique(enew);
 
+% delete entries in e that arise when a triangle has two nodes on a
+% boundary, but that triangle spans across the domain such that the
+% midpoint is actually inside the domain - this might not work
+ecut = [];
+for i = 1:length(enew)
+    [in, on] = inpolygon(p2(i, 1), p2(i, 2), p(:,1), p(:,2));
+    %sprintf('point: %d, in: %i, on: %i', enew(i), in, on)
+    if on
+        ecut = [ecut; enew(i)];
+    end
+end
 
+e = [e; ecut];
+scatter(p2(e(:,1), 1), p2(e(:,1), 2), 'o')
