@@ -1,13 +1,11 @@
-% first, call pmesh to generate the starting mesh (works for linear
-% elements)
-clear all
-
-pv = [0,0; 1,0; 1,1; 0,1; 0,0];
-hmax = 0.15;
-nref = 0.0;
-[p,t,e] = pmesh(pv, hmax, nref);g
+%function [p2, t2, e2] = p2mesh(p, t, e)
 
 % plot the starting mesh
+% tplot(p, t)
+% hold on
+pv = [0,0; 1,0; 1,1; 0,1; 0,0];
+pv = [0,0; 1,0; 0.5,0.5; 1,1; 0,1; 0,0];
+[p, t, e] = pmesh(pv, 0.15, 0.0);
 tplot(p, t)
 hold on
 
@@ -37,14 +35,11 @@ end
 % (none duplicated)
 pnew = unique(pnew, 'rows');
 p2 = [p; pnew];
-
-% scatter(p(:,1), p(:,2), 'o')
-% hold on
-% scatter(pnew(:,1), pnew(:,2), 'ro')
+scatter(p2(:,1), p2(:,2), 'bo')
+hold on
 
 % put in the new points to the triangulation (have to wait until you call
 % unique() to make sure the order is consistent
-
 for i = 1:length(t(:,1))
     A = [p(t(i, 1), 1), p(t(i, 1), 2)];
     B = [p(t(i, 2), 1), p(t(i, 2), 2)];
@@ -97,6 +92,7 @@ enew = unique(enew);
 % midpoint is actually inside the domain - this might not work
 ecut = [];
 for i = 1:length(enew)
+    on = 0;
     [in, on] = inpolygon(p2(i, 1), p2(i, 2), p(:,1), p(:,2));
     %sprintf('point: %d, in: %i, on: %i', enew(i), in, on)
     if on
@@ -104,5 +100,11 @@ for i = 1:length(enew)
     end
 end
 
-e = [e; ecut];
-scatter(p2(e(:,1), 1), p2(e(:,1), 2), 'o')
+t2 = T;
+e2 = [e; ecut];
+
+for i = 1:length(e2)
+    scatter(p2(e2(i), 1), p2(e2(i), 2), 'ro')
+    hold on
+end
+
