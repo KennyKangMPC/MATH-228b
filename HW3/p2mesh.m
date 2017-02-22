@@ -4,11 +4,15 @@ clear all
 % tplot(p, t)
 % hold on
 %pv = [0,0; 1,0; 1,1; 0,1; 0,0];
-%pv = [0,0; 1,0; 0.5,0.5; 1,1; 0,1; 0,0];
-%[p, t, e] = pmesh(pv, 0.15, 0.0);
-p = [0,0; 1,0; 0.5,1; 1.5,1; 3,0];
-t = [1,2,3; 2,4,3; 2,5,4];
-e = [1,2,3,4,5];
+pv = [0,0; 1,0; 0.5,0.5; 1,1; 0,1; 0,0];
+[p, t, e] = pmesh(pv, 0.15, 0.0);
+
+e = boundary_nodes(t);
+
+
+%p = [0,0; 1,0; 0.5,1; 1.5,1; 3,0];
+%t = [1,2,3; 2,4,3; 2,5,4];
+%e = [1,2,3,4,5];
 tplot(p, t)
 hold on
 
@@ -41,8 +45,6 @@ p2 = [p; pnew];
 scatter(p2(:,1), p2(:,2), 'bo')
 hold on
 
-% put in the new points to the triangulation (have to wait until you call
-% unique() to make sure the order is consistent
 for i = 1:length(t(:,1))
     A = [p(t(i, 1), 1), p(t(i, 1), 2)];
     B = [p(t(i, 2), 1), p(t(i, 2), 2)];
@@ -108,7 +110,7 @@ for k = 1:length(enew)
     end
 end
 
-e2 = [e'; enewer];
+e2 = [e; enewer];
 
 for i = 1:length(e2)
     scatter(p2(e2(i), 1), p2(e2(i), 2), 'ro')
