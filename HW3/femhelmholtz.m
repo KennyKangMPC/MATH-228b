@@ -70,6 +70,33 @@ for elem = 1:num_elem
     edges = [LM(elem,[1,2]); LM(elem,[2,3]); LM(elem,[3,1])];
     edges = sort(edges, 2);
     
+    % find if any of the element edges are on the boundaries
+    % in In?
+    
+    for edge = 1:length(edges(:,1))
+        % is it on the In boundary?
+        for in = 1:length(In(:, 1))
+            if edges(edge, 1) == In(in, 1) && edges(edge, 2) == In(in, 2)
+                sprintf('Element %i is on In', elem)
+            end
+        end
+        
+        % is it on the Out boundary?
+        for in = 1:length(Out(:, 1))
+            if edges(edge, 1) == Out(in, 1) && edges(edge, 2) == Out(in, 2)
+                sprintf('Element %i is on Out', elem)
+            end
+        end
+        
+        % is on the Wall boundary?
+        for in = 1:length(Wall(:, 1))
+            if edges(edge, 1) == Wall(in, 1) && edges(edge, 2) == Wall(in, 2)
+                sprintf('Element %i is on Wall', elem)
+            end
+        end
+    end
+    
+    
     % compute integrals over the boundaries (different quadrature rule)
     % for all boundaries, either xi or eta is constant
     for l = 1:length(wt1)
