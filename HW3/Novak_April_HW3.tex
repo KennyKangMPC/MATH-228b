@@ -90,7 +90,7 @@
 \setcounter{tocdepth}{4}
 \begin{document}
 
-\title{MATH 228b: HW3 ... 1c, 2bcd, 3abc, 4abc}
+\title{MATH 228b: HW3 ... 1c, 2bcd, 3abc, 4bc}
 \author{April Novak}
 
 \maketitle
@@ -290,6 +290,13 @@ This problem extends the {\tt fempoi.m} solver developed in the previous homewor
 
 \subsection{(a)}
 
-A mesh developed for linear basis functions can easily be extended to a mesh for quadratic basis functions by simply adding three additional nodes per triangle, one at the midpoint of each side. The additional points are added to the original mesh by looping over the triangles and adding the midpoints of every side, and the calling {\tt unique} to remove (roughly) half of these points which are shared by two triangles. Then, a loop is created that loops over all of the original triangles and re-computes these midpoints and then searches through the (original + new) list of points to determine the row number of that point. Then, the new triangulation is defined such that the corners of the original triangle fill the 1, 3, and 5 entries of the new triangulation, with the 2, 4, and 6 entries given as the row number of the midpoint along the corresponding edge. Because {\tt boundary\_nodes} is written specifically for three-node triangles, it must be recreated to determine the nodes that are on the boundary for quadrilateral triangle elements. 
+A mesh developed for linear basis functions can easily be extended to a mesh for quadratic basis functions by simply adding three additional nodes per triangle, one at the midpoint of each side. The additional points are added to the original mesh by looping over the triangles and adding the midpoints of every side, and the calling {\tt unique} to remove (roughly) half of these points which are shared by two triangles. Then, a loop is created that loops over all of the original triangles and re-computes these midpoints and then searches through the (original + new) list of points to determine the row number of that point. Then, the new triangulation is defined such that the corners of the original triangle fill the 1, 3, and 5 entries of the new triangulation, with the 2, 4, and 6 entries given as the row number of the midpoint along the corresponding edge.
+
+To determine which of the original nodes (in {\tt p}) are on the boundary, {\tt boundary\_nodes} is used. Then, to determine which of the new nodes are on the boundary, if two nodes in the same triangle are both on the boundary, then the midpoint node on the edge between those two corner points is in most situations also on the boundary. However, in some cases, when all three corner nodes of a triangle are on the boundary, then at least one of the midpoint nodes is actually not in the boundary. So, a loop over all of the rows and columns in the triangulation is used to determine if a point appears more than once in the triangulation - if so, it is not actually on the boundary. In this way, the boundary nodes, consisting of the original boundary nodes and the new boundary nodes, is created. The code developed for this section is shown in the Appendix.
+
+\section{Appendix}
+\subsection{Question 4}
+\subsubsection{Part (a) - {\tt p2mesh.m}}
+\lstinputlisting[language=Matlab]{p2mesh.m}
 
 \end{document}

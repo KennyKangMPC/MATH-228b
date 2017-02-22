@@ -5,10 +5,8 @@ e = boundary_nodes(t);
 %tplot(p, t)
 %hold on
 
-% initialize new triangulation and the new nodes and boundary nodes
 T = zeros(length(t(:,1)), 6);
-pnew = [];
-enew = [];
+pnew = []; enew = [];
 
 for i = 1:length(t(:,1))
     A = [p(t(i, 1), 1), p(t(i, 1), 2)];
@@ -25,7 +23,6 @@ for i = 1:length(t(:,1))
     T(i, 5) = t(i, 3);  
 end
 
-% p2 contains both the original mesh points and all of the midpoints
 pnew = unique(pnew, 'rows');
 p2 = [p; pnew];
 %scatter(p2(:,1), p2(:,2), 'bo')
@@ -36,7 +33,6 @@ for i = 1:length(t(:,1))
     B = [p(t(i, 2), 1), p(t(i, 2), 2)];
     C = [p(t(i, 3), 1), p(t(i, 3), 2)];
     
-    % three midpoint nodes for this triangle
     pt1 = [(A(1) + B(1))/2, (A(2) + B(2))/2];
     pt2 = [(C(1) + B(1))/2, (C(2) + B(2))/2];
     pt3 = [(A(1) + C(1))/2, (A(2) + C(2))/2];
@@ -45,12 +41,10 @@ for i = 1:length(t(:,1))
     T(i, 4) = row_number(pt2, p2);
     T(i, 6) = row_number(pt3, p2);
     
-    % check if side 1-2 or 1-3 is on the boundary (both nodes in e)
     for j = 1:length(e)
         if e(j) == T(i, 1) % the 1-coordinate is on the boundary
             for k = 1:length(e)
-                % either the 2 or 3-coordinate is on boundary
-                if e(k) == T(i, 3)
+                if e(k) == T(i, 3) % either 2 or 3-coordinate on boundary
                     enew = [enew; row_number(pt1, p2)];
                 end
                 if e(k) == T(i, 5)
