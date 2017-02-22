@@ -1,11 +1,14 @@
 %function [p2, t2, e2] = p2mesh(p, t, e)
-
+clear all
 % plot the starting mesh
 % tplot(p, t)
 % hold on
-pv = [0,0; 1,0; 1,1; 0,1; 0,0];
-pv = [0,0; 1,0; 0.5,0.5; 1,1; 0,1; 0,0];
-[p, t, e] = pmesh(pv, 0.15, 0.0);
+%pv = [0,0; 1,0; 1,1; 0,1; 0,0];
+%pv = [0,0; 1,0; 0.5,0.5; 1,1; 0,1; 0,0];
+%[p, t, e] = pmesh(pv, 0.15, 0.0);
+p = [0,0; 1,0; 0.5,1; 1.5,1; 3,0];
+t = [1,2,3; 2,4,3; 2,5,4];
+e = [1,2,3,4,5];
 tplot(p, t)
 hold on
 
@@ -54,9 +57,6 @@ for i = 1:length(t(:,1))
     T(i, 4) = row_number(pt2, p2);
     T(i, 6) = row_number(pt3, p2);
     
-    % the new boundary nodes are the midpoints between nodes that were
-    % previously on the boundary
-    
     % check if side 1-2 or 1-3 is on the boundary (both nodes in e)
     for j = 1:length(e)
         if e(j) == T(i, 1) % the 1-coordinate is on the boundary
@@ -86,25 +86,31 @@ for i = 1:length(t(:,1))
 end
 
 enew = unique(enew);
+t2 = T;
 
-% delete entries in e that arise when a triangle has two nodes on a
-% boundary, but that triangle spans across the domain such that the
-% midpoint is actually inside the domain - this might not work
-ecut = [];
-for i = 1:length(enew)
-    on = 0;
-    [in, on] = inpolygon(p2(i, 1), p2(i, 2), p(:,1), p(:,2));
-    %sprintf('point: %d, in: %i, on: %i', enew(i), in, on)
-    if on
-        ecut = [ecut; enew(i)];
+% delete points in e2 that appear more than one time in the triangulation
+enewer = [];
+for k = 1:length(enew)
+    flag = 0;
+
+    for i = 1:length(T(:,1))
+        for j = 1:6
+            if T(i, j) == enew(k)
+                flag = flag + 1;
+            end
+        end
+    end
+    
+    if flag >= 2
+        % point isn't actually on boundary
+    elseif flag == 1
+        enewer = [enewer; enew(k)];
     end
 end
 
-t2 = T;
-e2 = [e; ecut];
+e2 = [e'; enewer];
 
 for i = 1:length(e2)
     scatter(p2(e2(i), 1), p2(e2(i), 2), 'ro')
     hold on
 end
-
