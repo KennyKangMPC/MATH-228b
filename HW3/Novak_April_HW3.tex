@@ -90,7 +90,7 @@
 \setcounter{tocdepth}{4}
 \begin{document}
 
-\title{MATH 228b: HW3 ... 1c, 2bcd, 3abc, 4bc}
+\title{MATH 228b: HW3 ... 2bcd, 3abc, 4bc}
 \author{April Novak}
 
 \maketitle
@@ -201,6 +201,7 @@ Because \(\textbf{v}^T\) appears in every term, the above could be rearranged su
 To obtain a matrix equation in the form of that in the assignment, define:
 
 \beqa
+\label{eq:Matrices}
 \textbf{K}=&\int_{\Omega}\textbf{B}^T\textbf{B}d\Omega\\
 \textbf{M}=&\int_{\Omega}\textbf{N}^T\textbf{N}d\Omega\\
 \textbf{B}_{in}=&\int_{\Gamma_{in}}\textbf{N}^T\textbf{N}d\Gamma\\
@@ -224,7 +225,16 @@ The transmitted intensity, when computed as a function of the finite element sol
 H(u_h)=\int_{\Gamma_{out}}|\textbf{N}\textbf{u}|^2
 \eeq
 
-where \(|(.)|\) is the complex absolute value of \((.)\). 
+where \(|(.)|\) is the complex absolute value of \((.)\). For vectors, the ``square'' is equivalent to a dot product, which by properties of the dot product can also be written in terms of transposes. By recognizing that the integral of \(\textbf{N}^T\textbf{N}\) is exactly that defined by \(\textbf{B}_{out}\) in Eq. \eqref{eq:Matrices}, the result that \(H(u_h\) can be expressed in terms of \(\textbf{u}\) has been shown.
+
+\beqa
+H(u_h)=&\int_{\Gamma_{out}}(\textbf{N}\textbf{u})\cdot(\textbf{N}\textbf{u})\\
+H(u_h)=&\int_{\Gamma_{out}}(\textbf{N}\textbf{u})^T(\textbf{N}\textbf{u})\\
+H(u_h)=&\int_{\Gamma_{out}}\textbf{u}^T\textbf{N}^T\textbf{N}\textbf{u}\\
+H(u_h)=&\textbf{u}^T\textbf{B}_{out}\textbf{u}\\
+\eeqa
+
+
 
 \section{}
 
@@ -456,13 +466,13 @@ w=&\begin{bmatrix}1/3& 1/3& 1/3\end{bmatrix}\\
 \sum_{j=1}^3\left(\frac{\xi_j}{6}+\frac{\xi_2}{2}\right) & \sum_{j=1}^3\left(\frac{\eta_j}{6}+\frac{\eta_2}{2}\right)\\
 \sum_{j=1}^3\left(\frac{\xi_j}{6}+\frac{\xi_3}{2}\right) & \sum_{j=1}^3\left(\frac{\eta_j}{6}+\frac{\eta_3}{2}\right)
  \end{bmatrix}\\
-=&\begin{bmatrix}\left(\xi_1+\xi_2+\xi_3\right) & \left(\eta_1+\eta_2+\eta_3\right)\\
-\left(\xi_1+\xi_2+\xi_3\right)+\frac{3}{2} & \left(\eta_1+\eta_2+\eta_3\right)\\
-\left(\xi_1+\xi_2+\xi_3\right) & \left(\eta_1+\eta_2+\eta_3\right)+\frac{3}{2}
+=&\begin{bmatrix}\frac{1}{6}\left(\xi_1+\xi_2+\xi_3\right) & \frac{1}{6}\left(\eta_1+\eta_2+\eta_3\right)\\
+\frac{1}{6}\left(\xi_1+\xi_2+\xi_3\right)+\frac{3}{2} & \frac{1}{6}\left(\eta_1+\eta_2+\eta_3\right)\\
+\frac{1}{6}\left(\xi_1+\xi_2+\xi_3\right) & \frac{1}{6}\left(\eta_1+\eta_2+\eta_3\right)+\frac{3}{2}
  \end{bmatrix}\\
- =&\begin{bmatrix}1 & 1\\
-5/2 & 1\\
-1 & 5/2
+ =&\begin{bmatrix}1/6 & 1/6\\
+1/6+3/2 & 1/6\\
+1/6 & 1/6+3/2
  \end{bmatrix}
 \eeqa
 
