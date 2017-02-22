@@ -1,27 +1,15 @@
-%function [p2, t2, e2] = p2mesh(p, t, e)
-clear all
-% plot the starting mesh
-% tplot(p, t)
-% hold on
-%pv = [0,0; 1,0; 1,1; 0,1; 0,0];
-pv = [0,0; 1,0; 0.5,0.5; 1,1; 0,1; 0,0];
-[p, t, e] = pmesh(pv, 0.15, 0.0);
+function [p2, t2, e2] = p2mesh(p, t)
 
 e = boundary_nodes(t);
 
-
-%p = [0,0; 1,0; 0.5,1; 1.5,1; 3,0];
-%t = [1,2,3; 2,4,3; 2,5,4];
-%e = [1,2,3,4,5];
-tplot(p, t)
-hold on
+%tplot(p, t)
+%hold on
 
 % initialize new triangulation and the new nodes and boundary nodes
 T = zeros(length(t(:,1)), 6);
 pnew = [];
 enew = [];
 
-% add all of the midpoints
 for i = 1:length(t(:,1))
     A = [p(t(i, 1), 1), p(t(i, 1), 2)];
     B = [p(t(i, 2), 1), p(t(i, 2), 2)];
@@ -34,16 +22,14 @@ for i = 1:length(t(:,1))
     % create new row in T for the triangle - save original points
     T(i, 1) = t(i, 1);
     T(i, 3) = t(i, 2);
-    T(i, 5) = t(i, 3);
-    
+    T(i, 5) = t(i, 3);  
 end
 
 % p2 contains both the original mesh points and all of the midpoints
-% (none duplicated)
 pnew = unique(pnew, 'rows');
 p2 = [p; pnew];
-scatter(p2(:,1), p2(:,2), 'bo')
-hold on
+%scatter(p2(:,1), p2(:,2), 'bo')
+%hold on
 
 for i = 1:length(t(:,1))
     A = [p(t(i, 1), 1), p(t(i, 1), 2)];
@@ -65,7 +51,6 @@ for i = 1:length(t(:,1))
             for k = 1:length(e)
                 % either the 2 or 3-coordinate is on boundary
                 if e(k) == T(i, 3)
-                    %sprintf('1: %i, 2: %i', T(i, 1), T(i, 3))
                     enew = [enew; row_number(pt1, p2)];
                 end
                 if e(k) == T(i, 5)
@@ -115,4 +100,5 @@ e2 = [e; enewer];
 for i = 1:length(e2)
     scatter(p2(e2(i), 1), p2(e2(i), 2), 'ro')
     hold on
+end
 end
