@@ -3,15 +3,17 @@
 %  t = triangulation
 %  e = Dirichlet boundary nodes
 %  --- To use this function, you must have already run pmesh()
+clear all
 pv = [0,0; 1,0; 1,1; 0,1; 0,0];
 [p, t, e] = pmesh(pv, 0.15, 0);
+[p, t, e] = p2mesh(p, t);
 
 LM = t;
 coordinates = p;
 num_elem = length(LM(:,1)); 
 
 dirichlet_nodes(1,:) = e;       % specify Dirichlet nodes
-num_nodes_per_elem = 3;         % quadratic triangular elements
+num_nodes_per_elem = 6;         % quadratic triangular elements
 
 % form the permutation matrix for assembling the global matrices
 [perm] = permutation(num_nodes_per_elem);
@@ -22,8 +24,10 @@ a_k = dirichlet_nodes(2,:);
 num_nodes = length(p(:,1));
 
 % specify the quadrature rule
-wt = [1/2];
-qp = [1/3];
+wt = [1/3, 1/3, 1/3];
+qp = [1,1; 5/2,1; 1,5/2];
+%wt = [1/6];
+%qp = [1/3,1/3];
 
 % assemble the elemental k and elemental f
 K = zeros(num_nodes);
@@ -33,19 +37,22 @@ for elem = 1:num_elem
     k = 0;
     f = 0;
 
-    for ll = 1:length(qp) % eta loop
-         for l = 1:length(qp) % xe loop
-                 [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(qp(l), qp(ll), num_nodes_per_elem, coordinates, LM, elem);
+    for ll = 1:length(wt) % eta loop
+         %for l = 1:length(qp) % xe loop
+                 [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(qp(ll, 1), qp(ll, 2), num_nodes_per_elem, coordinates, LM, elem);
                  F_mat = transpose([dx_dxe, dx_deta; dy_dxe, dy_deta]);
                  J = det(F_mat);
 
                  % assemble the (elemental) forcing vector
-                 f = f + wt(ll) * wt(l) * transpose(N) * J;
+                 f = f + wt(ll) * transpose(N) * J;
 
                  % assemble the (elemental) stiffness matrix - correct
-                 k = k + wt(ll) * wt(l) * transpose(inv(F_mat) * B) * inv(F_mat) * B * J;      
-         end
+                 k = k + wt(ll) * transpose(inv(F_mat) * B) * inv(F_mat) * B * J;      
+         %end
     end
+    
+    k = k .* 0.5;
+    f = f .* 0.5;
     
     % place the elemental k matrix into the global K matrix
     for m = 1:length(perm(:,1))
