@@ -34,6 +34,32 @@ switch num_nodes_per_elem
         dN_deta(4) = 4*xe;
         dN_deta(5) = -1 + 4*eta;
         dN_deta(6) = 4 - 8*eta - 4*xe;
+
+%           N(1) = 1 - 3*xe - 3*eta + 2*xe^2 + 2*eta^2 + 4*xe*eta;
+%           N(2) = -xe + 2*xe^2;
+%           N(3) = -eta + 2*eta^2;
+%           N(4) = 4*eta - 4*eta^2 - 4*xe*eta;
+%           N(5) = 4*xe - 4*xe^2 - 4*xe*eta;
+%           N(6) = 4*xe*eta;
+%           dN_dxe(1) = -3 + 4*xe + 4*eta;
+%           dN_dxe(2) = -1 + 4*xe;
+%           dN_dxe(3) = 0;
+%           dN_dxe(4) = -4*eta;
+%           dN_dxe(5) = 4 - 8*xe - 4*eta;
+%           dN_dxe(6) = 4*eta;
+%           dN_deta(1) = -3 + 4*eta + 4*xe;
+%           dN_deta(2) = 0;
+%           dN_deta(3) = -1 + 4*eta;
+%           dN_deta(4) = 4 - 8*eta - 4*xe;
+%           dN_deta(5) = -4*xe;
+%           dN_deta(6) = 4*xe;
+
+%         N(1) = 1 - 3*xe - 3*eta + 2*xe^2 + 2*eta^2 + 4*xe*eta;
+%         N(2) = -eta + 2*eta^2;
+%         N(3) = 
+%         N(4) = 
+%         N(5) = 
+%         N(6) = 
         B = [dN_dxe(1), dN_dxe(2), dN_dxe(3), dN_dxe(4), dN_dxe(5), dN_dxe(6); dN_deta(1), dN_deta(2), dN_deta(3), dN_deta(4), dN_deta(5), dN_deta(6)];
     otherwise
         disp('You entered an unsupported number of nodes per element.');
@@ -47,8 +73,10 @@ for i = 1:num_nodes_per_elem
     sum_eta = sum_eta + dN_deta(i);
 end
 
-if abs(sum - 1) > 1e-10 || sum_xe ~= 0 || sum_eta ~= 0
+tol = 1e-14;
+if abs(sum - 1) > tol || abs(sum_xe - 0) >= tol || abs(sum_eta - 0) >= tol
     disp('Error in shape functions!')
+    sprintf('Sum: %f, dxe: %f, deta: %f', sum, sum_xe, sum_eta)
 end
 
 % x(xe, eta) and y(xe, eta) transformation to the parametric domain

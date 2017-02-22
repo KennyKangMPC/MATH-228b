@@ -1,12 +1,8 @@
-%function [a] = fempoi2(p, t, e)
+function [a] = fempoi2(p, t, e)
 %  p = coordinates in mesh
 %  t = triangulation
 %  e = Dirichlet boundary nodes
 %  --- To use this function, you must have already run pmesh()
-clear all
-pv = [0,0; 1,0; 1,1; 0,1; 0,0];
-[p, t, e] = pmesh(pv, 0.15, 0);
-[p, t, e] = p2mesh(p, t);
 
 LM = t;
 coordinates = p;
@@ -24,10 +20,17 @@ a_k = dirichlet_nodes(2,:);
 num_nodes = length(p(:,1));
 
 % specify the quadrature rule
-wt = [1/3, 1/3, 1/3];
-qp = [1,1; 5/2,1; 1,5/2];
-%wt = [1/6];
+% the rule i calculated
+%wt = [1/3, 1/3, 1/3];
+%qp = [1/6,1/6; 1/6+3/2,1/6; 1/6,1/6+3/2];
+
+% the one-point rule from last time
+%wt = [1/2];
 %qp = [1/3,1/3];
+
+% two-point rule from last time
+wt = [1/6; 1/6; 1/6];
+qp = [1/6,1/6; 2/3,1/6; 1/6,2/3];
 
 % assemble the elemental k and elemental f
 K = zeros(num_nodes);
@@ -37,18 +40,16 @@ for elem = 1:num_elem
     k = 0;
     f = 0;
 
-    for ll = 1:length(wt) % eta loop
-         %for l = 1:length(qp) % xe loop
-                 [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(qp(ll, 1), qp(ll, 2), num_nodes_per_elem, coordinates, LM, elem);
-                 F_mat = transpose([dx_dxe, dx_deta; dy_dxe, dy_deta]);
-                 J = det(F_mat);
+    for ll = 1:length(wt)
+         [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(qp(ll, 1), qp(ll, 2), num_nodes_per_elem, coordinates, LM, elem);
+         F_mat = transpose([dx_dxe, dx_deta; dy_dxe, dy_deta]);
+         J = det(F_mat);
 
-                 % assemble the (elemental) forcing vector
-                 f = f + wt(ll) * transpose(N) * J;
+         % assemble the (elemental) forcing vector
+         f = f + wt(ll) * transpose(N) * J;
 
-                 % assemble the (elemental) stiffness matrix - correct
-                 k = k + wt(ll) * transpose(inv(F_mat) * B) * inv(F_mat) * B * J;      
-         %end
+         % assemble the (elemental) stiffness matrix
+         k = k + wt(ll) * transpose(inv(F_mat) * B) * inv(F_mat) * B * J;      
     end
     
     k = k .* 0.5;
@@ -90,6 +91,6 @@ for a_row = 1:num_nodes
     end
 end
 
-tplot(p, LM, a)
+tplot(p, LM, a(1:size(p,1)))
 
-%end
+end

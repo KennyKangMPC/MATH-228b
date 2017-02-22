@@ -91,8 +91,10 @@ end
 
 e2 = [e; enewer];
 
-for i = 1:length(e2)
-    scatter(p2(e2(i), 1), p2(e2(i), 2), 'ro')
-    hold on
-end
+% for i = 1:length(e2)
+%     scatter(p2(e2(i), 1), p2(e2(i), 2), 'ro')
+%     hold on
+% end
+
+disp('Finished generating quadratic mesh...')
 end
