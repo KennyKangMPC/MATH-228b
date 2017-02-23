@@ -1,5 +1,5 @@
 
-l = 6;              % wave number
+wave = 6;              % wave number
 
 % generate the mesh
 pv = [0,0; 5,0; 5,1; 0,1; 0,0];
@@ -44,9 +44,7 @@ K = zeros(num_nodes); M = zeros(num_nodes);
 Bin = zeros(num_nodes); Bout = zeros(num_nodes); F = zeros(num_nodes, 1);
 
 for elem = 1:num_elem
-    k = 0;
-    f = 0;
-    m = 0;
+    k = 0; f = 0; m = 0; bin = 0; bout = 0;
 
     % compute integrals over the area (entire domain)
     for ll = 1:length(wt)
@@ -65,44 +63,59 @@ for elem = 1:num_elem
          f = f + wt(ll) * transpose(N) * J;  
     end
     
-    % find the edges of the current element, and sort so that lower number 
-    % is first
+    % find the edges of the current element
     edges = [LM(elem,[1,2]); LM(elem,[2,3]); LM(elem,[3,1])];
     edges = sort(edges, 2);
-    
-    % find if any of the element edges are on the boundaries
-    % in In?
     
     for edge = 1:length(edges(:,1))
         % is it on the In boundary?
         for in = 1:length(In(:, 1))
             if edges(edge, 1) == In(in, 1) && edges(edge, 2) == In(in, 2)
-                sprintf('Element %i is on In', elem)
+                % which edge is it - is xe or eta constant?
+                xe_edge = [LM(elem, 1), LM(elem, 2)];
+                eta_edge = [LM(elem, 3), LM(elem, 1)];
+                
+                xe_edge = sort(xe_edge, 2);
+                eta_edge = sort(eta_edge, 2);
+                
+                if edges(edge, 1) == xe_edge(1) && edges(edge, 2) == xe_edge(2)
+                    for l = 1:length(wt1) % along xe edge (eta = 0)
+                        [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(qp1(l), 0, num_nodes_per_elem, p, LM, elem);
+                        % compute Bin
+                    end
+                elseif edges(edge, 1) == eta_edge(1) && edges(edge, 2) == eta_edge(2)
+                    for l = 1:length(wt1) % along eta edge (xe = 0)
+                        [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(0, qp1(l), num_nodes_per_elem, p, LM, elem);
+                        % compute Bin
+                    end
+                else
+                    disp('Along weird edge.')
+                    % compute Bin
+                end
             end
         end
         
         % is it on the Out boundary?
         for in = 1:length(Out(:, 1))
             if edges(edge, 1) == Out(in, 1) && edges(edge, 2) == Out(in, 2)
-                sprintf('Element %i is on Out', elem)
+                for l = 1:length(wt1)
+                    [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(qp1(l), qp1(l), num_nodes_per_elem, p, LM, elem);
+                    % compute Bout
+                end
             end
         end
         
-        % is on the Wall boundary?
+        % is it on the Wall boundary?
         for in = 1:length(Wall(:, 1))
             if edges(edge, 1) == Wall(in, 1) && edges(edge, 2) == Wall(in, 2)
-                sprintf('Element %i is on Wall', elem)
+                for l = 1:length(wt1)
+                    [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(qp1(l), qp1(l), num_nodes_per_elem, p, LM, elem);
+                    % do nothing = homogeneous Neumann condition
+                end
             end
         end
     end
     
-    
-    % compute integrals over the boundaries (different quadrature rule)
-    % for all boundaries, either xi or eta is constant
-    for l = 1:length(wt1)
-        % In-boundary (vertical, so either xi or eta is constant)
-        [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(qp1(l), qp1(l), num_nodes_per_elem, p, LM, elem);
-    end
     
     % multiply by 0.5 according to quadrature rule
     k = k .* 0.5;
@@ -115,6 +128,8 @@ for elem = 1:num_elem
        j = perm(mm,2);
        K(LM(elem, i), LM(elem, j)) = K(LM(elem, i), LM(elem, j)) + k(i,j);
        M(LM(elem, i), LM(elem, j)) = M(LM(elem, i), LM(elem, j)) + m(i,j);
+       %Bin(LM(elem, i), LM(elem, j)) = Bin(LM(elem, i), LM(elem, j)) + bin(i,j);
+       %Bout(LM(elem, i), LM(elem, j)) = Bout(LM(elem, i), LM(elem, j)) + bout(i,j);
     end
 
     % place the elemental f vector into the global F vector

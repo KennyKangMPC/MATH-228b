@@ -2,8 +2,8 @@ function [p2, t2, e2] = p2mesh(p, t)
 
 e = boundary_nodes(t);
 
-%tplot(p, t)
-%hold on
+% tplot(p, t)
+% hold on
 
 T = zeros(length(t(:,1)), 6);
 pnew = []; enew = [];
@@ -91,10 +91,10 @@ end
 
 e2 = [e; enewer];
 
-% for i = 1:length(e2)
-%     scatter(p2(e2(i), 1), p2(e2(i), 2), 'ro')
-%     hold on
-% end
+%  for i = 1:length(e2)
+%      scatter(p2(e2(i), 1), p2(e2(i), 2), 'ro')
+%      hold on
+%  end
 
 disp('Finished generating quadratic mesh...')
 end

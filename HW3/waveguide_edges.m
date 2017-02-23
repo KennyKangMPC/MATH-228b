@@ -1,11 +1,5 @@
-% waveguide_edges
+function [In, Out, Wall] = waveguide_edges(p, t)
 tol = 1e-12;
-
-pv = [0,0; 5,0; 5,1; 0,1; 0,0];
-[p, t, e] = pmesh(pv, 0.25, 0);
-
-tplot(p, t)
-hold on
 
 % find all mesh edges - from boundary_nodes.m
 
