@@ -90,7 +90,7 @@
 \setcounter{tocdepth}{4}
 \begin{document}
 
-\title{MATH 228b: HW3 ... 2bcd, 3abc, 4bc}
+\title{MATH 228b: HW3 ... 1c, 2cd, 3abc, 4bc}
 \author{April Novak}
 
 \maketitle
@@ -234,8 +234,6 @@ H(u_h)=&\int_{\Gamma_{out}}\textbf{u}^T\textbf{N}^T\textbf{N}\textbf{u}\\
 H(u_h)=&\textbf{u}^T\textbf{B}_{out}\textbf{u}\\
 \eeqa
 
-
-
 \section{}
 
 This problem solves the problem stated in Eq. \eqref{eq:prob} for boundary conditions given in Eq. \eqref{eq:BCs} for the rectangular domain given in the assignment.
@@ -292,11 +290,41 @@ u(x)=&e^{-ikx}\\
 
 \subsection{(b)}
 
+The function {\tt waveguide\_edges} computes arrays of edges for the particular geometry for this question. By first finding all edges, the edges with both \(x\) coordinates equal to zero are on \(\Gamma_{in}\), while edges with both \(x\) coordinates equal to 5 are on \(\Gamma_{out}\), and edges with both \(y\) coordinates equal to 0 or 1 are on the \(\Gamma_{wall}\) boundary. The code developed for this section is shown in the Appendix.
+
+\subsection{(c)}
+
+This section computes the matrices given in Eq. \eqref{eq:Matrices} for a given mesh. To facilitate easier use of quadrature rules, all of the integrals in Eq. \eqref{eq:Matrices} are transformed to a master element, indicated by superscript \(e\) and variables of integration \(\xi\) and \(\eta\), as opposed to \(x\) and \(y\) in the physical domain. The boundary integrals are slightly more difficult to transform to the master domain. If the boundary corresponds to the bottom of the triangle in the master domain defined with corner points \((\xi=0,\eta=0), (\xi=1,\eta=0)\), then \(\eta=0\), and the integration is only with respect to \(\xi\) (and a normal, 1-D Gaussian quadrature rule can be used). Likewise, if the boundary corresponds to the left edge of the master domain triangle defined by \((\xi=0,\eta=0), (\xi=0,\eta=1)\), then \(\xi=0\), and the integration is only with respect to \(\eta\). 
+
+\beqa
+\label{eq:Matrices}
+\textbf{K}^e=&\int_{\Omega^e}(\textbf{J}^{-1}\textbf{C})^T(\textbf{J}^{-1}\textbf{C})|\textbf{J}|d\eta d\xi\\
+\textbf{M}^e=&\int_{\Omega^e}\textbf{N}^T\textbf{N}|\textbf{J}|d\eta d\xi\\
+\textbf{B}_{in}^e=&\int_{\Gamma_{in}}\textbf{N}^T\textbf{N}d\Gamma\\
+\textbf{B}_{out}^e=&\int_{\Gamma_{out}}\textbf{N}^T\textbf{N}d\Gamma\\
+\textbf{b}_{in}^e=&\int_{\Gamma_{in}}\textbf{N}^Td\Gamma\\
+\eeqa
+
+where \textbf{J} and \textbf{C} are defined as:
+
+\beqa
+\textbf{J}=&\begin{bmatrix}dx/d\xi & dx/d\eta\\ dy/d\xi & dy/d\eta\end{bmatrix}\\
+\textbf{C}=&\begin{bmatrix}
+\frac{\partial\psi_1}{d\xi} & \frac{\partial\psi_2}{d\xi} & \cdots & \frac{\partial\psi_{n_en}}{d\xi}\\
+\frac{\partial\psi_1}{d\eta} & \frac{\partial\psi_2}{d\eta} & \cdots & \frac{\partial\psi_{n_en}}{d\eta}\\
+\end{bmatrix}\\ 
+\eeqa
+
+
+
+
+
 \section{}
 
-\section{(a)}
-
 {\tt pmesh.m} (the one developed by the Professor, since I got points off from HW 1 for my {\tt pmesh}) is used to generate a mesh of the domain given in the assignment. 
+
+\subsection{(a)}
+
 
 \section{}
 
@@ -507,6 +535,9 @@ A_{uu}u_u=f_u-A_{uk}x_k
 
 
 \section{Appendix}
+\subsection{Question 2}
+\subsubsection{Part (b) - {\tt waveguide\_edges.m}}
+\lstinputlisting[language=Matlab]{waveguide_edges.m}
 \subsection{Question 4}
 \subsubsection{Part (a) - {\tt p2mesh.m}}
 \lstinputlisting[language=Matlab]{p2mesh.m}
