@@ -1,9 +1,10 @@
 
 wave = 6;              % wave number
+imag = sqrt(-1);
 
 % generate the mesh
 pv = [0,0; 5,0; 5,1; 0,1; 0,0];
-[p, t, e] = pmesh(pv, 0.15, 0);
+[p, t, e] = pmesh(pv, 0.1, 0);
 
 % find the edges of the mesh
 [In, Out, Wall] = waveguide_edges(p, t);
@@ -24,7 +25,7 @@ qp1 = [-1/sqrt(3); 1/sqrt(3)];
 wtedge = [1, 1];
 qpedge = [-1/sqrt(3), 1--1/sqrt(3); 1/sqrt(3), 1-1/sqrt(3)];
 
-% two-point rule from last time
+% two-point rule
 wt = [1/6; 1/6; 1/6];
 qp = [1/6,1/6; 2/3,1/6; 1/6,2/3];
 
@@ -35,17 +36,16 @@ Bin = zeros(num_nodes); Bout = zeros(num_nodes); F = zeros(num_nodes, 1);
 for elem = 1:num_elem
     k = 0; m = 0; bout = 0; bin = 0; bright = 0;
 
-    % compute integrals over the area (entire domain)
     for ll = 1:length(wt)
          [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(qp(ll, 1), qp(ll, 2), num_nodes_per_elem, p, LM, elem);
          F_mat = transpose([dx_dxe, dx_deta; dy_dxe, dy_deta]);
          J = det(F_mat);
          D = inv(F_mat) * B;
 
-         % assemble the (elemental) K matrix - correct
+         % assemble the (elemental) K matrix
          k = k + wt(ll) * transpose(D) * (D) * J;
          
-         % assemble the (elemental) m matrix - correct
+         % assemble the (elemental) m matrix
          m = m + wt(ll) * N * transpose(N) * J; 
     end
     
@@ -87,8 +87,9 @@ for elem = 1:num_elem
                         dx = abs(p(edges(edge, 1), 1) - p(edges(edge, 2), 1));
                         J = sqrt(dx^2 + dy^2)/sqrt(2);
                         bin = bin + wtedge(l) * N * transpose(N) * J;
-                        bright = bright + wt(l) * N * J;
+                        bright = bright + wtedge(l) * N * J;
                     end
+                    sprintf('Weird boundary for %f, %f', edges(edge, 1), edges(edge, 2))
                 end
             end
         end
@@ -125,6 +126,7 @@ for elem = 1:num_elem
                         J = sqrt(dx^2 + dy^2)/sqrt(2);
                         bout = bout + wtedge(l) * N * transpose(N) * J;
                     end
+                    sprintf('Weird boundary for %f, %f', edges(edge, 1), edges(edge, 2))
                 end
             end
         end
@@ -158,9 +160,19 @@ for elem = 1:num_elem
     end
 end
 
-K = K - (wave^2)*M + 1i*wave*(Bin + Bout);
-F = F .* 2*1i*wave;
+K = K - (wave.^2) .* M + imag .* wave .* (Bin + Bout);
+F = F .* 2 .* imag .* wave;
 
 a = K\F;
 
-tplot(p, LM, real(a(1:size(p,1))))
+% plot the exact solution
+exact = zeros(length(a), 1);
+
+for i = 1:length(exact(:, 1))
+    exact(i) = cos(wave .* p(i, 1)) + imag .* sin(wave .* p(i, 1));
+end
+
+real_exact = real(exact(1:size(p,1)));
+real_fem = real(a(1:size(p,1)));
+
+tplot(p, LM, real_fem)
