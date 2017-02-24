@@ -2,12 +2,20 @@
 wave = 6;              % wave number
 imag = sqrt(-1);
 
-% generate the mesh
-pv = [0,0; 5,0; 5,1; 0,1; 0,0];
-[p, t, e] = pmesh(pv, 0.1, 0);
+% % generate the mesh
+% pv = [0,0; 5,0; 5,1; 0,1; 0,0];
+% [p, t, e] = pmesh(pv, 0.1, 0);
+% [In, Out, Wall] = waveguide_edges(p, t);
 
-% find the edges of the mesh
-[In, Out, Wall] = waveguide_edges(p, t);
+
+% --- simple test case
+ p = [0,0; 1,0; 2,0; 0,1; 1,1; 2,1; 0,2; 1,2; 2,2];
+ t = [1,2,4; 2,5,4; 2,3,5; 3,6,5; 4,5,7; 5,8,7; 5,6,8; 6,9,8];
+ In = [1, 4; 4, 7];
+ Out = [3, 6; 6, 9];
+% ----
+
+
 
 LM = t;                         % location matrix                
 num_elem = length(LM(:,1));     % number of elements
@@ -40,20 +48,19 @@ for elem = 1:num_elem
     % find the edges of the current element
     edges = [LM(elem,[1,2]); LM(elem,[2,3]); LM(elem,[3,1])];
     edges = sort(edges, 2);
+    xe_edge = [LM(elem, 1), LM(elem, 2)];
+    eta_edge = [LM(elem, 3), LM(elem, 1)];
+    xe_edge = sort(xe_edge, 2);
+    eta_edge = sort(eta_edge, 2);
     
     for edge = 1:length(edges(:,1))
         % is it on the In boundary?
         for in = 1:length(In(:, 1))
-            if edges(edge, 1) == In(in, 1) && edges(edge, 2) == In(in, 2)
-                % which edge is it - is xe or eta constant?
-                xe_edge = [LM(elem, 1), LM(elem, 2)];
-                eta_edge = [LM(elem, 3), LM(elem, 1)];
-                xe_edge = sort(xe_edge, 2);
-                eta_edge = sort(eta_edge, 2);
-                
+            if edges(edge, 1) == In(in, 1) && edges(edge, 2) == In(in, 2)                
                 if edges(edge, 1) == xe_edge(1) && edges(edge, 2) == xe_edge(2)
                 elseif edges(edge, 1) == eta_edge(1) && edges(edge, 2) == eta_edge(2)
                 else
+                    sprintf('Changing LM for element %i', elem)
                     LM(elem, :) = [LM(elem, 2), LM(elem, 3), LM(elem, 1)];
                 end
             end
@@ -62,15 +69,10 @@ for elem = 1:num_elem
         % is it on the Out boundary?
         for in = 1:length(Out(:, 1))
             if edges(edge, 1) == Out(in, 1) && edges(edge, 2) == Out(in, 2)
-                % which edge is it - is xe or eta constant?
-                xe_edge = [LM(elem, 1), LM(elem, 2)];
-                eta_edge = [LM(elem, 3), LM(elem, 1)];
-                xe_edge = sort(xe_edge, 2);
-                eta_edge = sort(eta_edge, 2);
-                
                 if edges(edge, 1) == xe_edge(1) && edges(edge, 2) == xe_edge(2)
                 elseif edges(edge, 1) == eta_edge(1) && edges(edge, 2) == eta_edge(2)
                 else
+                    sprintf('Changing LM for element %i', elem)
                     LM(elem, :) = [LM(elem, 2), LM(elem, 3), LM(elem, 1)];
                 end
             end
@@ -90,10 +92,7 @@ for elem = 1:num_elem
          J = det(F_mat);
          D = inv(F_mat) * B;
 
-         % assemble the (elemental) K matrix
          k = k + wt(ll) * transpose(D) * (D) * J;
-         
-         % assemble the (elemental) m matrix
          m = m + wt(ll) * N * transpose(N) * J; 
     end
     
@@ -101,60 +100,44 @@ for elem = 1:num_elem
     edges = [LM(elem,[1,2]); LM(elem,[2,3]); LM(elem,[3,1])];
     edges = sort(edges, 2);
     
-    in_flag = 0;
+    xe_edge = [LM(elem, 1), LM(elem, 2)];
+    eta_edge = [LM(elem, 3), LM(elem, 1)];
+    xe_edge = sort(xe_edge, 2);
+    eta_edge = sort(eta_edge, 2);
+    
+    in_flag = 0; out_flag = 0;
     for edge = 1:length(edges(:,1))
+        
         % is it on the In boundary?
         for in = 1:length(In(:, 1))
             if edges(edge, 1) == In(in, 1) && edges(edge, 2) == In(in, 2)
                 in_flag = 1;
-                % which edge is it - is xe or eta constant?
-                xe_edge = [LM(elem, 1), LM(elem, 2)];
-                eta_edge = [LM(elem, 3), LM(elem, 1)];
-                
-                xe_edge = sort(xe_edge, 2);
-                eta_edge = sort(eta_edge, 2);
-                
+
+                g
                 if edges(edge, 1) == xe_edge(1) && edges(edge, 2) == xe_edge(2)
                     for l = 1:length(wt1) % along xe edge (eta = 0)
                         [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(qp1(l), 0, num_nodes_per_elem, p, LM, elem);
                         J = abs(p(edges(edge, 1), 2) - p(edges(edge, 2), 2));
                         bin = bin + wt1(l) * N * transpose(N) * J;
-                        bright = bright + wt(l) * N * J;
-                        bin = bin + wt1(l) * N * transpose(N) * J; % new
-                        bright = bright + wt1(l) * N * J; % new
+                        bright = bright + wt1(l) * N * J;
                     end
                 elseif edges(edge, 1) == eta_edge(1) && edges(edge, 2) == eta_edge(2)
                     for l = 1:length(wt1) % along eta edge (xe = 0)
                         [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(0, qp1(l), num_nodes_per_elem, p, LM, elem);
                         J = abs(p(edges(edge, 1), 2) - p(edges(edge, 2), 2));
                         bin = bin + wt1(l) * N * transpose(N) * J;
-                        bright = bright + wt(l) * N * J;
+                        bright = bright + wt1(l) * N * J;
                     end
                 else
-%                     for l = 1:length(wtedge) % along last edge
-%                         [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(qpedge(l, 1), qpedge(l, 2), num_nodes_per_elem, p, LM, elem);
-%                         dy = abs(p(edges(edge, 1), 2) - p(edges(edge, 2), 2));
-%                         dx = abs(p(edges(edge, 1), 1) - p(edges(edge, 2), 1));
-%                         J = sqrt(dx^2 + dy^2)/sqrt(2);
-%                         bin = bin + wtedge(l) * N * transpose(N) * J;
-%                         bright = bright + wtedge(l) * N * J;
-%                     end
                     sprintf('Weird boundary for %f, %f', edges(edge, 1), edges(edge, 2))
                 end
             end
         end
         
-        out_flag = 0;
         % is it on the Out boundary?
         for in = 1:length(Out(:, 1))
             if edges(edge, 1) == Out(in, 1) && edges(edge, 2) == Out(in, 2)
                 out_flag = 1;
-                % which edge is it - is xe or eta constant?
-                xe_edge = [LM(elem, 1), LM(elem, 2)];
-                eta_edge = [LM(elem, 3), LM(elem, 1)];
-                
-                xe_edge = sort(xe_edge, 2);
-                eta_edge = sort(eta_edge, 2);
                 
                 if edges(edge, 1) == xe_edge(1) && edges(edge, 2) == xe_edge(2)
                     for l = 1:length(wt1) % along xe edge (eta = 0)
@@ -169,14 +152,7 @@ for elem = 1:num_elem
                         bout = bout + wt1(l) * N * transpose(N) * J;
                     end
                 else
-%                     for l = 1:length(wtedge) % along last edge
-%                         [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(qpedge(l, 1), qpedge(l, 2), num_nodes_per_elem, p, LM, elem);
-%                         dy = abs(p(edges(edge, 1), 2) - p(edges(edge, 2), 2));
-%                         dx = abs(p(edges(edge, 1), 1) - p(edges(edge, 2), 1));
-%                         J = sqrt(dx^2 + dy^2)/sqrt(2);
-%                         bout = bout + wtedge(l) * N * transpose(N) * J;
-%                     end
-%                     sprintf('Weird boundary for %f, %f', edges(edge, 1), edges(edge, 2))
+                     sprintf('Weird boundary for %f, %f', edges(edge, 1), edges(edge, 2))
                 end
             end
         end
@@ -187,7 +163,7 @@ for elem = 1:num_elem
     % multiply by 0.5 according to quadrature rule
     k = k .* 0.5;
     m = m .* 0.5;
-    
+       
     % place the elemental k matrix into the global K matrix
     for mm = 1:length(perm(:,1))
        i = perm(mm,1);
@@ -210,10 +186,10 @@ for elem = 1:num_elem
     end
 end
 
-K = K - (wave.^2) .* M + imag .* wave .* (Bin + Bout);
-F = F .* 2 .* imag .* wave;
+Kk = K - (wave.^2) .* M + imag .* wave .* (Bin + Bout);
+Ff = F .* 2 .* imag .* wave;
 
-a = K\F;
+a = Kk\Ff;
 
 % plot the exact solution
 exact = zeros(length(a), 1);
