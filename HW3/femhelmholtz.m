@@ -33,7 +33,7 @@ K = zeros(num_nodes); M = zeros(num_nodes);
 Bin = zeros(num_nodes); Bout = zeros(num_nodes); F = zeros(num_nodes, 1);
 
 for elem = 1:num_elem
-    k = 0; f = 0; m = 0; bout = 0; bin = 0; bright = 0;
+    k = 0; m = 0; bout = 0; bin = 0; bright = 0;
 
     % compute integrals over the area (entire domain)
     for ll = 1:length(wt)
@@ -46,10 +46,7 @@ for elem = 1:num_elem
          k = k + wt(ll) * transpose(D) * (D) * J;
          
          % assemble the (elemental) m matrix - correct
-         m = m + wt(ll) * N * transpose(N) * J;
-         
-         % assemble the (elemental) forcing vector (b_in)
-         f = f + wt(ll) * transpose(N) * J;  
+         m = m + wt(ll) * N * transpose(N) * J; 
     end
     
     % find the edges of the current element
@@ -138,7 +135,6 @@ for elem = 1:num_elem
     % multiply by 0.5 according to quadrature rule
     k = k .* 0.5;
     m = m .* 0.5;
-    f = f .* 0.5;
     
     % place the elemental k matrix into the global K matrix
     for mm = 1:length(perm(:,1))
@@ -155,8 +151,7 @@ for elem = 1:num_elem
     end
 
     % place the elemental f vector into the global F vector
-    for i = 1:length(f)
-       %F(LM(elem, i)) = F((LM(elem, i))) + f(i);
+    for i = 1:num_nodes_per_elem
        if (in_flag)
            F(LM(elem, i)) = F((LM(elem, i))) + bright(i);
        end
