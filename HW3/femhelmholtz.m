@@ -16,35 +16,24 @@ num_nodes = length(p(:,1));     % total number of nodes
 % form the permutation matrix for assembling the global matrices
 [perm] = permutation(num_nodes_per_elem);
 
-% specify the boundary conditions - homogeneous neumann and dirichlet
-dirichlet_nodes(1,:) = e;       % specify Dirichlet nodes
-dirichlet_nodes(2,:) = zeros .* dirichlet_nodes(1,:);
-a_k = dirichlet_nodes(2,:);
-
-
-% specify the quadrature rule
-% the rule i calculated
-%wt = [1/3, 1/3, 1/3];
-%qp = [1/6,1/6; 1/6+3/2,1/6; 1/6,1/6+3/2];
-
-% the one-point rule from last time
-wt = [1/2];
-qp = [1/3,1/3];
-
 % 1-D quadrature rule
 wt1 = [1, 1];
 qp1 = [-1/sqrt(3); 1/sqrt(3)];
 
+% diagonal edge quadrature rule
+wtedge = [1, 1];
+qpedge = [-1/sqrt(3), 1--1/sqrt(3); 1/sqrt(3), 1-1/sqrt(3)];
+
 % two-point rule from last time
-%wt = [1/6; 1/6; 1/6];
-%qp = [1/6,1/6; 2/3,1/6; 1/6,2/3];
+wt = [1/6; 1/6; 1/6];
+qp = [1/6,1/6; 2/3,1/6; 1/6,2/3];
 
 % assemble the elemental k and elemental f
 K = zeros(num_nodes); M = zeros(num_nodes);
 Bin = zeros(num_nodes); Bout = zeros(num_nodes); F = zeros(num_nodes, 1);
 
 for elem = 1:num_elem
-    k = 0; f = 0; m = 0; bin = 0; bout = 0;
+    k = 0; f = 0; m = 0; bout = 0; bin = 0; bright = 0;
 
     % compute integrals over the area (entire domain)
     for ll = 1:length(wt)
@@ -67,10 +56,12 @@ for elem = 1:num_elem
     edges = [LM(elem,[1,2]); LM(elem,[2,3]); LM(elem,[3,1])];
     edges = sort(edges, 2);
     
+    in_flag = 0;
     for edge = 1:length(edges(:,1))
         % is it on the In boundary?
         for in = 1:length(In(:, 1))
             if edges(edge, 1) == In(in, 1) && edges(edge, 2) == In(in, 2)
+                in_flag = 1;
                 % which edge is it - is xe or eta constant?
                 xe_edge = [LM(elem, 1), LM(elem, 2)];
                 eta_edge = [LM(elem, 3), LM(elem, 1)];
@@ -81,41 +72,68 @@ for elem = 1:num_elem
                 if edges(edge, 1) == xe_edge(1) && edges(edge, 2) == xe_edge(2)
                     for l = 1:length(wt1) % along xe edge (eta = 0)
                         [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(qp1(l), 0, num_nodes_per_elem, p, LM, elem);
-                        % compute Bin
+                        J = abs(p(edges(edge, 1), 2) - p(edges(edge, 2), 2));
+                        bin = bin + wt1(l) * N * transpose(N) * J;
+                        bright = bright + wt(l) * N * J;
                     end
                 elseif edges(edge, 1) == eta_edge(1) && edges(edge, 2) == eta_edge(2)
                     for l = 1:length(wt1) % along eta edge (xe = 0)
                         [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(0, qp1(l), num_nodes_per_elem, p, LM, elem);
-                        % compute Bin
+                        J = abs(p(edges(edge, 1), 2) - p(edges(edge, 2), 2));
+                        bin = bin + wt1(l) * N * transpose(N) * J;
+                        bright = bright + wt(l) * N * J;
                     end
                 else
-                    disp('Along weird edge.')
-                    % compute Bin
+                    for l = 1:length(wtedge) % along last edge
+                        [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(qpedge(l, 1), qpedge(l, 2), num_nodes_per_elem, p, LM, elem);
+                        dy = abs(p(edges(edge, 1), 2) - p(edges(edge, 2), 2));
+                        dx = abs(p(edges(edge, 1), 1) - p(edges(edge, 2), 1));
+                        J = sqrt(dx^2 + dy^2)/sqrt(2);
+                        bin = bin + wtedge(l) * N * transpose(N) * J;
+                        bright = bright + wt(l) * N * J;
+                    end
                 end
             end
         end
         
+        out_flag = 0;
         % is it on the Out boundary?
         for in = 1:length(Out(:, 1))
             if edges(edge, 1) == Out(in, 1) && edges(edge, 2) == Out(in, 2)
-                for l = 1:length(wt1)
-                    [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(qp1(l), qp1(l), num_nodes_per_elem, p, LM, elem);
-                    % compute Bout
+                out_flag = 1;
+                % which edge is it - is xe or eta constant?
+                xe_edge = [LM(elem, 1), LM(elem, 2)];
+                eta_edge = [LM(elem, 3), LM(elem, 1)];
+                
+                xe_edge = sort(xe_edge, 2);
+                eta_edge = sort(eta_edge, 2);
+                
+                if edges(edge, 1) == xe_edge(1) && edges(edge, 2) == xe_edge(2)
+                    for l = 1:length(wt1) % along xe edge (eta = 0)
+                        [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(qp1(l), 0, num_nodes_per_elem, p, LM, elem);
+                        J = abs(p(edges(edge, 1), 2) - p(edges(edge, 2), 2));
+                        bout = bout + wt1(l) * N * transpose(N) * J;
+                    end
+                elseif edges(edge, 1) == eta_edge(1) && edges(edge, 2) == eta_edge(2)
+                    for l = 1:length(wt1) % along eta edge (xe = 0)
+                        [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(0, qp1(l), num_nodes_per_elem, p, LM, elem);
+                        J = abs(p(edges(edge, 1), 2) - p(edges(edge, 2), 2));
+                        bout = bout + wt1(l) * N * transpose(N) * J;
+                    end
+                else
+                    for l = 1:length(wtedge) % along last edge
+                        [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(qpedge(l, 1), qpedge(l, 2), num_nodes_per_elem, p, LM, elem);
+                        dy = abs(p(edges(edge, 1), 2) - p(edges(edge, 2), 2));
+                        dx = abs(p(edges(edge, 1), 1) - p(edges(edge, 2), 1));
+                        J = sqrt(dx^2 + dy^2)/sqrt(2);
+                        bout = bout + wtedge(l) * N * transpose(N) * J;
+                    end
                 end
             end
         end
         
-        % is it on the Wall boundary?
-        for in = 1:length(Wall(:, 1))
-            if edges(edge, 1) == Wall(in, 1) && edges(edge, 2) == Wall(in, 2)
-                for l = 1:length(wt1)
-                    [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(qp1(l), qp1(l), num_nodes_per_elem, p, LM, elem);
-                    % do nothing = homogeneous Neumann condition
-                end
-            end
-        end
+        % is it on the Wall boundary? - do nothing, homogeneous Neumann
     end
-    
     
     % multiply by 0.5 according to quadrature rule
     k = k .* 0.5;
@@ -128,37 +146,26 @@ for elem = 1:num_elem
        j = perm(mm,2);
        K(LM(elem, i), LM(elem, j)) = K(LM(elem, i), LM(elem, j)) + k(i,j);
        M(LM(elem, i), LM(elem, j)) = M(LM(elem, i), LM(elem, j)) + m(i,j);
-       %Bin(LM(elem, i), LM(elem, j)) = Bin(LM(elem, i), LM(elem, j)) + bin(i,j);
-       %Bout(LM(elem, i), LM(elem, j)) = Bout(LM(elem, i), LM(elem, j)) + bout(i,j);
+       if (in_flag)
+            Bin(LM(elem, i), LM(elem, j)) = Bin(LM(elem, i), LM(elem, j)) + bin(i,j);
+       end
+       if (out_flag)
+           Bout(LM(elem, i), LM(elem, j)) = Bout(LM(elem, i), LM(elem, j)) + bout(i,j);
+       end
     end
 
     % place the elemental f vector into the global F vector
     for i = 1:length(f)
-       F(LM(elem, i)) = F((LM(elem, i))) + f(i);
+       %F(LM(elem, i)) = F((LM(elem, i))) + f(i);
+       if (in_flag)
+           F(LM(elem, i)) = F((LM(elem, i))) + bright(i);
+       end
     end
 end
 
-% perform static condensation to remove known Dirichlet nodes from solve
-[K_uu, K_uk, F_u, F_k] = condensation(K, F, num_nodes, dirichlet_nodes);
+K = K - (wave^2)*M + 1i*wave*(Bin + Bout);
+F = F .* 2*1i*wave;
 
-% perform the solve
-a_u_condensed = K_uu \ (F_u - K_uk * dirichlet_nodes(2,:)');
+a = K\F;
 
-% expand a_condensed to include the Dirichlet nodes
-a = zeros(num_nodes, 1);
-
-a_row = 1;
-i = 1;      % index for dirichlet_nodes
-j = 1;      % index for expanded row
-
-for a_row = 1:num_nodes
-    if (find(dirichlet_nodes(1, :) == a_row))
-        a(a_row) = dirichlet_nodes(2,i);
-        i = i + 1;
-    else
-        a(a_row) = a_u_condensed(j);
-        j = j + 1;
-    end
-end
-
-%tplot(p, LM, a(1:size(p,1)))
+tplot(p, LM, real(a(1:size(p,1))))
