@@ -2,18 +2,21 @@
 wave = 6;              % wave number
 imag = sqrt(-1);
 
-% % generate the mesh
-pv = [0,0; 5,0; 5,1; 0,1; 0,0];
-[p, t, e] = pmesh(pv, 0.1, 0);
-[In, Out, Wall] = waveguide_edges(p, t);
-
-
 % --- simple test case
-%  p = [0,0; 1,0; 2,0; 0,1; 1,1; 2,1; 0,2; 1,2; 2,2];
-%  t = [1,2,4; 2,5,4; 2,3,5; 3,6,5; 4,5,7; 5,8,7; 5,6,8; 6,9,8];
-%  In = [1, 4; 4, 7];
-%  Out = [3, 6; 6, 9];
+ p = [0,0; 1,0; 2,0; 0,1; 1,1; 2,1; 0,2; 1,2; 2,2];
+ t = [1,2,4; 2,5,4; 2,3,5; 3,6,5; 4,5,7; 5,8,7; 5,6,8; 6,9,8];
+ In = [1, 4; 4, 7];
+ Out = [3, 6; 6, 9];
 % ----
+
+if (1)
+    % % generate the mesh
+    pv = [0,0; 5,0; 5,1; 0,1; 0,0];
+    [p, t, e] = pmesh(pv, 0.1, 0);
+    [In, Out, Wall] = waveguide_edges(p, t);
+end
+
+
 
 
 
@@ -25,13 +28,11 @@ num_nodes = length(p(:,1));     % total number of nodes
 % form the permutation matrix for assembling the global matrices
 [perm] = permutation(num_nodes_per_elem);
 
-% 1-D quadrature rule
-wt1 = [1, 1];
-qp1 = [-1/sqrt(3); 1/sqrt(3)];
-
-% diagonal edge quadrature rule
-wtedge = [1, 1];
-qpedge = [-1/sqrt(3), 1--1/sqrt(3); 1/sqrt(3), 1-1/sqrt(3)];
+% 1-D quadrature rule (Simpson's rule)
+%wt1 = [1, 1];
+%qp1 = [-1/sqrt(3); 1/sqrt(3)];
+wt1 = [1/6, 4/6, 1/6];
+qp1 = [0, 0.5, 1];
 
 % two-point rule
 wt = [1/6; 1/6; 1/6];
@@ -111,16 +112,15 @@ for elem = 1:num_elem
         for in = 1:length(In(:, 1))     % is it on the In boundary?
             if edges(edge, 1) == In(in, 1) && edges(edge, 2) == In(in, 2)
                 in_flag = 1;
-
                 for l = 1:length(wt1)
                     if edges(edge, 1) == xe_edge(1) && edges(edge, 2) == xe_edge(2)
-                        xe = qp1(l);
-                        eta = 0;
+                        xe = qp1(l); eta = 0;
                     else
-                        xe = 0;
-                        eta = qp1(l);
+                        xe = 0; eta = qp1(l);
                     end
                     
+                    %[N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions_edge(xe, eta, num_nodes_per_elem, p, LM, elem);
+                    %J = abs(p(edges(edge, 1), 2) - p(edges(edge, 2), 2))/2;
                     [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(xe, eta, num_nodes_per_elem, p, LM, elem);
                     J = abs(p(edges(edge, 1), 2) - p(edges(edge, 2), 2));
                     bin = bin + wt1(l) * N * transpose(N) * J;
@@ -133,37 +133,19 @@ for elem = 1:num_elem
         for in = 1:length(Out(:, 1))
             if edges(edge, 1) == Out(in, 1) && edges(edge, 2) == Out(in, 2)
                 out_flag = 1;
-                
                 for l = 1:length(wt1)
                     if edges(edge, 1) == xe_edge(1) && edges(edge, 2) == xe_edge(2)
-                        xe = qp1(l);
-                        eta = 0;
+                        xe = qp1(l); eta = 0;
                     else
-                        xe = 0;
-                        eta = qp1(l);
+                        xe = 0; eta = qp1(l);
                     end
                     
                     [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(xe, eta, num_nodes_per_elem, p, LM, elem);
                     J = abs(p(edges(edge, 1), 2) - p(edges(edge, 2), 2));
+                    %[N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions_edge(xe, eta, num_nodes_per_elem, p, LM, elem);
+                    %J = abs(p(edges(edge, 1), 2) - p(edges(edge, 2), 2))/2;
                     bout = bout + wt1(l) * N * transpose(N) * J;
                 end
-
-                
-%                 if edges(edge, 1) == xe_edge(1) && edges(edge, 2) == xe_edge(2)
-%                     for l = 1:length(wt1) % along xe edge (eta = 0)
-%                         [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(qp1(l), 0, num_nodes_per_elem, p, LM, elem);
-%                         J = abs(p(edges(edge, 1), 2) - p(edges(edge, 2), 2));
-%                         bout = bout + wt1(l) * N * transpose(N) * J;
-%                     end
-%                 elseif edges(edge, 1) == eta_edge(1) && edges(edge, 2) == eta_edge(2)
-%                     for l = 1:length(wt1) % along eta edge (xe = 0)
-%                         [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(0, qp1(l), num_nodes_per_elem, p, LM, elem);
-%                         J = abs(p(edges(edge, 1), 2) - p(edges(edge, 2), 2));
-%                         bout = bout + wt1(l) * N * transpose(N) * J;
-%                     end
-%                 else
-%                      sprintf('Weird boundary for %f, %f', edges(edge, 1), edges(edge, 2))
-%                 end
             end
         end
         
@@ -181,9 +163,15 @@ for elem = 1:num_elem
        K(LM(elem, i), LM(elem, j)) = K(LM(elem, i), LM(elem, j)) + k(i,j);
        M(LM(elem, i), LM(elem, j)) = M(LM(elem, i), LM(elem, j)) + m(i,j);
        if (in_flag)
+           if mm == 1
+               bin
+           end
             Bin(LM(elem, i), LM(elem, j)) = Bin(LM(elem, i), LM(elem, j)) + bin(i,j);
        end
        if (out_flag)
+           if mm == 1
+               bout
+           end
            Bout(LM(elem, i), LM(elem, j)) = Bout(LM(elem, i), LM(elem, j)) + bout(i,j);
        end
     end
@@ -211,8 +199,4 @@ end
 real_exact = real(exact(1:size(p,1)));
 real_fem = real(a(1:size(p,1)));
 
-figure
-tplot(p, LM, real_fem)
-
-figure
-tplot(p, t)
+tplot(p, LM, real_fem - real_exact)
