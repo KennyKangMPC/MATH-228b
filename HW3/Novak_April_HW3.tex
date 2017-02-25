@@ -90,7 +90,7 @@
 \setcounter{tocdepth}{4}
 \begin{document}
 
-\title{MATH 228b: HW3 ... 1c, 2d, 3abc, 4bc}
+\title{MATH 228b: HW3 ... 1c, 3abc, 4bc}
 \author{April Novak}
 
 \maketitle
@@ -294,7 +294,7 @@ The function {\tt waveguide\_edges} computes arrays of edges for the particular 
 
 \subsection{(c)}
 
-This section computes the matrices given in Eq. \eqref{eq:Matrices} for a given mesh. To facilitate easier use of quadrature rules, all of the integrals in Eq. \eqref{eq:Matrices} are transformed to a master element, indicated by superscript \(e\) and variables of integration \(\xi\) and \(\eta\), as opposed to \(x\) and \(y\) in the physical domain. The boundary integrals are slightly more difficult to transform to the master domain. If the boundary corresponds to the bottom of the triangle in the master domain defined with corner points \((\xi=0,\eta=0), (\xi=1,\eta=0)\), then \(\eta=0\), and the integration is only with respect to \(\xi\) (and a normal, 1-D quadrature rule can be used). Likewise, if the boundary corresponds to the left edge of the master domain triangle defined by \((\xi=0,\eta=0), (\xi=0,\eta=1)\), then \(\xi=0\), and the integration is only with respect to \(\eta\). For elements with the hypotenuse of the master triangle on a boundary, the connectivity matrix is edited such that the edge along the boundary is the \(\xi\) edge (this is performed by simply shuffling the element row in the connectivity matrix by moving every number one position further to the right, and assigning the last number to the first column). Simpson's rule is used for integrating the boundary integrals, while the quadrature rule given in Question 4 is used for the area integrals. The code developed for this section is given in the Appendix.
+This section computes the matrices given in Eq. \eqref{eq:Matrices} for a given mesh. To facilitate easier use of quadrature rules, all of the integrals in Eq. \eqref{eq:Matrices} are transformed to a master element, indicated by superscript \(e\) and variables of integration \(\xi\) and \(\eta\), as opposed to \(x\) and \(y\) in the physical domain. The boundary integrals are slightly more difficult to transform to the master domain. If the boundary corresponds to the bottom of the triangle in the master domain defined with corner points \((\xi=0,\eta=0), (\xi=1,\eta=0)\), then \(\eta=0\), and the integration is only with respect to \(\xi\) (and a normal, 1-D quadrature rule can be used). Likewise, if the boundary corresponds to the left edge of the master domain triangle defined by \((\xi=0,\eta=0), (\xi=0,\eta=1)\), then \(\xi=0\), and the integration is only with respect to \(\eta\). For elements with the hypotenuse of the master triangle on a boundary, the connectivity matrix is edited such that the edge along the boundary is the \(\xi\) edge (this is performed by simply shuffling the element row in the connectivity matrix by moving every number one position further to the right, and assigning the last number to the first column). Simpson's rule is used for integrating the boundary integrals, while the quadrature rule given in Question 4 is used for the area integrals. The code developed for this section is given in the Appendix. Also included in the Appendix is the code used for swapping location matrix (a.k.a. triangulation) indices.
 
 \beqa
 \label{eq:Matrices}
@@ -315,9 +315,16 @@ where \textbf{J} and \textbf{C} are defined as:
 \end{bmatrix}\\ 
 \eeqa
 
+\subsection{(d)}
 
+Finally, {\tt femhelmholtz.m} is used to solve the given domain for successively finer and finer meshes to determine the rate of convergence. A short script was developed to show the convergence, and is included in the Appendix. The rate of convergence is estimated as {\tt rate=log2(errors(end-1))-log2(errors(end))}, and is approximately 1.9854. This is to be expected, since the rate of convergence of the finite element method, for sufficiently smooth solutions (which is the case here, since cosines and sines are infinitely differentiable), is only dependent on the polynomial order and an unknown constant. Hence, from the previous assignment, a convergence rate of 2 is obtained for linear elements (and a convergence rate of 3 would be obtained for quadratic elements).
 
-
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\textwidth]{error.png}
+\caption{Max norm of the error between the analytic and finite element method solutions.}
+\label{fig:1}
+\end{figure}
 
 \section{}
 
@@ -540,6 +547,10 @@ A_{uu}u_u=f_u-A_{uk}x_k
 \lstinputlisting[language=Matlab]{waveguide_edges.m}
 \subsubsection{Part (c) - {\tt femhelmholtz.m}}
 \lstinputlisting[language=Matlab]{femhelmholtz.m}
+\subsubsection{Part (c) - {\tt changeLM.m}}
+\lstinputlisting[language=Matlab]{changeLM.m}
+\subsubsection{Part (d) - {\tt convergence\_helmholtz.m}}
+\lstinputlisting[language=Matlab]{convergence_helmholtz.m}
 \subsection{Question 4}
 \subsubsection{Part (a) - {\tt p2mesh.m}}
 \lstinputlisting[language=Matlab]{p2mesh.m}

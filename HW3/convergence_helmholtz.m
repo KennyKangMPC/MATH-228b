@@ -4,7 +4,7 @@ clear all
 wave = 6;
 imag = 1i;
 hmax = 0.3;
-nrefmax = 5;
+nrefmax = 4;
 errors = zeros(1, nrefmax);
 tol = 1e-10;
 
@@ -34,7 +34,14 @@ for nref = 0:(nrefmax - 1)
     errors(nref + 1) = max(error);
 end
 
-loglog(1./hmax .^ (0:(nrefmax - 1)), errors, 'o-')
+sizes = 1./hmax .^ (0:(nrefmax - 1));
+loglog(sizes, errors, 'o-')
+xlabel('1/hmax', 'FontSize', 16)
+ylabel('Max-Norm of the Error', 'FontSize', 16)
+grid on
+
 for i = 1:(length(errors) - 1)
     rate(i) = log2(errors(i)) - log2(errors(i+1));
 end
+
+saveas(gcf, 'error', 'png')
