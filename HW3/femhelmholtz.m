@@ -9,15 +9,12 @@ imag = sqrt(-1);
  Out = [3, 6; 6, 9];
 % ----
 
-if (1)
+if (0)
     % % generate the mesh
     pv = [0,0; 5,0; 5,1; 0,1; 0,0];
-    [p, t, e] = pmesh(pv, 0.1, 0);
+    [p, t, e] = pmesh(pv, 0.15, 1);
     [In, Out, Wall] = waveguide_edges(p, t);
 end
-
-
-
 
 
 LM = t;                         % location matrix                
@@ -29,8 +26,6 @@ num_nodes = length(p(:,1));     % total number of nodes
 [perm] = permutation(num_nodes_per_elem);
 
 % 1-D quadrature rule (Simpson's rule)
-%wt1 = [1, 1];
-%qp1 = [-1/sqrt(3); 1/sqrt(3)];
 wt1 = [1/6, 4/6, 1/6];
 qp1 = [0, 0.5, 1];
 
@@ -42,47 +37,8 @@ qp = [1/6,1/6; 2/3,1/6; 1/6,2/3];
 K = zeros(num_nodes); M = zeros(num_nodes);
 Bin = zeros(num_nodes); Bout = zeros(num_nodes); F = zeros(num_nodes, 1);
 
-% change the LM for weird elements from 1 - 2 - 3 (2 - 3 is on boundary)
-% to 2 - 3 - 1 (edge 2-3 is now the xe edge)
-
-for elem = 1:num_elem
-    % find the edges of the current element
-    edges = [LM(elem,[1,2]); LM(elem,[2,3]); LM(elem,[3,1])];
-    edges = sort(edges, 2);
-    xe_edge = [LM(elem, 1), LM(elem, 2)];
-    eta_edge = [LM(elem, 3), LM(elem, 1)];
-    xe_edge = sort(xe_edge, 2);
-    eta_edge = sort(eta_edge, 2);
-    
-    for edge = 1:length(edges(:,1))
-        % is it on the In boundary?
-        for in = 1:length(In(:, 1))
-            if edges(edge, 1) == In(in, 1) && edges(edge, 2) == In(in, 2)                
-                if edges(edge, 1) == xe_edge(1) && edges(edge, 2) == xe_edge(2)
-                elseif edges(edge, 1) == eta_edge(1) && edges(edge, 2) == eta_edge(2)
-                else
-                    sprintf('Changing LM for element %i', elem)
-                    LM(elem, :) = [LM(elem, 2), LM(elem, 3), LM(elem, 1)];
-                end
-            end
-        end
-        
-        % is it on the Out boundary?
-        for in = 1:length(Out(:, 1))
-            if edges(edge, 1) == Out(in, 1) && edges(edge, 2) == Out(in, 2)
-                if edges(edge, 1) == xe_edge(1) && edges(edge, 2) == xe_edge(2)
-                elseif edges(edge, 1) == eta_edge(1) && edges(edge, 2) == eta_edge(2)
-                else
-                    sprintf('Changing LM for element %i', elem)
-                    LM(elem, :) = [LM(elem, 2), LM(elem, 3), LM(elem, 1)];
-                end
-            end
-        end
-    end
-end
-
-
-
+% change the LM for weird elements
+[LM] = changeLM(num_elem, LM, In, Out);
 
 for elem = 1:num_elem
     k = 0; m = 0; bout = 0; bin = 0; bright = 0;
@@ -118,11 +74,11 @@ for elem = 1:num_elem
                     else
                         xe = 0; eta = qp1(l);
                     end
-                    
-                    %[N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions_edge(xe, eta, num_nodes_per_elem, p, LM, elem);
-                    %J = abs(p(edges(edge, 1), 2) - p(edges(edge, 2), 2))/2;
                     [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(xe, eta, num_nodes_per_elem, p, LM, elem);
-                    J = abs(p(edges(edge, 1), 2) - p(edges(edge, 2), 2));
+                    %J = abs(p(edges(edge, 1), 2) - p(edges(edge, 2), 2));
+                    dx = p(edges(edge, 1), 1) - p(edges(edge, 2), 1);
+                    dy = p(edges(edge, 1), 2) - p(edges(edge, 2), 2);
+                    J = sqrt(dx^2 + dy^2);
                     bin = bin + wt1(l) * N * transpose(N) * J;
                     bright = bright + wt1(l) * N * J;
                 end
@@ -139,11 +95,11 @@ for elem = 1:num_elem
                     else
                         xe = 0; eta = qp1(l);
                     end
-                    
                     [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(xe, eta, num_nodes_per_elem, p, LM, elem);
-                    J = abs(p(edges(edge, 1), 2) - p(edges(edge, 2), 2));
-                    %[N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions_edge(xe, eta, num_nodes_per_elem, p, LM, elem);
-                    %J = abs(p(edges(edge, 1), 2) - p(edges(edge, 2), 2))/2;
+                    dx = p(edges(edge, 1), 1) - p(edges(edge, 2), 1);
+                    dy = p(edges(edge, 1), 2) - p(edges(edge, 2), 2);
+                    J = sqrt(dx^2 + dy^2);
+                    %J = abs(p(edges(edge, 1), 2) - p(edges(edge, 2), 2));
                     bout = bout + wt1(l) * N * transpose(N) * J;
                 end
             end
@@ -155,7 +111,7 @@ for elem = 1:num_elem
     % multiply by 0.5 according to quadrature rule
     k = k .* 0.5;
     m = m .* 0.5;
-       
+    
     % place the elemental k matrix into the global K matrix
     for mm = 1:length(perm(:,1))
        i = perm(mm,1);
@@ -163,13 +119,13 @@ for elem = 1:num_elem
        K(LM(elem, i), LM(elem, j)) = K(LM(elem, i), LM(elem, j)) + k(i,j);
        M(LM(elem, i), LM(elem, j)) = M(LM(elem, i), LM(elem, j)) + m(i,j);
        if (in_flag)
-           if mm == 1
+           if elem == 1 && mm == 1
                bin
-           end
-            Bin(LM(elem, i), LM(elem, j)) = Bin(LM(elem, i), LM(elem, j)) + bin(i,j);
+           end   
+           Bin(LM(elem, i), LM(elem, j)) = Bin(LM(elem, i), LM(elem, j)) + bin(i,j);
        end
        if (out_flag)
-           if mm == 1
+           if elem == 4 && mm == 1
                bout
            end
            Bout(LM(elem, i), LM(elem, j)) = Bout(LM(elem, i), LM(elem, j)) + bout(i,j);
@@ -190,13 +146,14 @@ Ff = F .* 2 .* imag .* wave;
 a = Kk\Ff;
 
 % plot the exact solution
-exact = zeros(length(a), 1);
+real_exact = zeros(length(a), 1);
+imag_exact = zeros(length(a), 1);
 
-for i = 1:length(exact(:, 1))
-    exact(i) = cos(wave .* p(i, 1)) + imag .* sin(wave .* p(i, 1));
+for i = 1:length(real_exact(:, 1))
+    real_exact(i) = cos(wave .* p(i, 1));
+    imag_exact(i) = imag .* sin(wave .* p(i, 1));
 end
 
-real_exact = real(exact(1:size(p,1)));
-real_fem = real(a(1:size(p,1)));
+real_fem = real(a);
 
-tplot(p, LM, real_fem - real_exact)
+tplot(p, LM, real_fem)

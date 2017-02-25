@@ -19,15 +19,6 @@ dirichlet_nodes(2,:) = zeros .* dirichlet_nodes(1,:);
 a_k = dirichlet_nodes(2,:);
 num_nodes = length(p(:,1));
 
-% specify the quadrature rule
-% the rule i calculated
-%wt = [1/3, 1/3, 1/3];
-%qp = [1/6,1/6; 1/6+3/2,1/6; 1/6,1/6+3/2];
-
-% the one-point rule from last time
-%wt = [1/2];
-%qp = [1/3,1/3];
-
 % two-point rule from last time
 wt = [1/6; 1/6; 1/6];
 qp = [1/6,1/6; 2/3,1/6; 1/6,2/3];
