@@ -1,24 +1,8 @@
 function [K, M, Bin, Bout, bin] = femhelmholtz(p, t, ein, eout)
 wave = 6;              % wave number
 imag = sqrt(-1);
-
-% --- simple test case
-%  p = [0,0; 1,0; 2,0; 0,1; 1,1; 2,1; 0,2; 1,2; 2,2];
-%  t = [1,2,4; 2,5,4; 2,3,5; 3,6,5; 4,5,7; 5,8,7; 5,6,8; 6,9,8];
-%  ein = [1, 4; 4, 7];
-%  eout = [3, 6; 6, 9];
-% ----
-
- if (0)
-    % % generate the mesh
-    pv = [0,0; 5,0; 5,1; 0,1; 0,0];
-    [p, t, e] = pmesh(pv, 0.15, 1);
-    [ein, eout, Wall] = waveguide_edges(p, t);
- end
-
-
-%t = t;                         % location matrix                
-num_elem = length(t(:,1));     % number of elements
+               
+num_elem = length(t(:,1));      % number of elements
 num_nodes_per_elem = 3;         % linear triangular elements
 num_nodes = length(p(:,1));     % total number of nodes
 
@@ -33,13 +17,8 @@ qp1 = [0, 0.5, 1];
 wt = 0.5 .* [1/3; 1/3; 1/3];
 qp = [1/6,1/6; 2/3,1/6; 1/6,2/3];
 
-% assemble the elemental k and elemental f
-% K = sparse(num_nodes, num_nodes); M = sparse(num_nodes);
-% Bin = sparse(num_nodes); Bout = sparse(num_nodes); F = zeros(num_nodes, 1);
-
 K = sparse(num_nodes, num_nodes); M = sparse(num_nodes, num_nodes);
 Bin = sparse(num_nodes, num_nodes); Bout = sparse(num_nodes, num_nodes); F = zeros(num_nodes, 1);
-
 
 % change the t for weird elements
 [t] = changeLM(num_elem, t, ein, eout);
@@ -133,19 +112,4 @@ for elem = 1:num_elem
 end
 
 bin = F;
-
-% Kk = K - (wave.^2) .* M + imag .* wave .* (Bin + Bout);
-% Ff = bin .* 2 .* imag .* wave;
-% 
-% a = Kk\Ff;
-% 
-% % plot the exact solution
-% real_exact = zeros(length(a), 1);
-% 
-% for i = 1:length(real_exact(:, 1))
-%     real_exact(i) = cos(wave .* p(i, 1));
-% end
-% 
-% real_fem = real(a);
-
 end

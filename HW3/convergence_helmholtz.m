@@ -34,7 +34,7 @@ for nref = 0:(nrefmax - 1)
     errors(nref + 1) = max(error);
 end
 
-loglog(1./hmax .^ (0:(nrefmax - 1)), errors)
+loglog(1./hmax .^ (0:(nrefmax - 1)), errors, 'o-')
 for i = 1:(length(errors) - 1)
     rate(i) = log2(errors(i)) - log2(errors(i+1));
 end
