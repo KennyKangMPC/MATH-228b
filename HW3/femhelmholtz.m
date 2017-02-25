@@ -9,7 +9,7 @@ imag = sqrt(-1);
  Out = [3, 6; 6, 9];
 % ----
 
-if (0)
+if (1)
     % % generate the mesh
     pv = [0,0; 5,0; 5,1; 0,1; 0,0];
     [p, t, e] = pmesh(pv, 0.15, 1);
@@ -30,7 +30,7 @@ wt1 = [1/6, 4/6, 1/6];
 qp1 = [0, 0.5, 1];
 
 % two-point rule
-wt = [1/6; 1/6; 1/6];
+wt = [1/3; 1/3; 1/3];
 qp = [1/6,1/6; 2/3,1/6; 1/6,2/3];
 
 % assemble the elemental k and elemental f
@@ -112,6 +112,10 @@ for elem = 1:num_elem
     k = k .* 0.5;
     m = m .* 0.5;
     
+    if elem == 1
+        %m
+    end
+    
     % place the elemental k matrix into the global K matrix
     for mm = 1:length(perm(:,1))
        i = perm(mm,1);
@@ -119,14 +123,14 @@ for elem = 1:num_elem
        K(LM(elem, i), LM(elem, j)) = K(LM(elem, i), LM(elem, j)) + k(i,j);
        M(LM(elem, i), LM(elem, j)) = M(LM(elem, i), LM(elem, j)) + m(i,j);
        if (in_flag)
-           if elem == 1 && mm == 1
+           if elem == 2 && mm == 1
                bin
            end   
            Bin(LM(elem, i), LM(elem, j)) = Bin(LM(elem, i), LM(elem, j)) + bin(i,j);
        end
        if (out_flag)
            if elem == 4 && mm == 1
-               bout
+               %bout
            end
            Bout(LM(elem, i), LM(elem, j)) = Bout(LM(elem, i), LM(elem, j)) + bout(i,j);
        end
