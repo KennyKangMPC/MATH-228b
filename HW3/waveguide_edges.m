@@ -53,24 +53,24 @@ for i = 1:length(C)
     end
 end
 
-for i = 1:length(ein(:,1))
-    scatter(p(ein(i, 1), 1), p(ein(i, 1), 2), 'ro')
-    hold on
-    scatter(p(ein(i, 2), 1), p(ein(i, 2), 2), 'ro')
-    hold on
-end
+% for i = 1:length(ein(:,1))
+%     scatter(p(ein(i, 1), 1), p(ein(i, 1), 2), 'ro')
+%     hold on
+%     scatter(p(ein(i, 2), 1), p(ein(i, 2), 2), 'ro')
+%     hold on
+% end
 
-for i = 1:length(eout(:,1))
-    scatter(p(eout(i, 1), 1), p(eout(i, 1), 2), 'bo')
-    hold on
-    scatter(p(eout(i, 2), 1), p(eout(i, 2), 2), 'bo')
-    hold on
-end
+% for i = 1:length(eout(:,1))
+%     scatter(p(eout(i, 1), 1), p(eout(i, 1), 2), 'bo')
+%     hold on
+%     scatter(p(eout(i, 2), 1), p(eout(i, 2), 2), 'bo')
+%     hold on
+% end
 
-for i = 1:length(ewall(:,1))
-    scatter(p(ewall(i, 1), 1), p(ewall(i, 1), 2), 'go')
-    hold on
-    scatter(p(ewall(i, 2), 1), p(ewall(i, 2), 2), 'go')
-    hold on
-end
+% for i = 1:length(ewall(:,1))
+%     scatter(p(ewall(i, 1), 1), p(ewall(i, 1), 2), 'go')
+%     hold on
+%     scatter(p(ewall(i, 2), 1), p(ewall(i, 2), 2), 'go')
+%     hold on
+% end
 
