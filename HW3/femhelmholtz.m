@@ -3,10 +3,10 @@ wave = 6;              % wave number
 imag = sqrt(-1);
 
 % --- simple test case
- p = [0,0; 1,0; 2,0; 0,1; 1,1; 2,1; 0,2; 1,2; 2,2];
- t = [1,2,4; 2,5,4; 2,3,5; 3,6,5; 4,5,7; 5,8,7; 5,6,8; 6,9,8];
- In = [1, 4; 4, 7];
- Out = [3, 6; 6, 9];
+%  p = [0,0; 1,0; 2,0; 0,1; 1,1; 2,1; 0,2; 1,2; 2,2];
+%  t = [1,2,4; 2,5,4; 2,3,5; 3,6,5; 4,5,7; 5,8,7; 5,6,8; 6,9,8];
+%  In = [1, 4; 4, 7];
+%  Out = [3, 6; 6, 9];
 % ----
 
 if (1)
@@ -29,8 +29,8 @@ num_nodes = length(p(:,1));     % total number of nodes
 wt1 = [1/6, 4/6, 1/6];
 qp1 = [0, 0.5, 1];
 
-% two-point rule
-wt = [1/3; 1/3; 1/3];
+% two-point rule - already multiplied by the area
+wt = 0.5 .* [1/3; 1/3; 1/3];
 qp = [1/6,1/6; 2/3,1/6; 1/6,2/3];
 
 % assemble the elemental k and elemental f
@@ -75,7 +75,6 @@ for elem = 1:num_elem
                         xe = 0; eta = qp1(l);
                     end
                     [N, dN_dxe, dN_deta, x_xe_eta, y_xe_eta, dx_dxe, dx_deta, dy_dxe, dy_deta, B] = shapefunctions(xe, eta, num_nodes_per_elem, p, LM, elem);
-                    %J = abs(p(edges(edge, 1), 2) - p(edges(edge, 2), 2));
                     dx = p(edges(edge, 1), 1) - p(edges(edge, 2), 1);
                     dy = p(edges(edge, 1), 2) - p(edges(edge, 2), 2);
                     J = sqrt(dx^2 + dy^2);
@@ -99,7 +98,6 @@ for elem = 1:num_elem
                     dx = p(edges(edge, 1), 1) - p(edges(edge, 2), 1);
                     dy = p(edges(edge, 1), 2) - p(edges(edge, 2), 2);
                     J = sqrt(dx^2 + dy^2);
-                    %J = abs(p(edges(edge, 1), 2) - p(edges(edge, 2), 2));
                     bout = bout + wt1(l) * N * transpose(N) * J;
                 end
             end
@@ -108,30 +106,16 @@ for elem = 1:num_elem
         % is it on the Wall boundary? - do nothing, homogeneous Neumann
     end
     
-    % multiply by 0.5 according to quadrature rule
-    k = k .* 0.5;
-    m = m .* 0.5;
-    
-    if elem == 1
-        %m
-    end
-    
     % place the elemental k matrix into the global K matrix
     for mm = 1:length(perm(:,1))
        i = perm(mm,1);
        j = perm(mm,2);
        K(LM(elem, i), LM(elem, j)) = K(LM(elem, i), LM(elem, j)) + k(i,j);
        M(LM(elem, i), LM(elem, j)) = M(LM(elem, i), LM(elem, j)) + m(i,j);
-       if (in_flag)
-           if elem == 2 && mm == 1
-               bin
-           end   
+       if (in_flag)  
            Bin(LM(elem, i), LM(elem, j)) = Bin(LM(elem, i), LM(elem, j)) + bin(i,j);
        end
        if (out_flag)
-           if elem == 4 && mm == 1
-               %bout
-           end
            Bout(LM(elem, i), LM(elem, j)) = Bout(LM(elem, i), LM(elem, j)) + bout(i,j);
        end
     end
@@ -160,4 +144,4 @@ end
 
 real_fem = real(a);
 
-tplot(p, LM, real_fem)
+tplot(p, LM, real_fem - real_exact)
