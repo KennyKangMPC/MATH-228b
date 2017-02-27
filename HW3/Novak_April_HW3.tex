@@ -346,7 +346,7 @@ Fig. \ref{fig:q3mesh} shows the mesh generated for this domain.
 \end{figure}
 
 \subsection{(b)}
-
+In order to investigate wave phenomena, the {\tt femhelmholtz} solver is used to solve Eq. \eqref{eq:prob} with boundary conditions Eq. \eqref{eq:BCs} on the new domain. To solve using a range of \(k\) values, the {\tt femhelmholtz} function is modified so that it can take a \(k\) value as input (though this is not the form that is eventually submitted since the format does not fit that requested). It is assumed that all of the boundaries retain the same meaning as in Question 2, and that the boundaries of the slits are also on \(\Gamma_{wall}\). 
 
 
 
