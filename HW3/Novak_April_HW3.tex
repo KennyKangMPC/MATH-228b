@@ -90,7 +90,7 @@
 \setcounter{tocdepth}{4}
 \begin{document}
 
-\title{MATH 228b: HW3 ... 1c, 3bc, 4bc}
+\title{MATH 228b: HW3 ... 3bc, 4bc}
 \author{April Novak}
 
 \maketitle
@@ -222,18 +222,37 @@ Refer to the definitions of \textbf{N} and \textbf{B} to see these definitions i
 The transmitted intensity, when computed as a function of the finite element solution, is:
 
 \beq
-H(u_h)=\int_{\Gamma_{out}}|\textbf{N}\textbf{u}|^2
+H(u_h)=\int_{\Gamma_{out}}|\textbf{N}\textbf{u}|^2d\Gamma
 \eeq
 
-where \(|(.)|\) is the complex absolute value of \((.)\). For vectors, the ``square'' is equivalent to a dot product, which by properties of the dot product can also be written in terms of transposes. By recognizing that the integral of \(\textbf{N}^T\textbf{N}\) is exactly that defined by \(\textbf{B}_{out}\) in Eq. \eqref{eq:Matrices}, the result that \(H(u_h\) can be expressed in terms of \(\textbf{u}\) has been shown.
+where \(|(.)|\) is the complex absolute value of \((.)\). Because \textbf{u} may have real and imaginary components, it should be split up as:
+
+\beq
+\textbf{u}=\textbf{u}_r+i\textbf{u}_i
+\eeq
+
+where \(r\) subscripts indicate the real component and \(i\) the imaginary component. Then, the transmitted intensity becomes:
 
 \beqa
-H(u_h)=&\int_{\Gamma_{out}}(\textbf{N}\textbf{u})\cdot(\textbf{N}\textbf{u})\\
-H(u_h)=&\int_{\Gamma_{out}}(\textbf{N}\textbf{u})^T(\textbf{N}\textbf{u})\\
-H(u_h)=&\int_{\Gamma_{out}}\textbf{u}^T\textbf{N}^T\textbf{N}\textbf{u}\\
-H(u_h)=&\textbf{u}^T\textbf{B}_{out}\textbf{u}\\
+H(u_h)=&\int_{\Gamma_{out}}|\textbf{N}\left(\textbf{u}_r+i\textbf{u}_i\right)|^2d\Gamma\\
+=&\int_{\Gamma_{out}}\left(\textbf{N}(\textbf{u}_r+i\textbf{u}_i)\right)\cdot\left(\textbf{N}(\textbf{u}_r-i\textbf{u}_i)\right)d\Gamma\\
+=&\int_{\Gamma_{out}}\left(\textbf{N}(\textbf{u}_r-i\textbf{u}_i)\right)^T\left(\textbf{N}(\textbf{u}_r+i\textbf{u}_i)\right)d\Gamma\\
+=&\int_{\Gamma_{out}}(\textbf{u}_r-i\textbf{u}_i)^T\textbf{N}^T\textbf{N}(\textbf{u}_r+i\textbf{u}_i)d\Gamma\\
+=&\int_{\Gamma_{out}}\textbf{u}^H\textbf{N}^T\textbf{N}\textbf{u}d\Gamma\\
+=\ &\textbf{u}^H\textbf{B}_{out}\textbf{u}\\
 \eeqa
 
+where the definition of \(\textbf{B}_{out}\) from Eq. \eqref{eq:Matrices} has been used to show how \(H(u)\) can be represented in terms of the finite element solution and \(\textbf{B}_{out}\).
+
+
+
+
+
+
+
+
+
+% QUESTION 2
 \section{}
 
 This problem solves the problem stated in Eq. \eqref{eq:prob} for boundary conditions given in Eq. \eqref{eq:BCs} for the rectangular domain given in the assignment.
