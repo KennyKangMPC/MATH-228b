@@ -90,7 +90,7 @@
 \setcounter{tocdepth}{4}
 \begin{document}
 
-\title{MATH 228b: HW3 ... 3c, 4bc}
+\title{MATH 228b: HW3 ... 4bc}
 \author{April Novak}
 
 \maketitle
@@ -374,6 +374,26 @@ In order to investigate wave phenomena, the {\tt femhelmholtz} solver is used to
 \label{fig:wavephenomena}
 \end{figure}
 
+\subsection{(c)}
+
+The maximum value of \(H(u)=0.3625\) occurs for \(k=6.13\), while the minimum value of \(H(u)=0.0013\) occurs for \(k=6.36\). Fig. \ref{fig:max} shows the real part of the solution obtained for \(k=6.13\), while Fig. \ref{fig:min} shows the solution for \(k=6.36\). As can be seen, the transmitted intensity beyond the first slit for the minimum \(H\) is essentially zero, while that intensity is roughly two orders of magnitude greater for the maximum value. All of the code written for this section is included in the Appendix.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\textwidth]{max.png}
+\caption{Real part of the solution for \(k=6.13\), or the maximum value in \(H\).}
+\label{fig:max}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\textwidth]{min.png}
+\caption{Real part of the solution for \(k=6.36\), or the minimum value in \(H\).}
+\label{fig:max}
+\end{figure}
+
+
+
 
 
 
@@ -598,6 +618,9 @@ A_{uu}u_u=f_u-A_{uk}x_k
 \lstinputlisting[language=Matlab]{changeLM.m}
 \subsubsection{Part (d) - {\tt convergence\_helmholtz.m}}
 \lstinputlisting[language=Matlab]{convergence_helmholtz.m}
+\subsection{Question 3}
+\subsubsection{Parts (a), (b), and (c) - {\tt q3.m}}
+\lstinputlisting[language=Matlab]{q3.m}
 \subsection{Question 4}
 \subsubsection{Part (a) - {\tt p2mesh.m}}
 \lstinputlisting[language=Matlab]{p2mesh.m}
