@@ -90,7 +90,7 @@
 \setcounter{tocdepth}{4}
 \begin{document}
 
-\title{MATH 228b: HW3 ... 3bc, 4bc}
+\title{MATH 228b: HW3 ... 3c, 4bc}
 \author{April Novak}
 
 \maketitle
@@ -359,13 +359,22 @@ Fig. \ref{fig:q3mesh} shows the mesh generated for this domain.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{mesh_q3.png}
+\includegraphics[width=1.0\textwidth]{mesh_q3.png}
 \caption{Mesh generated for the provided domain using {\tt pmesh}.}
 \label{fig:q3mesh}
 \end{figure}
 
 \subsection{(b)}
-In order to investigate wave phenomena, the {\tt femhelmholtz} solver is used to solve Eq. \eqref{eq:prob} with boundary conditions Eq. \eqref{eq:BCs} on the new domain. To solve using a range of \(k\) values, the {\tt femhelmholtz} function is modified so that it can take a \(k\) value as input (though this is not the form that is eventually submitted since the format does not fit that requested). It is assumed that all of the boundaries retain the same meaning as in Question 2, and that the boundaries of the slits are also on \(\Gamma_{wall}\). 
+In order to investigate wave phenomena, the {\tt femhelmholtz} solver is used to solve Eq. \eqref{eq:prob} with boundary conditions Eq. \eqref{eq:BCs} on the new domain. To solve using a range of \(k\) values, the {\tt femhelmholtz} function is modified so that it can take a \(k\) value as input (though this is not the form that is eventually submitted since the format does not fit that requested). It is assumed that all of the boundaries retain the same meaning as in Question 2, and that the boundaries of the slits are also on \(\Gamma_{wall}\). Fig. \ref{fig:wavephenomena} shows \(log(H(u))\) as a function of \(k\). As can be seen, for \(k=6.36\), there is a minimum in the transmitted intensity near \(2\pi\), since there is about two orders or magnitude drop in \(H(u)\) from its maximum value over the same range. It is interesting to see that for small changes in \(k\) that there is a substantial difference in the transmitted intensity, and this can be attributed to resonance phenomena as waves interact with the geometry of the slits.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.7\textwidth]{wave_phenomena.png}
+\caption{\(log(H(u))\) vs. \(k\).}
+\label{fig:wavephenomena}
+\end{figure}
+
+
 
 
 
