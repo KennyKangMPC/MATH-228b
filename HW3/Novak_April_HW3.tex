@@ -90,7 +90,7 @@
 \setcounter{tocdepth}{4}
 \begin{document}
 
-\title{MATH 228b: HW3 ... 4bc}
+\title{MATH 228b: HW3}
 \author{April Novak}
 
 \maketitle
@@ -340,7 +340,7 @@ Finally, {\tt femhelmholtz.m} is used to solve the given domain for successively
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.6\textwidth]{error.png}
+\includegraphics[width=0.6\textwidth]{figures/error.png}
 \caption{Max norm of the error between the analytic and finite element method solutions.}
 \label{fig:1}
 \end{figure}
@@ -359,7 +359,7 @@ Fig. \ref{fig:q3mesh} shows the mesh generated for this domain.
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=1.0\textwidth]{mesh_q3.png}
+\includegraphics[width=1.0\textwidth]{figures/mesh_q3.png}
 \caption{Mesh generated for the provided domain using {\tt pmesh}.}
 \label{fig:q3mesh}
 \end{figure}
@@ -369,7 +369,7 @@ In order to investigate wave phenomena, the {\tt femhelmholtz} solver is used to
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.7\textwidth]{wave_phenomena.png}
+\includegraphics[width=0.7\textwidth]{figures/wave_phenomena.png}
 \caption{\(log(H(u))\) vs. \(k\).}
 \label{fig:wavephenomena}
 \end{figure}
@@ -380,14 +380,14 @@ The maximum value of \(H(u)=0.3625\) occurs for \(k=6.13\), while the minimum va
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.6\textwidth]{max.png}
+\includegraphics[width=0.6\textwidth]{figures/max.png}
 \caption{Real part of the solution for \(k=6.13\), or the maximum value in \(H\).}
 \label{fig:max}
 \end{figure}
 
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.6\textwidth]{min.png}
+\includegraphics[width=0.6\textwidth]{figures/min.png}
 \caption{Real part of the solution for \(k=6.36\), or the minimum value in \(H\).}
 \label{fig:max}
 \end{figure}
@@ -402,7 +402,7 @@ The maximum value of \(H(u)=0.3625\) occurs for \(k=6.13\), while the minimum va
 % QUESTION 4
 \section{}
 
-This problem extends the {\tt fempoi.m} solver developed in the previous homework for quadratic triangular elements. All triangle are assumed to have straight edges. 
+This problem extends the {\tt fempoi.m} solver developed in the previous homework for quadratic triangular elements. All triangle are assumed to have straight edges. NOTE: I have assumed a triangulation for nodes numbered 1, 2, 3, 4, 5, 6 in the counterclockwise direction as {\tt t = [1, 2, 3, 4, 5, 6];} for one triangle. The short example given in an email the day before this was due gave a triangulation as {\tt t = [1, 3, 5, 2, 4, 6];}. Using such a triangulation with my code will not work, because I use master domain to physical domain mappings that require a consistent node numbering between the triangulation and the shape functions used in {\tt shapefunctions.m}. 
 
 \subsection{(a)}
 
@@ -577,8 +577,8 @@ w=&\begin{bmatrix}1/3& 1/3& 1/3\end{bmatrix}\\
 \frac{1}{6}\left(\xi_1+\xi_2+\xi_3\right) & \frac{1}{6}\left(\eta_1+\eta_2+\eta_3\right)+\frac{3}{2}
  \end{bmatrix}\\
  =&\begin{bmatrix}1/6 & 1/6\\
-1/6+3/2 & 1/6\\
-1/6 & 1/6+3/2
+1/6+2/3 & 1/6\\
+1/6 & 1/6+2/3
  \end{bmatrix}
 \eeqa
 
@@ -607,6 +607,26 @@ Then, similar to the discussion in Problem 2, instead of solving \(\textbf{A}\te
 A_{uu}u_u=f_u-A_{uk}x_k
 \eeq
 
+Instead of the above approach of solving the matrix system, where post-processing must be performed to apply Dirichlet conditions, the Dirichlet conditions can also be applied directly into the matrices \textbf{A} and \textbf{f} - this is the approach used in this assignment. Fig. \ref{fig:q4soln} shows the solution for the same domain as in homework 2. The code used for this section is given in the Appendix. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\textwidth]{figures/q4soln.png}
+\caption{Solution of the Poisson problem over the same domain as in homework 2.}
+\label{fig:q4soln}
+\end{figure}
+
+\subsection{(c)}
+
+Finally, a convergence study is performed over the domain shown above for a maximum refinement level of 4, where the errors are compared against the finest mesh over the node points that are common to the coarsest and finest meshes. Fig. \ref{fig:convergence} shows on a log-log plot the max-norm of the error as  a function of \(1/h_{max}\). By computing the rate of convergence as {\tt rate=log2(errors(end-1))-log2(errors(end))}, the convergence rate is 3.24. The expected convergence rate is 3 due to the use of quadratic elements, and likely if the error were compared against a finer mesh with higher than four refinements, this would be observed, but because we are calculating errors relative to a numerical solution, which itself has errors, it is not that surprising that the theoretical convergence rate is not observed. The script used to measure the convergence rate is given in the Appendix.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\textwidth]{figures/errorq4.png}
+\caption{Max norm of the error compared with the finest mesh for a maximum refinement level of 4.}
+\label{fig:convergence}
+\end{figure}
+
 
 \section{Appendix}
 \subsection{Question 2}
@@ -624,5 +644,9 @@ A_{uu}u_u=f_u-A_{uk}x_k
 \subsection{Question 4}
 \subsubsection{Part (a) - {\tt p2mesh.m}}
 \lstinputlisting[language=Matlab]{p2mesh.m}
+\subsubsection{Part (b) - {\tt fempoi2.m}}
+\lstinputlisting[language=Matlab]{fempoi2.m}
+\subsubsection{Part (b) - {\tt convergence\_fempoi.m}}
+\lstinputlisting[language=Matlab]{convergence_fempoi.m}
 
 \end{document}
