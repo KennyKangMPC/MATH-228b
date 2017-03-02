@@ -1,6 +1,4 @@
 function [K, M, Bin, Bout, bin] = femhelmholtz(p, t, ein, eout)
-wave = 6;              % wave number
-imag = sqrt(-1);
                
 num_elem = length(t(:,1));      % number of elements
 num_nodes_per_elem = 3;         % linear triangular elements
