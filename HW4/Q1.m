@@ -1,4 +1,4 @@
-% Q1, HW 4
+% Q1, HW 4, using Godunov's method
 clear all
 p_max = 1.0;
 u_max = 1.0;
@@ -7,9 +7,8 @@ p_right = 0.0;
 dx = 4/400;
 dt = 0.8 * dx / u_max;
 X = 5;
-T = 2;
+T = 3;
 
-% problem domain - node locations
 mesh = 0:dx:X;
 time = 0:dt:T;
 
@@ -34,25 +33,15 @@ for t = 1:length(time)
         flux_left = flux(left_point);
         flux_mid = flux(p{t}(i));
         flux_right = flux(p{t}(i + 1));
-
-        if left_point < p{t}(i)
-            F_left(i) = min(flux_left, flux_mid);
-        else
-            F_left(i) = max(flux_left, flux_mid);
-        end
-
-        if p{t}(i) < p{t}(i + 1)
-            F_right(i) = min(flux_mid, flux_right);
-        else
-            F_right(i) = max(flux_mid, flux_right);
-        end
+        
+        [F_left(i), F_right(i)] = Godunov(flux_left, flux_mid, flux_right, left_point, p{t}(i), p{t}(i+1));
 
     p{t + 1}(i) = p{t}(i) - (dt / dx) * (F_right(i) - F_left(i));
     end
 end
 
 for t = 1:length(time)
-    plot(mesh, p{t}); % plot what you want in the new frame
-    drawnow % clear and draw new frame
-    pause(0.0005); % this just slows down locally, can be removed and does NOT influence the saved video
+    plot(mesh, p{t});
+    drawnow
+    pause(0.00001);
 end
