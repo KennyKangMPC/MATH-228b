@@ -12,36 +12,48 @@ T = 3;
 mesh = 0:dx:X;
 time = 0:dt:T;
 
-p = cell(length(time), 1);
+pG = cell(length(time), 1);
+pR = cell(length(time), 1);
 for i = 1:length(time)
-    p{i} = p_right .* ones(size(mesh));
+    pG{i} = p_right .* ones(size(mesh));
+    pR{i} = p_right .* ones(size(mesh));
 end
 
 for t = 1:length(time)
-    F_left = zeros(size(mesh));
-    F_right = zeros(size(mesh));
+    F_leftG = zeros(size(mesh));
+    F_rightG = zeros(size(mesh));
+    F_leftR = zeros(size(mesh));
+    F_rightR = zeros(size(mesh));
 
     % sweep over all of the nodes for a single time step, except the last node
     % and compute the left and right fluxes
     for i = 1:(length(mesh) - 1)
         if i == 1
-            left_point = p_left;
+            left_pointG = p_left;
+            left_pointR = p_left;
         else
-            left_point = p{t}(i - 1);
+            left_pointG = pG{t}(i - 1);
+            left_pointR = pR{t}(i - 1);
         end
         
-        flux_left = flux(left_point);
-        flux_mid = flux(p{t}(i));
-        flux_right = flux(p{t}(i + 1));
+        flux_leftG = flux(left_pointG);
+        flux_midG = flux(pG{t}(i));
+        flux_rightG = flux(pG{t}(i + 1));
         
-        [F_left(i), F_right(i)] = Godunov(flux_left, flux_mid, flux_right, left_point, p{t}(i), p{t}(i+1));
-
-    p{t + 1}(i) = p{t}(i) - (dt / dx) * (F_right(i) - F_left(i));
+        flux_leftR = flux(left_pointR);
+        flux_midR = flux(pR{t}(i));
+        flux_rightR = flux(pR{t}(i + 1));
+        
+        [F_leftG(i), F_rightG(i)] = Godunov(flux_leftG, flux_midG, flux_rightG, left_pointG, pG{t}(i), pG{t}(i+1));
+        [F_leftR(i), F_rightR(i)] = Roe(flux_leftR, flux_midR, flux_rightR, left_pointR, pR{t}(i), pR{t}(i+1));
+        
+    pG{t + 1}(i) = pG{t}(i) - (dt / dx) * (F_rightG(i) - F_leftG(i));
+    pR{t + 1}(i) = pR{t}(i) - (dt / dx) * (F_rightR(i) - F_leftR(i));
     end
 end
 
 for t = 1:length(time)
-    plot(mesh, p{t});
+    plot(mesh, pG{t}, 'g', mesh, pR{t}, 'r');
     drawnow
     pause(0.00001);
 end
