@@ -1,0 +1,188 @@
+\documentclass[10pt]{article}
+\usepackage[letterpaper]{geometry}
+\geometry{verbose,tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in}
+\usepackage{setspace}
+\usepackage{ragged2e}
+\usepackage{color}
+\usepackage{titlesec}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{mathtools}
+\usepackage{amsmath}
+\usepackage[font=small,labelfont=bf,labelsep=period]{caption}
+\usepackage[english]{babel}
+\usepackage{indentfirst}
+\usepackage{array}
+\usepackage{makecell}
+\usepackage[usenames,dvipsnames]{xcolor}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{arydshln}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{xfrac}
+\usepackage{etoolbox}
+\usepackage{cite}
+\usepackage{url}
+\usepackage{dcolumn}
+\usepackage{hyperref}
+\usepackage{courier}
+\usepackage{esvect}
+\usepackage{commath}
+\usepackage{verbatim} % for block comments
+\usepackage{enumitem}
+\usepackage{hyperref} % for clickable table of contents
+\usepackage{braket}
+\usepackage{titlesec}
+\usepackage{booktabs}
+\usepackage{gensymb}
+\usepackage{listings}
+\usepackage{cancel}
+\usepackage[mathscr]{euscript}
+\lstset{
+    frame=single,
+    breaklines=true,
+    postbreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\color{red}\hookrightarrow\space}}
+}
+
+% for circled numbers
+\usepackage{tikz}
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+            \node[shape=circle,draw,inner sep=2pt] (char) {#1};}}
+
+\newcommand{\beq}{\begin{equation}}
+\newcommand{\eeq}{\end{equation}}
+\newcommand{\beqa}{\begin{equation}\begin{aligned}}
+\newcommand{\eeqa}{\end{aligned}\end{equation}}
+
+\titleclass{\subsubsubsection}{straight}[\subsection]
+
+% define new command for triple sub sections
+\newcounter{subsubsubsection}[subsubsection]
+\renewcommand\thesubsubsubsection{\thesubsubsection.\arabic{subsubsubsection}}
+\renewcommand\theparagraph{\thesubsubsubsection.\arabic{paragraph}} % optional; useful if paragraphs are to be numbered
+
+\titleformat{\subsubsubsection}
+  {\normalfont\normalsize\bfseries}{\thesubsubsubsection}{1em}{}
+\titlespacing*{\subsubsubsection}
+{0pt}{3.25ex plus 1ex minus .2ex}{1.5ex plus .2ex}
+
+\makeatletter
+\renewcommand\paragraph{\@startsection{paragraph}{5}{\z@}%
+  {3.25ex \@plus1ex \@minus.2ex}%
+  {-1em}%
+  {\normalfont\normalsize\bfseries}}
+\renewcommand\subparagraph{\@startsection{subparagraph}{6}{\parindent}%
+  {3.25ex \@plus1ex \@minus .2ex}%
+  {-1em}%
+  {\normalfont\normalsize\bfseries}}
+\def\toclevel@subsubsubsection{4}
+\def\toclevel@paragraph{5}
+\def\toclevel@paragraph{6}
+\def\l@subsubsubsection{\@dottedtocline{4}{7em}{4em}}
+\def\l@paragraph{\@dottedtocline{5}{10em}{5em}}
+\def\l@subparagraph{\@dottedtocline{6}{14em}{6em}}
+\makeatother
+
+\newcommand{\volume}{\mathop{\ooalign{\hfil$V$\hfil\cr\kern0.08em--\hfil\cr}}\nolimits}
+
+\setcounter{secnumdepth}{4}
+\setcounter{tocdepth}{4}
+\begin{document}
+
+\title{MATH 228b: HW4... 1, 2, 3}
+\author{April Novak}
+
+\maketitle
+
+\section{}
+
+The continuity equation is used to model the density of cars:
+
+\beq
+\frac{\partial\rho}{\partial t}+\frac{\partial f(u, \rho)}{\partial x}=0
+\eeq
+
+where \(\rho\) is the density of cars and \(f(u)\) the flux of cars, which is a function of the car velocity \(u\) and density. A road is treated as a continuum, such that no individual cars are modeled. Integrating the above over \(x_{i-1/2}\leq x\leq x_{i+1/2}\), where a node-centered finite volume method is to be used, gives:
+
+\beqa
+\int_{x_{i-1/2}}^{x_{i+1/2}}\left(\frac{\partial\rho(x,t)}{\partial t}+\frac{\partial f(u, \rho)}{\partial x}\right)dx=&0\\
+\frac{\partial}{\partial t}\int_{x_{i-1/2}}^{x_{i+1/2}}\rho(x,t) dx+\int_{x_{i-1/2}}^{x_{i+1/2}}\frac{\partial f(u, \rho)}{\partial x}dx=&0\\
+\frac{\partial}{\partial t}\int_{x_{i-1/2}}^{x_{i+1/2}}\rho(x,t) dx+f(\rho(x_{i+1/2}), u)-f(\rho(x_{i-1/2}), u)=&0\\
+\eeqa
+
+Then, integrating in time over \(t_{n}\leq t\leq t_{n+1}\) gives:
+
+\beqa
+\int_{t_n}^{t_{n+1}}\left(\frac{\partial}{\partial t}\int_{x_{i-1/2}}^{x_{i+1/2}}\rho(x,t) dx\right)dt+\int_{t_n}^{t_{n+1}}\left(f(\rho(x_{i+1/2}), u)-f(\rho(x_{i-1/2}), u)\right)dt=&0\\
+\int_{x_{i-1/2}}^{x_{i+1/2}}\rho(x, t_{n+1}) dx-\int_{x_{i-1/2}}^{x_{i+1/2}}\rho(x, t_{n}) dx+\int_{t_n}^{t_{n+1}}\left(f(\rho(x_{i+1/2}), u)-f(\rho(x_{i-1/2}), u)\right)dt=&0\\
+\eeqa
+
+Multiplying through by \(1/\Delta x\), or the inverse of the mesh spacing:
+
+\beqa
+\label{eq:1}
+\frac{1}{\Delta x}\int_{x_{i-1/2}}^{x_{i+1/2}}\rho(x, t_{n+1}) dx-\frac{1}{\Delta x}\int_{x_{i-1/2}}^{x_{i+1/2}}\rho(x, t_{n}) dx+\frac{1}{\Delta x}\int_{t_n}^{t_{n+1}}\left(f(\rho(x_{i+1/2}), u)-f(\rho(x_{i-1/2}), u)\right)dt=&0\\
+\eeqa
+
+Then, we can define the solution cell \(i\) spatial average as \(P\):
+
+\beq
+P_i^{n}\equiv\frac{1}{\Delta x}\int_{x_{i-1/2}}^{x_{i+1/2}}\rho(x, t_{n}) dx
+\eeq
+
+Likewise, the numerical flux is defined as the flux cell \(i\) temporal average:
+
+\beq
+F_{i-1/2}^n\equiv\frac{1}{\Delta t}\int_{t_n}^{t_{n+1}}f(\rho(x_{i-1/2}),t)dt
+\eeq
+
+Inserting these into Eq. \eqref{eq:1} gives the fundamental structure of the finite volume method. At this point, the numerical flux can be defined by a large magnitude of different methods. Godunov's method, which is essentially equivalent to an upwinding method, and Roe's method, which consists of an arithmetic average plus a stabilizing correction term, will be investigated in this question.
+
+\beqa
+P_i^{n+1}-P_i^n+\frac{\Delta t}{\Delta x}\left(F_{i+1/2}-F_{i-1/2}\right)=&0\\
+P_i^{n+1}=&P_i^n-\frac{\Delta t}{\Delta x}\left(F_{i+1/2}-F_{i-1/2}\right)\\
+\eeqa
+
+Godunov's method specifies the numerical flux according to the value of the solution that would be present at the original Riemann discontinuity location after \(\epsilon\) time has elapsed. For scalar conservation equations, this essentially reduces to upwinding. 
+
+\beqa
+F_{i+1/2}=&\begin{cases}\textrm{min}\left(f(\rho_i), f(\rho_{i+1})\right) & \rho_i < \rho_{i+1}\\
+\textrm{max}\left(f(\rho_i), f(\rho_{i+1})\right) & \rho_i>\rho_{i+1}\\
+\end{cases}\\
+F_{i-1/2}=&\begin{cases}\textrm{min}\left(f(\rho_{i-1}), f(\rho_{i})\right) & \rho_{i-1} < \rho_{i}\\
+\textrm{max}\left(f(\rho_{i-1}), f(\rho_{i})\right) & \rho_{i-1}>\rho_{i}\\
+\end{cases}\\
+\eeqa
+
+Roe's method combines an arithmetic average of two neighboring fluxes based on cell-centered values with a stabilizing correction term, giving the following numerical fluxes:
+
+\beqa
+F_{i+1/2}=&\frac{1}{2}\left(f(\rho_i)+f(\rho_{i+1})\right)-\frac{1}{2}u_{max}\biggr\lvert\left(1-\frac{\rho_i+\rho_{i+1}}{\rho_{max}}\right)\biggr\rvert(\rho_{i+1}-\rho_{i})\\
+F_{i-1/2}=&\frac{1}{2}\left(f(\rho_{i-1})+f(\rho_{i})\right)-\frac{1}{2}u_{max}\biggr\lvert\left(1-\frac{\rho_{i-1}+\rho_{i}}{\rho_{max}}\right)\biggr\rvert(\rho_{i}-\rho_{i-1})\\
+\eeqa
+
+
+
+
+
+\section{}
+Now, a traffic light is located at \(x_{i-1/2}\) for \(i=1\), i.e. the very first node has a traffic light at its left boundary. This traffic light will be simulated by setting \(F_{i-1/2}=0\) at the traffic light location (in other words, this is equivalent to setting \(F_{i+1/2}=0\) from the perspective of a traffic light location in one element further to the left). 
+
+
+
+%\begin{figure}[H]
+%\centering
+%\includegraphics[width=0.6\textwidth]{figures/errorq4.png}
+%\caption{Max norm of the error compared with the finest mesh for a maximum refinement level of 4.}
+%\label{fig:convergence}
+%\end{figure}
+
+
+\section{Appendix}
+\subsection{Question 2}
+%\subsubsection{Part (b) - {\tt waveguide\_edges.m}}
+%\lstinputlisting[language=Matlab]{waveguide_edges.m}
+
+
+\end{document}

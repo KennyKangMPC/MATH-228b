@@ -1,4 +1,4 @@
-% Q1, HW 4, using Godunov's method
+% Q1, HW 4
 clear all
 p_max = 1.0;
 u_max = 1.0;
@@ -6,27 +6,27 @@ p_left = 0.8;
 p_right = 0.0;
 dx = 4/400;
 dt = 0.8 * dx / u_max;
+XL = -5;
 X = 5;
-T = 3;
+T = 2;
 
-mesh = 0:dx:X;
+mesh = XL:dx:X;
 time = 0:dt:T;
+
+backsize = length(mesh(mesh < 0.0));
+frontsize = length(mesh) - backsize;
 
 pG = cell(length(time), 1);
 pR = cell(length(time), 1);
 for i = 1:length(time)
-    pG{i} = p_right .* ones(size(mesh));
-    pR{i} = p_right .* ones(size(mesh));
+    pG{i} = [p_left .* ones(1, backsize), p_right .* ones(1, frontsize)];
+    pR{i} = [p_left .* ones(1, backsize), p_right .* ones(1, frontsize)];
 end
 
 for t = 1:length(time)
-    F_leftG = zeros(size(mesh));
-    F_rightG = zeros(size(mesh));
-    F_leftR = zeros(size(mesh));
-    F_rightR = zeros(size(mesh));
+    F_leftG = zeros(size(mesh)); F_rightG = zeros(size(mesh));
+    F_leftR = zeros(size(mesh)); F_rightR = zeros(size(mesh));
 
-    % sweep over all of the nodes for a single time step, except the last node
-    % and compute the left and right fluxes
     for i = 1:(length(mesh) - 1)
         if i == 1
             left_pointG = p_left;
@@ -49,11 +49,11 @@ for t = 1:length(time)
         
     pG{t + 1}(i) = pG{t}(i) - (dt / dx) * (F_rightG(i) - F_leftG(i));
     pR{t + 1}(i) = pR{t}(i) - (dt / dx) * (F_rightR(i) - F_leftR(i));
-    end
+    end    
 end
 
 for t = 1:length(time)
-    plot(mesh, pG{t}, 'g', mesh, pR{t}, 'r');
-    drawnow
-    pause(0.00001);
+   plot(mesh, pG{t}, 'g', mesh, pR{t}, 'r');
+   ylim([0, 0.8])
+   drawnow
 end
