@@ -147,11 +147,11 @@ P_i^{n+1}=&P_i^n-\frac{\Delta t}{\Delta x}\left(F_{i+1/2}-F_{i-1/2}\right)\\
 Godunov's method specifies the numerical flux according to the value of the solution that would be present at the original Riemann discontinuity location after \(\epsilon\) time has elapsed. For scalar conservation equations, this essentially reduces to upwinding. 
 
 \beqa
-F_{i+1/2}=&\begin{cases}\textrm{min}\left(f(\rho_i), f(\rho_{i+1})\right) & \rho_i < \rho_{i+1}\\
-\textrm{max}\left(f(\rho_i), f(\rho_{i+1})\right) & \rho_i>\rho_{i+1}\\
+F_{i+1/2}=&\begin{cases}\textrm{min}_{\rho_i\leq\rho\leq\rho_{i+1}}f(\rho) & \rho_i < \rho_{i+1}\\
+\textrm{max}_{\rho_i\geq\rho\geq\rho_{i+1}}f(\rho) & \rho_i>\rho_{i+1}\\
 \end{cases}\\
-F_{i-1/2}=&\begin{cases}\textrm{min}\left(f(\rho_{i-1}), f(\rho_{i})\right) & \rho_{i-1} < \rho_{i}\\
-\textrm{max}\left(f(\rho_{i-1}), f(\rho_{i})\right) & \rho_{i-1}>\rho_{i}\\
+F_{i-1/2}=&\begin{cases}\textrm{min}_{\rho_{i-1}\leq\rho\leq\rho_{i}}f(\rho) & \rho_{i-1} < \rho_{i}\\
+\textrm{max}_{\rho_{i-1}\geq\rho\geq\rho_{i}}f(\rho) & \rho_{i-1}>\rho_{i}\\
 \end{cases}\\
 \eeqa
 
@@ -162,9 +162,29 @@ F_{i+1/2}=&\frac{1}{2}\left(f(\rho_i)+f(\rho_{i+1})\right)-\frac{1}{2}u_{max}\bi
 F_{i-1/2}=&\frac{1}{2}\left(f(\rho_{i-1})+f(\rho_{i})\right)-\frac{1}{2}u_{max}\biggr\lvert\left(1-\frac{\rho_{i-1}+\rho_{i}}{\rho_{max}}\right)\biggr\rvert(\rho_{i}-\rho_{i-1})\\
 \eeqa
 
+These two models are both used to model a traffic light turning green at \(t=0\). The initial condition specifies \(\rho_{-1/2}\), and in order to allow the simulation to evolve appropriately, a domain from \(-5,5\) is used (this should be increased if a longer time duration is studied). The density cannot simply be held at \(\rho_L\) at the traffic light, since this would not allow a rarefaction wave to develop, and so the actual boundary condition applied at each time step is to set the density at the very first spatial node (at \(x=-5\), outside the range of interest) to \(\rho_L\). The simulation results for several time steps are shown below, including \(t=2\). 
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\textwidth]{figures/godunov1.png}
+\caption{Solution at various time steps for the Godunov method.}
+\end{figure}
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\textwidth]{figures/roe1.png}
+\caption{Solution at various time steps for the Roe method.}
+\end{figure}
 
+By superimposing the two above graphs, it can be seen that at the front of the rarefaction wave, the Godunov and Roe solutions agree well with each other - they only give different results in the vicinity of the initial shock. For instance, by comparing the difference to either of the previous two plots, it can be seen that the difference drops to close to zero at around 1.25 for \(t=2\), even though the front of the rarefaction wave reaches out to about 2. So, both schemes capture the behavior far from the shock, but differ in the vicinity of the shock. In addition, there is a slight ``bump'' in the solution at the location of the traffic light for the Godunov solution, but by refining the mesh in both space and time, this small discontinuity disappeared, and is likely a remnant of the fact that the Godunov method (as well as the Roe method) is simply an approximation to the flux for each finite volume. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.6\textwidth]{figures/difference1.png}
+\caption{Difference between the Godunov solution and the Roe solution at various time steps.}
+\end{figure}
+
+The code for this section is included in the Appendix.
 
 \section{}
 Now, a traffic light is located at \(x_{i-1/2}\) for \(i=1\), i.e. the very first node has a traffic light at its left boundary. This traffic light will be simulated by setting \(F_{i-1/2}=0\) at the traffic light location (in other words, this is equivalent to setting \(F_{i+1/2}=0\) from the perspective of a traffic light location in one element further to the left). 

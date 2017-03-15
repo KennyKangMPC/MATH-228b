@@ -36,15 +36,35 @@ for t = 1:length(time)
         end
         
         [F_leftG(i), F_rightG(i)] = Godunov(left_pointG, pG{t}(i), pG{t}(i+1), p_max);
-        [F_leftR(i), F_rightR(i)] = Roe(left_pointR, pR{t}(i), pR{t}(i+1));
+        [F_leftR(i), F_rightR(i)] = Roe(left_pointR, pR{t}(i), pR{t}(i+1), p_max, u_max);
         
     pG{t + 1}(i) = pG{t}(i) - (dt / dx) * (F_rightG(i) - F_leftG(i));
     pR{t + 1}(i) = pR{t}(i) - (dt / dx) * (F_rightR(i) - F_leftR(i));
     end    
 end
 
-for t = 1:length(time)
-   plot(mesh, pG{t}, 'g', mesh, pR{t}, 'r');
-   ylim([0, 0.8])
-   drawnow
+
+dc = 0.0;
+Godunov = false;
+Roe = false;
+plottime = 1:50:length(time);
+for t = plottime
+    Gcolor = [1.0 - dc, 0.0, dc];
+    if (Godunov)
+        plot(mesh, pG{t}, 'Color', Gcolor)
+        ylabel('Godunov Solution')g
+    elseif (Roe)
+        plot(mesh, pR{t}, 'Color', Gcolor)
+        ylabel('Roe Solution')
+    else
+        plot(mesh, pG{t} - pR{t}, 'Color', Gcolor)
+        ylabel('Godunov solution - Roe solution')
+    end
+        
+    hold on
+    ylim([0, 0.8])
+    xlim([-2, 2])
+    xlabel('Spatial Domain')
+    dc = dc + 0.1;
 end
+legend('t=0.0', 't=0.4', 't=0.8', 't=1.2', 't=1.6', 't=2.0')

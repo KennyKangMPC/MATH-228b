@@ -1,6 +1,4 @@
-function [F_left, F_right] = Roe(left_point, mid_point, right_point)
-p_max = 1.0;
-u_max = 1.0;
+function [F_left, F_right] = Roe(left_point, mid_point, right_point, p_max, u_max)
 
 flux_left = flux(left_point);
 flux_mid = flux(mid_point);
