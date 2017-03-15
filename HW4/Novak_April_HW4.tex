@@ -41,6 +41,7 @@
 \usepackage[mathscr]{euscript}
 \lstset{
     frame=single,
+    	basicstyle=\ttfamily\small,
     breaklines=true,
     postbreak=\raisebox{0ex}[0ex][0ex]{\ensuremath{\color{red}\hookrightarrow\space}}
 }
@@ -90,7 +91,7 @@
 \setcounter{tocdepth}{4}
 \begin{document}
 
-\title{MATH 228b: HW4... 1, 2, 3}
+\title{MATH 228b: HW4... g2, 3}
 \author{April Novak}
 
 \maketitle
@@ -178,13 +179,17 @@ These two models are both used to model a traffic light turning green at \(t=0\)
 
 By superimposing the two above graphs, it can be seen that at the front of the rarefaction wave, the Godunov and Roe solutions agree well with each other - they only give different results in the vicinity of the initial shock. For instance, by comparing the difference to either of the previous two plots, it can be seen that the difference drops to close to zero at around 1.25 for \(t=2\), even though the front of the rarefaction wave reaches out to about 2. So, both schemes capture the behavior far from the shock, but differ in the vicinity of the shock. In addition, there is a slight ``bump'' in the solution at the location of the traffic light for the Godunov solution, but by refining the mesh in both space and time, this small discontinuity disappeared, and is likely a remnant of the fact that the Godunov method (as well as the Roe method) is simply an approximation to the flux for each finite volume. 
 
+The Godunov method gives the more realistic solution than Roe's method because Roe's method fails at resolving rarefaction waves, such as in this test problem. Roe's method is derived as a linearization about the averaged state \((\rho_i+\rho_{i+1})/2\) (for \(F_{i+1/2}\)). Due to this linearization, the solution will only consist of a single wave, as opposed to the \textit{two} waves that should normally travel from rarefaction waves. So, Roe's method entirely misses the left-going wave that causes the density to decrease to the left of the traffic light. For cases where the solution does not contain a rarefaction wave, Roe's method will perform well, since a shock consists of a single wave, moving either to the left or right. The code for this section is included in the Appendix.
+
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.6\textwidth]{figures/difference1.png}
 \caption{Difference between the Godunov solution and the Roe solution at various time steps.}
 \end{figure}
 
-The code for this section is included in the Appendix.
+
+
+
 
 \section{}
 Now, a traffic light is located at \(x_{i-1/2}\) for \(i=1\), i.e. the very first node has a traffic light at its left boundary. This traffic light will be simulated by setting \(F_{i-1/2}=0\) at the traffic light location (in other words, this is equivalent to setting \(F_{i+1/2}=0\) from the perspective of a traffic light location in one element further to the left). 
@@ -200,9 +205,18 @@ Now, a traffic light is located at \(x_{i-1/2}\) for \(i=1\), i.e. the very firs
 
 
 \section{Appendix}
-\subsection{Question 2}
-%\subsubsection{Part (b) - {\tt waveguide\_edges.m}}
-%\lstinputlisting[language=Matlab]{waveguide_edges.m}
-
+\subsection{Question 1}
+\subsubsection{{\tt flux.m}}
+This function calculates the flux given a density.
+\lstinputlisting[language=Matlab]{flux.m}
+\subsubsection{{\tt Godunov.m}}
+This function calculates the left and right numerical fluxes using the Godunov method.
+\lstinputlisting[language=Matlab]{Godunov.m}
+\subsubsection{{\tt Roe.m}}
+This function calculates the left and right numerical fluxes using the Roe method.
+\lstinputlisting[language=Matlab]{Roe.m}
+\subsubsection{{\tt Q1.m}}
+This function calculates the solution for a single traffic light using both the Godunov and Roe methods.
+\lstinputlisting[language=Matlab]{Q1.m}
 
 \end{document}

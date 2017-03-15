@@ -1,10 +1,10 @@
-function [F_left, F_right] = Godunov(left_point, mid_point, right_point, p_max)
+function [F_left, F_right] = Godunov(left_point, mid_point, right_point, p_max, u_max)
 maxpt = p_max/2;
-maxflux = flux(maxpt);
+maxflux = flux(maxpt, p_max, u_max);
 
-flux_left = flux(left_point);
-flux_mid = flux(mid_point);
-flux_right = flux(right_point);
+flux_left = flux(left_point, p_max, u_max);
+flux_mid = flux(mid_point, p_max, u_max);
+flux_right = flux(right_point, p_max, u_max);
 
 if left_point < mid_point
     if ((maxpt > left_point) && (maxpt < mid_point))
