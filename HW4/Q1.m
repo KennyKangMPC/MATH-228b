@@ -32,7 +32,7 @@ for t = 1:length(time)
             left_pointR = pR{t}(i - 1);
         end
         
-        [F_leftG(i), F_rightG(i)] = Godunov(left_pointG, pG{t}(i), pG{t}(i+1), p_max, u_max);
+        [F_leftG(i), F_rightG(i)] = Godunov2(left_pointG, pG{t}(i), pG{t}(i+1), p_max, u_max);
         [F_leftR(i), F_rightR(i)] = Roe(left_pointR, pR{t}(i), pR{t}(i+1), p_max, u_max);
         
     pG{t + 1}(i) = pG{t}(i) - (dt / dx) * (F_rightG(i) - F_leftG(i));
@@ -42,7 +42,7 @@ end
 
 % plot the solutions
 dc = 0.0;
-Godunov = false; Roe = false; difference = false;
+Godunov = false; Roe = false; difference = true;
 plottime = 1:50:length(time);
 for t = plottime
     Gcolor = [1.0 - dc, 0.0, dc];
