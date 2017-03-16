@@ -192,16 +192,23 @@ The Godunov method gives the more realistic solution than Roe's method because R
 
 
 \section{}
-Now, a traffic light is located at \(x_{i-1/2}\) for \(i=1\), i.e. the very first node has a traffic light at its left boundary. This traffic light will be simulated by setting \(F_{i-1/2}=0\) at the traffic light location (in other words, this is equivalent to setting \(F_{i+1/2}=0\) from the perspective of a traffic light location in one element further to the left). 
+Now, a traffic light is located at \(x_{i-1/2}\) for \(i=1\), i.e. the very first node has a traffic light at its left boundary. This traffic light will be simulated by setting \(F_{i-1/2}=0\) for the cell to the right of the traffic light, and \(F_{i+1/2}=0\) for the cell to the left of the traffic light. The figure below shows the solution at several time steps (over one full period) once reaching steady-state. Only results with the Godunov method are shown, since from Question 1, it was shown that Roe's method did not give good results for rarefaction waves. As can be seen from the figure below, the effects of the traffic light are correctly simulated - because the results at \(t=15.0\) exactly overlapped those at \(t=17.0\), results are shown at \(t=15.1\), just after the traffic light has turned red. A plateau of maximum density is reached, indicating that cars are arriving at the light and stopping still because they cannot drive forward. At \(t=16.0\), the light is just about to turn green, and a rarefaction wave develops after the light turns green as cars from behind the light can approach it, and cars beyond it continue to drive away. 
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.75\textwidth]{figures/godunov2.png}
+\caption{Godunov solution for a traffic light at \(x=-\Delta x/2\) with a period of \(2\), where the green light and red light each occupy half a period.}
+\end{figure}
+
+By conservation of the mass of cars per unit length of the road (i.e. continuity), the average flow \(\dot{q}\) can be computed at any point in the domain (and this is verified by computing the estimated flow at 50 different points in the domain). 
+
+\beq
+\dot{q}=\frac{1}{N_T}\sum_{n=1}^{N_T}f_n
+\eeq
+
+where \(N_T\) is the number of time steps per period, which for the time step given in Question 1 is 125. The average flow is computed to be roughly 0.251 cars/length\textsuperscript{2}time\textsuperscript{2}, where the units are consistent with those given in the problem. The code for this section is included in the Appendix.
 
 
-
-%\begin{figure}[H]
-%\centering
-%\includegraphics[width=0.6\textwidth]{figures/errorq4.png}
-%\caption{Max norm of the error compared with the finest mesh for a maximum refinement level of 4.}
-%\label{fig:convergence}
-%\end{figure}
 
 
 \section{Appendix}
@@ -218,5 +225,10 @@ This function calculates the left and right numerical fluxes using the Roe metho
 \subsubsection{{\tt Q1.m}}
 This function calculates the solution for a single traffic light using both the Godunov and Roe methods.
 \lstinputlisting[language=Matlab]{Q1.m}
+
+\subsection{Question 2}
+\subsubsection{{\tt Q2.m}}
+This function calculates the solution for a cycling traffic light using Godunov's method.
+\lstinputlisting[language=Matlab]{Q2.m}
 
 \end{document}
