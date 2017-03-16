@@ -4,49 +4,48 @@ p_max = 1.0; u_max = 1.0;
 p_left = p_max/2; p_right = 0.0;
 dx = 4/400;
 dt = 0.8 * dx / u_max;
-XL = -5; X = 5;
-T = 30;
+XL = -2; X = 4; T = 28;
 
 mesh = XL:dx:X;
 time = 0:dt:T;
 
 % number of time steps while red, equal to number of time steps while green
 period = ceil(1/dt);
-red1 = false;
+red1 = false; t_switch1 = 0;
 red2 = true;
 
 backsize = length(mesh(mesh < 0.0));
 frontsize = length(mesh) - backsize;
-
-back2 = length(mesh(mesh < 2.15));
+back2 = length(mesh(mesh < 0.15));
 front2 = length(mesh) - back2;
 
 % bounding nodes for lights
 light1 = [backsize, backsize + 1];
 light2 = [back2, back2 + 1];
 
-K = 9;
-Loc = (backsize + 10):25:(backsize + 500);
-averages = zeros(length(K), length(Loc));
+K = 0:9;
+Loc = floor(back2 + 100);
+averages = [];
 
-r = 1;
 for k = K
 tau = floor(k * period / 10); % number of time steps to delay the second light
-
+    
     pG = cell(length(time), 1);
     for i = 1:length(time)
-        %pG{i} = [p_left .* ones(1, backsize), p_right .* ones(1, frontsize)];
-        pG{i} = [p_left .* ones(1, back2), p_right .* ones(1, front2)];
+        pG{i} = [0.0 .* ones(1, length(mesh))];
     end
-
-    for t = 1:length(time)
+    
+    switch_flag = 0;
+    for t = 1:length(time)        
         F_leftG = zeros(size(mesh)); F_rightG = zeros(size(mesh));
-
+        
+        switch_flag = switch_flag + 1;
         if mod(t, period) == 0
+            switch_flag = 0;
             red1 = ~red1;
         end
 
-        if mod(t + tau, period) == 0
+        if switch_flag == tau
             red2 = ~red2;
         end
 
@@ -57,7 +56,7 @@ tau = floor(k * period / 10); % number of time steps to delay the second light
                 left_pointG = pG{t}(i - 1);
             end
 
-            [F_leftG(i), F_rightG(i)] = Godunov(left_pointG, pG{t}(i), pG{t}(i+1), p_max, u_max);
+            [F_leftG(i), F_rightG(i)] = Godunov2(left_pointG, pG{t}(i), pG{t}(i+1), p_max, u_max);
 
             if (red1 && (i == light1(1)))
                 F_rightG(i) = 0.0;
@@ -75,34 +74,20 @@ tau = floor(k * period / 10); % number of time steps to delay the second light
                 F_leftG(i) = 0.0;
             end
 
-
         pG{t + 1}(i) = pG{t}(i) - (dt / dx) * (F_rightG(i) - F_leftG(i));
         end    
     end
-
-    for t = 1:5:length(time)
-        plot(mesh, pG{t})
-        drawnow
+    
+    pmatrix = [];
+    for tt = 1:length(time)
+        pmatrix(tt, :) = pG{tt};
     end
     
     % compute average flow
-    l = 1;
-    for location = Loc
-        for t = (25*period):1:(27*period)
-            averages(r, l) = averages(r, l) + flux(pG{t}(location), p_max, u_max)./period;
-        end
-        l = l + 1;
-    end
-    r = r + 1;
+    averages = [averages, sum(flux(pmatrix(25*period:27*period, Loc), p_max, u_max))./ (2*period)];
 end
-% plot the solutions
-% plottime = floor([15.1, 15.5, 16, 16.5, 17] ./ dt);
-% for t = plottime
-%     plot(mesh, pG{t})
-%     ylabel('Godunov Solution')
-%     hold on
-%     ylim([0, 1.0])
-%     xlim([-2, 2])
-%     xlabel('Spatial Domain')
-% end
-% legend('t=15.1', 't=15.5', 't=16.0', 't=16.5', 't=17.0')
+
+plot(K, averages)
+xlabel('k')
+ylabel('Average Capacity')
+ylim([0.08, 0.13])

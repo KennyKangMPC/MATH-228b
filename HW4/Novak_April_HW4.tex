@@ -91,7 +91,7 @@
 \setcounter{tocdepth}{4}
 \begin{document}
 
-\title{MATH 228b: HW4... g2, 3}
+\title{MATH 228b: HW4}
 \author{April Novak}
 
 \maketitle
@@ -206,7 +206,28 @@ By conservation of the mass of cars per unit length of the road (i.e. continuity
 \dot{q}=\frac{1}{N_T}\sum_{n=1}^{N_T}f_n
 \eeq
 
-where \(N_T\) is the number of time steps per period, which for the time step given in Question 1 is 125. The average flow is computed to be roughly 0.251 cars/length\textsuperscript{2}time\textsuperscript{2}, where the units are consistent with those given in the problem. The code for this section is included in the Appendix.
+where \(N_T\) is the number of time steps per period, which for the time step given in Question 1 is 125. The average flow is computed to be roughly 0.125 cars/length\textsuperscript{2}time\textsuperscript{2}, where the units are consistent with those given in the problem. The code for this section is included in the Appendix.
+
+
+
+
+\section{}
+This question models a domain with two traffic lights. For both lights, the incoming and outgoing numerical fluxes exactly at the light are set to zero when the light is red, and no condition is imposed otherwise. It was discovered that the calculated capacity is a function of the precise switching algorithm used for the lights. For my algorithm, the results are the same regardless of which light begins as red or green, as shown in the figure below. This occurs because the results are measured once reaching steady state, and initial transients related to the switching have died out. The switching is performed by the second light, i.e. the first light switches every half period regardless of the color of the second light. The second light will switch after the delay time steps following a switch of the first light. As can be seen, it appears that \(k=1, 2, 3\) give the highest road capacity, since some cars will be able to approach the second light while it is red and build up such that the density beyond the second light is very low once the second light turns green - this allows roughly the same capacity as was observed in Question 2 with a single stop light. When the lights are fairly out-of-sync, such as for \(5\leq k\leq 9\), cars will spend a relatively long time waiting at the second light even though they have the ability to pass the first light. The code for this section is given in the Appendix.
+
+\begin{figure}[H]
+        \centering
+        \begin{subfigure}[b]{0.5\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{figures/greenred.png}
+                \caption{Left light is green, right light is red at \(t=0\).}
+        \end{subfigure}%
+        \begin{subfigure}[b]{0.5\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{figures/redgreen.png}
+                \caption{Left light is red, right light is green at \(t=0\).}
+        \end{subfigure}%
+        \caption{Road average capacity as a function of \(k\), for \(\tau=kT/10\). }
+\end{figure}
 
 
 
@@ -216,9 +237,9 @@ where \(N_T\) is the number of time steps per period, which for the time step gi
 \subsubsection{{\tt flux.m}}
 This function calculates the flux given a density.
 \lstinputlisting[language=Matlab]{flux.m}
-\subsubsection{{\tt Godunov.m}}
+\subsubsection{{\tt Godunov2.m}}
 This function calculates the left and right numerical fluxes using the Godunov method.
-\lstinputlisting[language=Matlab]{Godunov.m}
+\lstinputlisting[language=Matlab]{Godunov2.m}
 \subsubsection{{\tt Roe.m}}
 This function calculates the left and right numerical fluxes using the Roe method.
 \lstinputlisting[language=Matlab]{Roe.m}
@@ -230,5 +251,10 @@ This function calculates the solution for a single traffic light using both the 
 \subsubsection{{\tt Q2.m}}
 This function calculates the solution for a cycling traffic light using Godunov's method.
 \lstinputlisting[language=Matlab]{Q2.m}
+
+\subsection{Question 3}
+\subsubsection{{\tt Q3.m}}
+This function calculates the solution for two cycling traffic lights using Godunov's method.
+\lstinputlisting[language=Matlab]{Q3.m}
 
 \end{document}

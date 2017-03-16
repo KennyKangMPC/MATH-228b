@@ -1,11 +1,10 @@
-% Q1, HW 4
+% Q2, HW 4
 clear all
 p_max = 1.0; u_max = 1.0;
 p_left = p_max/2; p_right = 0.0;
-dx = 4/400;
+dx = 4/400; 
 dt = 0.8 * dx / u_max;
-XL = -5; X = 5;
-T = 30;
+XL = -3; X = 5; T = 30;
 
 mesh = XL:dx:X;
 time = 0:dt:T;
@@ -22,7 +21,7 @@ light1 = [backsize, backsize + 1];
 
 pG = cell(length(time), 1);
 for i = 1:length(time)
-    pG{i} = [p_left .* ones(1, backsize), p_right .* ones(1, frontsize)];
+    pG{i} = [0.0 .* ones(1, length(mesh))];
 end
 
 for t = 1:length(time)
@@ -39,7 +38,7 @@ for t = 1:length(time)
             left_pointG = pG{t}(i - 1);
         end
         
-        [F_leftG(i), F_rightG(i)] = Godunov(left_pointG, pG{t}(i), pG{t}(i+1), p_max, u_max);
+        [F_leftG(i), F_rightG(i)] = Godunov2(left_pointG, pG{t}(i), pG{t}(i+1), p_max, u_max);
         
         if (red && (i == light1(1)))
             F_rightG(i) = 0.0;
@@ -53,17 +52,16 @@ for t = 1:length(time)
     end    
 end
 
-% plot the solutions
-% plottime = floor([15.1, 15.5, 16, 16.5, 17] ./ dt);
-% for t = plottime
-%     plot(mesh, pG{t})
-%     ylabel('Godunov Solution')
-%     hold on
-%     ylim([0, 1.0])
-%     xlim([-2, 2])
-%     xlabel('Spatial Domain')
-% end
-% legend('t=15.1', 't=15.5', 't=16.0', 't=16.5', 't=17.0')
+plottime = floor([15.1, 15.5, 16, 16.5, 17] ./ dt);
+for t = plottime
+    plot(mesh, pG{t})
+    ylabel('Godunov Solution')
+    hold on
+    ylim([0, 1.0])
+    xlim([-2, 2])
+    xlabel('Spatial Domain')
+end
+legend('t=15.1', 't=15.5', 't=16.0', 't=16.5', 't=17.0')
 
 % compute average flow
 for location = (backsize + 100):10:(backsize + 500)

@@ -4,8 +4,7 @@ p_max = 1.0; u_max = 1.0;
 p_left = 0.8; p_right = 0.0;
 dx = 4/400;
 dt = 0.8 * dx / u_max;
-XL = -5; X = 5;
-T = 2;
+XL = -5; X = 5; T = 2;
 
 mesh = XL:dx:X;
 time = 0:dt:T;
@@ -40,7 +39,6 @@ for t = 1:length(time)
     end    
 end
 
-% plot the solutions
 dc = 0.0;
 Godunov = false; Roe = false; difference = true;
 plottime = 1:50:length(time);
