@@ -1,13 +1,14 @@
 %DGCONVECT0  1-D Linear Convection, DG and RK4
 n = 10; % number of elements
-p = 1; % order of the shape functions
+p = 2; % order of the shape functions
 T = 1; % end simulation time
-dt = 0.1; % time step size
+dt = 1e-4; % time step size
 
 % UC Berkeley Math 228B, Per-Olof Persson <persson@berkeley.edu>
 
     h = 1/n;
-    s = h * (0:p)' / p;                            % Equidistant nodes
+    s = - cos(pi * (0:p) / p);
+    s = ((s + 1).* h / 2)';                        % Chebyshev nodes
     x = s * ones(1,n) + ones(p+1,1) * (0:h:1-h);   % Entire mesh
     uinit = @(x) exp(-(x - 0.5).^2 / 0.1^2);       % Initial solution
     
@@ -22,21 +23,13 @@ dt = 0.1; % time step size
         error('Polynomial order not implemented.');
     end
     
-    % RHS function in semi-discrete system
-    function r = rhs(u)
-        r = Kel * u;                               % Integral
-        r(end,:) = r(end,:) - u(end,:);            % Right-end flux
-        r(1,:) = r(1,:) + u(end, [end, 1:end-1]);  % Left-end flux
-        r = Mel \ r;                               % Mass matrix inverse
-    end
-
     u = uinit(x);                                  % Interpolate initial condition
     for it = 1:T/dt                                % Main time-stepping loop
         % Runge-Kutta 4
-        k1 = dt * rhs(u);
-        k2 = dt * rhs(u + k1/2);
-        k3 = dt * rhs(u + k2/2);
-        k4 = dt * rhs(u + k3);
+        k1 = dt * rhs(u, Kel, Mel);
+        k2 = dt * rhs(u + k1/2, Kel, Mel);
+        k3 = dt * rhs(u + k2/2, Kel, Mel);
+        k4 = dt * rhs(u + k3, Kel, Mel);
         u = u + (k1 + 2*k2 + 2*k3 + k4) / 6;
 
         % Plotting
