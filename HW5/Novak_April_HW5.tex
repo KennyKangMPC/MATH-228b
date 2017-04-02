@@ -100,8 +100,97 @@
 
 The first part of this question requires replacing equidistant node positions with the Chebyshev nodes, which should eliminate Runge phenomena, which is commonly observed as oscillations in high-degree polynomials. The Chebyshev node positions \(s_i\) are given as \(s_i=\cos{(\pi i/p)}\), where \(p=0, \cdots, P\), where \(P\) is the polynomial order of the shape functions. The Chebyshev nodes are defined on \([-1, 1]\), so to transform these to a single element defined over \([0, h]\), the Chebyshev nodes are multiplied by \(-2/h\), where 2 is the length of the domain of the Chebyshev nodes, and \(h\) the length of the desired domain.
 
+Next, we need to compute the elementary mass and stiffness matrices. The strong form of the governing equation is:
 
+\beqa
+\frac{\partial u}{\partial t}+\frac{\partial u}{\partial x}=&0\\
+\frac{\partial u}{\partial t}+\frac{\partial f(u)}{\partial x}=&0\\
+\eeqa
 
+where \(f(u)=u\) is the flux function. We will expand the solution \(u\) in a single element:
+
+\beq
+u_h=\sum_{j=0}^{P}u_j\phi_j
+\eeq
+
+and over the entire domain of \(K\) elements:
+
+\beq
+u_h=\sum_{k=1}^{K}\sum_{j=0}^{P}u_j^k\phi_j^k(x)
+\eeq
+
+where \(\phi_j\) are the expansion functions within a single element. Following the Galerkin approach, the test function \(v_h\) will also be expanded in the same set of basis functions. Integrate the flux term by parts, which due to the discontinuous nature of \(u_h\) and \(v_h\) cannot technically be performed. It is here that the discontinuous Galerkin method borrow from the finite volume method. For the discontinuities, approximate using a numerical flux function \(F(u_h)\). At the left side of an element (at \(x_{k}\)), this numerical flux should depend (at a minimum at least) only on \(u_0^k\) and \(u_P^{k-1}\), where now a new notation is introduced to describe the multiple expansion coefficients in each element (ranging from 0 to \(P\)). 
+
+\beqa
+\int_{\Omega}\frac{\partial u_h}{\partial t}v_hdx+\int_{\Omega}\frac{\partial f(u_h)}{\partial x}v_hdx=&0\\
+\int_{\Omega}\frac{\partial u_h}{\partial t}v_hdx-\int_{\Omega}f(u_h)\frac{\partial v_h}{\partial x}dx+\left\lbrack f(u_h)v_h\cdot\hat{n}\right\rbrack_{x_{k-i}}^{x_k}=&0\\
+\int_{\Omega}\frac{\partial u_h}{\partial t}v_hdx-\int_{\Omega}f(u_h)\frac{\partial v_h}{\partial x}dx+F(u_0^{k+1}, u_P^k)v_h(x_{k})-F(u_0^k, u_P^{k-1})v_h(x_{k-1})=&0\\
+\eeqa
+
+Substituting in the expansion over a single element into the equation above:
+
+\beqa
+\int_{\Omega}\frac{\partial}{\partial t}\left(\sum_{j=0}^{P}u_j\phi_j(x)\right)\sum_{i=0}^{P}v_i\phi_i(x)dx-\int_{\Omega}f(u_h)\frac{\partial}{\partial x}\left(\sum_{i=0}^{P}v_i\phi_i(x)\right)dx+\quad\\
+F(u_0^{k+1}, u_P^k)\sum_{i=0}^{P}v_i\phi_i(x_{k})-F(u_0^k, u_P^{k-1})\sum_{i=0}^{P}v_i\phi_i(x_{k-1})=0\\
+\eeqa
+
+Then, because \(v_i\) appears in every term and is arbitrary, it can be ``cancelled'' from each term by pulling the summation over \(i\) outside all integrals such that the integrand must be zero.
+
+\beqa
+\int_{\Omega}\frac{\partial}{\partial t}\left(\sum_{j=0}^{P}u_j\phi_j(x)\right)\sum_{i=0}^{P}\phi_i(x)dx-\int_{\Omega}f(u_h)\frac{\partial}{\partial x}\left(\sum_{i=0}^{P}\phi_i(x)\right)dx+\quad\\
+F(u_0^{k+1}, u_P^k)\sum_{i=0}^{P}\phi_i(x_{k})-F(u_0^k, u_P^{k-1})\sum_{i=0}^{P}\phi_i(x_{k-1})=0\\
+\eeqa
+
+Then, while the above equation is true, it is also true that it holds for each individual choice of \(i\) and \(j\) such that the summations can be removed with the implicit assumption of creating matrices that are of size \(p+1\times p+1\) for the creation of a system of equations that holds for a single element. For the case of linear advection, \(f(u_h)=u_h\), giving the second form below.
+
+\beqa
+\int_{\Omega}\frac{\partial u_j}{\partial t}\phi_j(x)\phi_i(x)dx-\int_{\Omega}f(u_h)\frac{\partial \phi_i(x)}{\partial x}dx+F(u_0^{k+1}, u_P^k)\phi_i(x_{k})-F(u_0^k, u_P^{k-1})\phi_i(x_{k-1})=&0\\
+\int_{\Omega}\frac{\partial u_j}{\partial t}\phi_j(x)\phi_i(x)dx-\int_{\Omega}u_j\phi_j(x)\frac{\partial \phi_i(x)}{\partial x}dx+F(u_0^{k+1}, u_P^k)\phi_i(x_{k})-F(u_0^k, u_P^{k-1})\phi_i(x_{k-1})=&0\\
+\eeqa
+
+By defining the mass matrix \(M_{ij}\) as:
+
+\beq
+M_{ij}^k=\int_{x_{k-1}}^{x_k}\phi_j(x)\phi_i(x)dx
+\eeq
+
+and the stiffness matrix \(K_{ij}^k\) as:
+
+\beq
+K_{ij}^k=\int_{x_{k-1}}^{x_k}\phi_j(x)\frac{\partial \phi_i(x)}{\partial x}dx
+\eeq
+
+For linear advection (i.e. with constant velocity), a good choice of numerical flux is to use upwinding such that the downwind value is always selected as the numerical flux. Then, the weak form becomes:
+
+\beq
+\int_{\Omega}\frac{\partial u_j}{\partial t}\phi_j(x)\phi_i(x)dx-\int_{\Omega}u_j\phi_j(x)\frac{\partial \phi_i(x)}{\partial x}dx+u_P^k\phi_i^k(x_{k})-u_P^{k-1}\phi_i^k(x_{k-1})=0\\
+\eeq
+
+Then a system of equations that holds for a single element is:
+
+\beq
+M_{ij}^k\dot{u_j}^k-K_{ij}^ku_j^k+u_P^k\phi_i^k(x_{k})-u_P^{k-1}\phi_i^k(x_{k-1})=0
+\eeq
+
+Because we will use nodal basis functions, \(\phi_i^k(x_k)\) and \(\phi_i^k(x_{k-1})\) are zero at all nodes except a single node. Hence, all of these extra terms will drop out except for one term each. Alternatively, if using Legendre polynomial expansions, then all of the polynomials are equal to either 1 or -1 at \(\xi=-1\) and \(xi=1\). 
+
+%\beq
+%M_{ij}^k\dot{u_j}^k-K_{ij}^ku_j^k+u_P^k-u_P^{k-1}=0
+%\eeq
+
+Finally, to implement arbitrary order polynomials, the mass and stiffness matrices must be computed. Because very high order polynomials will be used, these should be computed in a domain over \([-1,1]\) so that Gaussian quadrature can easily be used. These matrices transform according to:
+
+\beqa
+M_{ij}^k=&\int_{-1}^{1}\phi_j(\xi)\phi_i(\xi)\frac{dx}{d\xi}d\xi\\
+=&\int_{-1}^{1}\phi_j(\xi)\phi_i(\xi)\frac{h}{2}d\xi\\
+\eeqa
+
+where \(-1\leq\xi\leq1\) represents the domain over which the integration will occur and the Jacobian of the transformation in 1-D is simply \(h/2\) because the length of the domain in the physical domain is \(h\) and the length in the \(\xi\) domain is 2. Likewise, the stiffness matrix transforms according to:
+
+\beqa
+K_{ij}^k=&\int_{-1}^{1}\phi_j(\xi)\frac{\partial \phi_i(\xi)}{\partial \xi}\frac{\partial \xi}{\partial x}\frac{\partial x}{\partial \xi}d\xi\\
+=&\int_{-1}^{1}\phi_j(\xi)\frac{\partial \phi_i(\xi)}{\partial \xi}d\xi\\
+\eeqa
 
 
 
