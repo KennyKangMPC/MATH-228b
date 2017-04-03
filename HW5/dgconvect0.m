@@ -1,27 +1,28 @@
 %DGCONVECT0  1-D Linear Convection, DG and RK4
+clear all
 n = 10; % number of elements
 p = 2; % order of the shape functions
-T = 1; % end simulation time
+T = 0.25; % end simulation time
 dt = 1e-4; % time step size
 
 % UC Berkeley Math 228B, Per-Olof Persson <persson@berkeley.edu>
 
     h = 1/n;
-    s = - cos(pi * (0:p) / p);
-    s = ((s + 1).* h / 2)';                        % Chebyshev nodes
+    s_master = - cos(pi * (0:p) / p);
+    s = ((s_master + 1).* h / 2)';                        % Chebyshev nodes
     x = s * ones(1,n) + ones(p+1,1) * (0:h:1-h);   % Entire mesh
     uinit = @(x) exp(-(x - 0.5).^2 / 0.1^2);       % Initial solution
     
-%     switch p
-%       case 1
-%         Mel = h/6 * [2,1; 1,2];                    % Elemental mass-matrix
-%         Kel = [-1 -1; 1 1]/2;                      % Elemental stiffness-matrix
-%       case 2
-%         Mel = h/30 * [4,2,-1; 2,16,2; -1,2,4];     % Elemental mass-matrix
-%         Kel = [-3,-4,1; 4,0,-4; -1,4,3]/6;         % Elemental stiffness-matrix
-%       otherwise
-%         error('Polynomial order not implemented.');
-%     end
+    % find basis function coefficients (c_i^j) for each element
+    A = []; 
+    I = eye(length(s));
+    
+    % coefficients are found in the master domain
+    for i = 1:length(s)
+        A(i, :) = legendre_poly(s_master(i), p);
+    end
+    
+    c = I \ A;
     
     % quadrature points and weights
     [qp, wt] = gauss_quad(2*p);
@@ -30,13 +31,12 @@ dt = 1e-4; % time step size
     K = zeros(p + 1, p + 1);
     % loop over the quadrature points
     for q = 1:length(qp)
-        % loop over i
+        [yi, dyi] = legendre_poly(qp(q), p);
+        [yj, dyj] = legendre_poly(qp(q), p);
         for i = 1:(p + 1)
-            [yi, dyi] = legendre_poly(qp(q), i - 1);
             for j = 1:(p + 1)
-                [yj, dyj] = legendre_poly(qp(q), j - 1);
-                M(i, j) = M(i, j) + wt(q) * yi(i) * yj(j) * h / 2;
-                K(i, j) = K(i, j) + wt(q) * yj(j) * dyi(i);
+                M(i, j) = M(i, j) + wt(q) * dot(c(i, :), yi) * dot(c(j, :), yj) * h / 2;
+                K(i, j) = K(i, j) + wt(q) * dot(c(j, :), yj) * dot(c(i, :), dyi);
             end
         end
     end
@@ -44,13 +44,31 @@ dt = 1e-4; % time step size
     Mel = M;
     Kel = K;
     
-%     u = uinit(x);                                  % Interpolate initial condition
+    u = uinit(x);                                  % Interpolate initial condition
+    
+    % sum of phi_i(x_k) from i = 0 to P
+    [y_right] = legendre_poly(1, p)';
+    [y_left] = legendre_poly(-1, p)';
+    
+    %y_right = y_right * ones(1, n);
+    %y_left = y_left * ones(1, n);
+    
+    %y_right = y_right * u(end, :);
+    %y_left = y_left * u(end, [end, 1:(end-1)]);
+
+
+    
+    
+    % temporary
+    yr = y_right;
+    yl = y_left;
+    
 %     for it = 1:T/dt                                % Main time-stepping loop
 %         % Runge-Kutta 4
-%         k1 = dt * rhs(u, Kel, Mel);
-%         k2 = dt * rhs(u + k1/2, Kel, Mel);
-%         k3 = dt * rhs(u + k2/2, Kel, Mel);
-%         k4 = dt * rhs(u + k3, Kel, Mel);
+%         k1 = dt * rhs(u, Kel, Mel, yr, yl);
+%         k2 = dt * rhs(u + k1/2, Kel, Mel, yr, yl);
+%         k3 = dt * rhs(u + k2/2, Kel, Mel, yr, yl);
+%         k4 = dt * rhs(u + k3, Kel, Mel, yr, yl);
 %         u = u + (k1 + 2*k2 + 2*k3 + k4) / 6;
 % 
 %         % Plotting
@@ -58,9 +76,14 @@ dt = 1e-4; % time step size
 %             xx = linspace(0, 1, 1000);             % Fine grid for exact solution
 %             uexact = uinit(mod(xx - dt*it, 1.0));  % Exact solution
 %             plot(x, u, 'b', xx, uexact, 'k')
-%             grid on, axis([0, 1, -0.1, 1.1]), drawnow
+%             grid on
+%             %axis([0, 1, -0.1, 1.1])
+%             drawnow
 %         end
 %     end
 % 
 %     uexact = uinit(mod(x - T, 1.0));               % Exact final solution
 %     error = max(abs(u(:) - uexact(:)));            % Discrete inf-norm error
+%     
+%     % compute the error as the (integrated) L-2 norm
+%     
