@@ -1,10 +1,10 @@
 %DGCONVECT0  1-D Linear Convection, DG and RK4
 clear all
-n = 2; % number of elements
+n = 80; % number of elements
 p = 1; % order of the shape functions
 T = 0.1; % end simulation time
 dt = 1e-4; % time step size
-fine_el = ceil(100/n); % number of points to resolve per discontinuous element
+fine_el = 100; % number of points to resolve per discontinuous element
 exact_el = fine_el * n - (n - 1);
 
 h = 1/n;
@@ -49,12 +49,7 @@ u = uinit(x);                                  % Interpolate initial condition
 x_plot = [];
 for el = 1:n
     x_plot(:, el) = linspace(x(1, el), x(end, el), 3*p);
-end
-
-% [u_plot] = u_plot(n, p, u, x_plot, x);
-% it = 1;
-% uexact = uinit(mod(xx - dt*it, 1.0));
-% plot(x, u, 'r', x_plot, u_plot, 'b', xx, uexact, 'k')
+    endg
 
 horiz = [[0, x(end, :)]; [0, x(end, :)]];
 vert = [0; 1] * ones(1, length([0, x(end, :)]));
@@ -128,11 +123,6 @@ for el = 1:n
     u_exact_norm(:, el) = u_exact_n(i:j)';
     i = i + fine_el - 1;
     j = j + fine_el - 1;
-end
-
-for el = 1:n
-    ((el - 1) * fine_el + 1)
-    (el * fine_el)
 end
 
 % L-2 norm for each element is determined using trapz() at the last time
