@@ -148,7 +148,7 @@ Then, while the above equation is true, it is also true that it holds for each i
 \int_{\Omega}\frac{\partial u_j}{\partial t}\phi_j(x)\phi_i(x)dx-\int_{\Omega}u_j\phi_j(x)\frac{\partial \phi_i(x)}{\partial x}dx+F(u_0^{k+1}, u_P^k)\phi_i(x_{k})-F(u_0^k, u_P^{k-1})\phi_i(x_{k-1})=&0\\
 \eeqa
 
-By defining the mass matrix \(M_{ij}\) as:
+Define the mass matrix \(M_{ij}\) as:
 
 \beq
 M_{ij}^k=\int_{x_{k-1}}^{x_k}\phi_j(x)\phi_i(x)dx
@@ -172,7 +172,7 @@ Then a system of equations that holds for a single element is:
 M_{ij}^k\dot{u_j}^k-K_{ij}^ku_j^k+u_P^k\phi_i^k(x_{k})-u_P^{k-1}\phi_i^k(x_{k-1})=0
 \eeq
 
-Because we will use nodal basis functions, \(\phi_i^k(x_k)\) and \(\phi_i^k(x_{k-1})\) are zero at all nodes except a single node. Hence, all of these extra terms will drop out except for one term each. Alternatively, if using Legendre polynomial expansions, then all of the polynomials are equal to either 1 or -1 at \(\xi=-1\) and \(xi=1\). 
+%Because we will use nodal basis functions, \(\phi_i^k(x_k)\) and \(\phi_i^k(x_{k-1})\) are zero at all nodes except a single node. Hence, all of these extra terms will drop out except for one term each. Alternatively, if using Legendre polynomial expansions, then all of the polynomials are equal to either 1 or -1 at \(\xi=-1\) and \(xi=1\). 
 
 %\beq
 %M_{ij}^k\dot{u_j}^k-K_{ij}^ku_j^k+u_P^k-u_P^{k-1}=0
@@ -192,9 +192,49 @@ K_{ij}^k=&\int_{-1}^{1}\phi_j(\xi)\frac{\partial \phi_i(\xi)}{\partial \xi}\frac
 =&\int_{-1}^{1}\phi_j(\xi)\frac{\partial \phi_i(\xi)}{\partial \xi}d\xi\\
 \eeqa
 
+Legendre polynomials are used as the expansion functions for this problem because they will eliminate the oscillatory nature of higher-degree monomials. However, the stand-alone Legendre polynomials are not a nodal basis. To make these polynomials a nodal basis, we write our basis functions \(\phi_i\) as a sum of \(P\) Legendre polynomials:
+
+\beq
+\phi_i(\xi)=\sum_{i=0}^Pc_i^jP_j(\xi)
+\eeq
+
+For \(P=3\) (just for example), the coefficients \(c_i^j\) can be determined by requiring that the basis function goes to zero at all nodes except one. For nodes \(s_p\) (of which there are \(p+1\)):
+
+\beq
+\begin{bmatrix}
+P_0(s_0) & P_1(s_0) & P_2(s_0)\\
+P_0(s_1) & P_1(s_1) & P_2(s_1)\\
+P_0(s_2) & P_1(s_2) & P_2(s_2)\\
+\end{bmatrix}
+\begin{bmatrix}
+c_0^0 & c_1^0 & c_2^0\\
+c_0^1 & c_1^1 & c_2^1\\
+c_0^2 & c_1^2 & c_2^2\\
+\end{bmatrix}=
+\begin{bmatrix}
+1 & 0 & 0\\
+0 & 1 & 0\\
+0 & 0 & 1
+\end{bmatrix}
+\eeq
+
+This must be performed for each element to determine the basis functions for each element. Alternatively, because the integrals are to be performed in the \(\xi\) domain anyways, these can be found a single time in the \(\xi\) domain (and then reused for every element). Then, only for plotting purposes would these need to be determined individually for each element.
 
 
 
+To compute the error, the \(L^2\) norm is computed over the entire domain. Because the solution is discontinuous, this is straightforward, and the solution over each element is integrated from \(x_{k-1}\) to \(x_k\) and then summed. 
+
+
+
+
+
+\section{}
+
+This problem modifies the code developed in the first part by solving the convection-diffusion equation:
+
+\beq
+\frac{\partial u}{\partial t}+\frac{\partial u}{\partial x}+\frac{\partial^2 u}{\partial x^2}=0
+\eeq
 
 
 
