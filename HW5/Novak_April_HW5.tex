@@ -261,7 +261,7 @@ u_1^2
 
 This is then repeated for every element until the solution over each element is fully specified. Then, the monomial defined using the coefficients \(A\) is sampled at the desired interpolation points for plotting purposes. 
 
-Finally, to compute the error, the \(L^2\) norm is computed over the entire domain. Because the solution is discontinuous, this is straightforward, and the solution over each element is integrated from \(x_{k-1}\) to \(x_k\) and then summed (and then square-rooted). 
+Finally, to compute the error, the \(L^2\) norm is computed over the entire domain. Because the solution is discontinuous, this is straightforward, and the solution over each element is integrated from \(x_{k-1}\) to \(x_k\) and then summed (and then square-rooted). To compute the norm, the exact solution is interpolated into a discontinuous Galerkin basis (i.e. it is expressed in the same form as {\tt u} from the original {\tt dgconvect0.m} code), and then trapezoidal integration is performed over each element by simply taking the square of the difference entry-wise between the discontinuous Galerkin solution and the analytical solution. To ensure that accurate norms are obtained, the interpolation of the analytical and numerical solutions into new spatial domains of length 100 nodes/element is performed. 
 
 
 
