@@ -49,10 +49,10 @@ for el = 1:n
     x_plot(:, el) = linspace(x(1, el), x(end, el), 3*p);
 end
 
-[u_plot] = u_plot(n, p, u, x_plot, x);
-it = 1;
-uexact = uinit(mod(xx - dt*it, 1.0));
-plot(x, u, 'r', x_plot, u_plot, 'b', xx, uexact, 'k')
+% [u_plot] = u_plot(n, p, u, x_plot, x);
+% it = 1;
+% uexact = uinit(mod(xx - dt*it, 1.0));
+% plot(x, u, 'r', x_plot, u_plot, 'b', xx, uexact, 'k')
 
 horiz = [[0, x(end, :)]; [0, x(end, :)]];
 vert = [0; 1] * ones(1, length([0, x(end, :)]));
@@ -65,10 +65,8 @@ for it = 1:T/dt                                % Main time-stepping loop
     k4 = dt * rhs(u + k3, Kel, Mel);
     u = u + (k1 + 2*k2 + 2*k3 + k4) / 6;
 
-    
-
     % Plotting
-    if mod(it, T/dt/1000) == 0                 % 1000 frames
+    if mod(it, T/dt/500) == 0                 % 1000 frames
 
         uexact = uinit(mod(xx - dt*it, 1.0));  % Exact solution
         u_plot = []; A = []; coeff_plot = [];
