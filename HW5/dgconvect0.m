@@ -1,17 +1,18 @@
 %DGCONVECT0  1-D Linear Convection, DG and RK4
 clear all
-n = 10; % number of elements
-p = 3; % order of the shape functions
+n = 2; % number of elements
+p = 1; % order of the shape functions
 T = 0.1; % end simulation time
 dt = 1e-4; % time step size
-fine_el = ceil(1000/n); % number of points to resolve per element
+fine_el = ceil(100/n); % number of points to resolve per discontinuous element
+exact_el = fine_el * n - (n - 1);
 
 h = 1/n;
 s_master = - cos(pi * (0:p) / p);
 s = ((s_master + 1).* h / 2)';                 % Chebyshev nodes
 x = s * ones(1,n) + ones(p+1,1) * (0:h:1-h);   % Entire mesh
 uinit = @(x) exp(-(x - 0.5).^2 / 0.1^2);       % Initial solution
-xx = linspace(0, 1, fine_el);                     % Fine grid for exact soln
+xx = linspace(0, 1, exact_el);                     % Fine grid for exact soln
 
 % find basis function coefficients (c_i^j) for each element
 A = []; 
@@ -84,17 +85,16 @@ for it = 1:T/dt                                % Main time-stepping loop
             end
         end
 
-        plot(x_plot, u_plot, 'b*-', x, u, 'r', xx, uexact, 'k', horiz, vert, '--')
-        grid on
-        axis([0, 1, -0.1, 1.1])
-        drawnow
+        %plot(x_plot, u_plot, 'b*-', x, u, 'r', xx, uexact, 'k', horiz, vert, '--')
+        %grid on
+        %axis([0, 1, -0.1, 1.1])
+        %drawnow
     end
 end
 
 uexact = uinit(mod(x - T, 1.0));               % Exact final solution
 error = max(abs(u(:) - uexact(:)));            % Discrete inf-norm error
-
-% compute the error as the (integrated) L-2 norm   
+   
 
 
 
@@ -103,9 +103,6 @@ x_norm = [];
 for el = 1:n
     x_norm(:, el) = linspace(x(1, el), x(end, el), fine_el);
 end
-
-% dx for numerical integration
-dx = x_norm(end, 1) - x_norm(end - 1, 1);
 
 A = []; coeff_plot = []; u_norm = [];
 for el = 1:n
@@ -122,13 +119,27 @@ end
 
 % u_norm : DG solution
 % u_exact_norm : exact solution
-u_exact_norm = uinit(mod(xx - T, 1.0)); 
+u_exact_n = uinit(mod(xx - T, 1.0));
+u_exact_norm = [];
+
+i = 1;
+j = fine_el;
+for el = 1:n
+    u_exact_norm(:, el) = u_exact_n(i:j)';
+    i = i + fine_el - 1;
+    j = j + fine_el - 1;
+end
+
+for el = 1:n
+    ((el - 1) * fine_el + 1)
+    (el * fine_el)
+end
 
 % L-2 norm for each element is determined using trapz() at the last time
 % step only (follows the original code)
 L2_elem = [];
 for el = 1:n
-    L2_elem(el) = trapz(x_norm(:, el), (u_exact_norm - u_norm(:, el)') .^ 2);
+    L2_elem(el) = trapz(x_norm(:, el), (u_exact_norm(:, el)' - u_norm(:, el)') .^ 2);
 end
 
 % sum over all the elements
