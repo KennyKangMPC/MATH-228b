@@ -198,7 +198,7 @@ Legendre polynomials are used as the expansion functions for this problem becaus
 \phi_i(\xi)=\sum_{i=0}^Pc_i^jP_j(\xi)
 \eeq
 
-For \(P=3\) (just for example), the coefficients \(c_i^j\) can be determined by requiring that the basis function goes to zero at all nodes except one. For nodes \(s_p\) (of which there are \(p+1\)):
+For \(P=2\) (just for example), the coefficients \(c_i^j\) can be determined by requiring that the basis function goes to zero at all nodes except one. For nodes \(s_p\) (of which there are \(p+1\)):
 
 \beq
 \begin{bmatrix}
@@ -218,11 +218,50 @@ c_0^2 & c_1^2 & c_2^2\\
 \end{bmatrix}
 \eeq
 
-This must be performed for each element to determine the basis functions for each element. Alternatively, because the integrals are to be performed in the \(\xi\) domain anyways, these can be found a single time in the \(\xi\) domain (and then reused for every element). Then, only for plotting purposes would these need to be determined individually for each element.
+This must be performed for each element to determine the basis functions for each element. Alternatively, because the integrals are to be performed in the \(\xi\) domain anyways, these can be found a single time in the \(\xi\) domain (and then reused for every element). After these coefficients are determined, the elemental mass and stiffness matrices are determined according to the equations given previously. The {\tt legendre\_poly.m} function is used for evaluating these polynomials and their derivatives over the reference element. Then, the remainder of the solve does not need to be modified, since at this point it is a ``turn-the-crank'' procedure.
 
+To plot the solution using \(3P\) points per element requires using the nodal values to determine the solution in each element. We need to evaluate the solution at these points in order to be able to interpolate the solution values at these \(3P\) points with straight lines (as requested). Because all of the integrals were transformed to the reference element appropriately, all of the solution values {\tt u} obtained during the time-stepping loop are valid in the physical domain. However, for plotting, the expansion functions in the physical domain must be determined - up until now, they have only been defined for a reference element. The solution over an element in the reference domain for \(P=2\) is:
 
+\beq
+u_h^{e=1}=C_1^0\phi_0(\xi)+C_1^1\phi_1(\xi)+C_1^2\phi_2(\xi)
+\eeq
 
-To compute the error, the \(L^2\) norm is computed over the entire domain. Because the solution is discontinuous, this is straightforward, and the solution over each element is integrated from \(x_{k-1}\) to \(x_k\) and then summed. 
+And in the physical domain, it is:
+
+\beq
+u_h^{e=1}=u_1^0\phi_0(x)+u_1^1\phi_1(x)+u_1^2\phi_2(x)
+\eeq
+
+But, the expansion functions are only known in the reference element. Because the Legendre polynomials form a basis, we can express any \(P\)-order polynomial using a summation of \(P\) Legendre polynomials. Hence, for \(P=2\) for instance, the solution in each element is a cubic of the form:
+
+\beq
+u_h^e=A_0^e+A_1^ex+A_2^ex^2
+\eeq
+
+where once these coefficients are determined, the solution over the element is fully known. For an element \(e=1\) with nodes at \(x=0.25, 0.5, 0.75\), we can solve for these coefficients \(A\) by:
+
+\beq
+\begin{bmatrix}
+1\cdot 0.25^0 & 1\cdot 0.25^1 & 1\cdot 0.25^2\\
+1\cdot 0.50^0 & 1\cdot 0.50^1 & 1\cdot 0.50^2\\
+1\cdot 0.75^0 & 1\cdot 0.75^1 & 1\cdot 0.75^2
+\end{bmatrix}
+\begin{bmatrix}
+A_0^1\\
+A_1^1\\
+A_2^1
+\end{bmatrix}
+=
+\begin{bmatrix}
+u_1^0\\
+u_1^1\\
+u_1^2
+\end{bmatrix}
+\eeq
+
+This is then repeated for every element until the solution over each element is fully specified. Then, the monomial defined using the coefficients \(A\) is sampled at the desired interpolation points for plotting purposes. 
+
+Finally, to compute the error, the \(L^2\) norm is computed over the entire domain. Because the solution is discontinuous, this is straightforward, and the solution over each element is integrated from \(x_{k-1}\) to \(x_k\) and then summed (and then square-rooted). 
 
 
 

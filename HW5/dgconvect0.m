@@ -82,8 +82,8 @@ for it = 1:T/dt                                % Main time-stepping loop
                 u_plot(i, el) = sum(coeff_plot(:, el)' .* (x_plot(i, el) .^ ((1:(p + 1)) - 1)));
             end
         end
-        
-        plot(x_plot, u_plot, 'b', xx, uexact, 'k', horiz, vert, '--')
+
+        plot(x_plot, u_plot, 'b*-', x, u, 'r', xx, uexact, 'k', horiz, vert, '--')
         grid on
         axis([0, 1, -0.1, 1.1])
         drawnow
