@@ -94,3 +94,24 @@ uexact = uinit(mod(x - T, 1.0));               % Exact final solution
 error = max(abs(u(:) - uexact(:)));            % Discrete inf-norm error
 
 % compute the error as the (integrated) L-2 norm   
+
+
+
+% determines the solution in the physical domain for plotting
+x_norm = [];
+for el = 1:n
+    x_norm(:, el) = linspace(x(1, el), x(end, el), 100);
+end
+A = []; coeff_plot = []; u_norm = [];
+
+for el = 1:n
+    for i = 1:(p + 1)
+        A(i, 1:(p + 1)) = x(i, el) .^ ((1:(p + 1)) - 1);
+    end
+
+    coeff_plot(:, el) = A \ u(:, el);
+
+    for i = 1:length(x_norm(:, 1))
+        u_norm(i, el) = sum(coeff_plot(:, el)' .* (x_norm(i, el) .^ ((1:(p + 1)) - 1)));
+    end
+end
