@@ -5,7 +5,11 @@ function [u, error] = dgconvect(n, p, T, dt)
 % dt = time step
 
 % number of points to resolve per discontinuous element
-fine_el = 1000;
+if n <= 4
+    fine_el = 5000;
+else
+    fine_el = 1000;
+end
 % number of points to resolve for analytical solution
 exact_el = fine_el * n - (n - 1); 
 
@@ -61,28 +65,27 @@ for it = 1:T/dt
     k4 = dt * rhs(u + k3, Kel, Mel);
     u = u + (k1 + 2*k2 + 2*k3 + k4) / 6;
 
-    % Plotting
-%             if mod(it, T/dt/1000) == 0                 % 1000 frames
-%                 uexact = uinit(mod(xx - dt*it, 1.0));  % Exact solution
-%                 u_plot = []; A = []; coeff_plot = [];
-% 
-%                 for el = 1:n
-%                     for i = 1:(p + 1)
-%                         A(i, 1:(p + 1)) = x(i, el) .^ ((1:(p + 1)) - 1);
-%                     end
-% 
-%                     coeff_plot(:, el) = A \ u(:, el);
-% 
-%                     for i = 1:length(x_plot(:, 1))
-%                         u_plot(i, el) = sum(coeff_plot(:, el)' .* (x_plot(i, el) .^ ((1:(p + 1)) - 1)));
-%                     end
-%                 end
-% 
-%                 plot(x_plot, u_plot, 'b*-', x, u, 'r', xx, uexact, 'k', horiz, vert, '--')
-%                 grid on
-%                 axis([0, 1, -0.1, 1.1])
-%                 drawnow
-%             end
+    if mod(it, T/dt/1000) == 0                 % 1000 frames
+        uexact = uinit(mod(xx - dt*it, 1.0));  % Exact solution
+        u_plot = []; A = []; coeff_plot = [];
+
+        for el = 1:n
+            for i = 1:(p + 1)
+                A(i, 1:(p + 1)) = x(i, el) .^ ((1:(p + 1)) - 1);
+            end
+
+            coeff_plot(:, el) = A \ u(:, el);
+
+            for i = 1:length(x_plot(:, 1))
+                u_plot(i, el) = sum(coeff_plot(:, el)' .* (x_plot(i, el) .^ ((1:(p + 1)) - 1)));
+            end
+        end
+
+        plot(x_plot, u_plot, 'b*-', x, u, 'r', xx, uexact, 'k', horiz, vert, '--')
+        grid on
+        axis([0, 1, -0.1, 1.1])
+        drawnow
+    end
 end
 
 uexact = uinit(mod(x - T, 1.0));               % Exact final solution

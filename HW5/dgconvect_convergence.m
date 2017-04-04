@@ -1,9 +1,9 @@
-%function [errors, slopes] = dgconvect_convergence
+function [errors, slopes] = dgconvect_convergence
 
 T = 1;                      % end simulation time
 dt = 2e-4;                  % time step size
 P = [1, 2, 4, 8, 16];       % polynomial orders for convergence study
-N = [16, 32, 48, 64, 80, 96, 112, 128, 256]; % numbers of nodes
+N = 16:16:256;              % numbers of nodes
 
 errors = zeros(length(P), length(P));
 
@@ -20,10 +20,14 @@ slopes = [];
 leg = cell(1, length(P)); leg_text = ''; % to hold the legend labels
 
 for p = 1:length(P)
+    p_error = errors(p, :);
+    % to remove points affected by rounding:
+    p_error = p_error(p_error > 1e-8);
+    N = N(1:length(p_error));
     % find the rates of convergence
-    fit = polyfit(log(N ./ p), log(errors(p, :)), 1);
+    fit = polyfit(log(N), log(p_error), 1);
     slopes(p) = fit(1);
-    loglog(N ./ p,errors(p, :), '*-')
+    loglog(N, p_error, '*-')
     leg{p} = sprintf('p = %i, slope = %.2i', P(p), slopes(p));
     hold on
     
@@ -35,9 +39,8 @@ for p = 1:length(P)
 end
 
 leg_text = strcat(strcat('legend(', leg_text), ')');
-
 eval(leg_text)
-xlabel('log(number of elements)')
-ylabel('L2-norm')
+xlabel('log(number of nodes)')
+ylabel('log(L2-norm)')
 
-%end
+end

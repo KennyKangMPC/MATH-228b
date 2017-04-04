@@ -91,7 +91,7 @@
 \setcounter{tocdepth}{4}
 \begin{document}
 
-\title{MATH 228b: HW5... 1b, 2ab}
+\title{MATH 228b: HW5... 2ab}
 \author{April Novak}
 
 \maketitle
@@ -259,44 +259,69 @@ This is then repeated for every element until the solution over each element is 
 
 Finally, to compute the error, the \(L^2\) norm is computed over the entire domain. Because the solution is discontinuous, this is straightforward, and the solution over each element is integrated from \(x_{k-1}\) to \(x_k\) and then summed (and then square-rooted). To compute the norm, the exact solution is interpolated into a discontinuous Galerkin basis (i.e. it is expressed in the same form as {\tt u} from the original {\tt dgconvect0.m} code), and then trapezoidal integration is performed over each element by simply taking the square of the difference entry-wise between the discontinuous Galerkin solution and the analytical solution. To ensure that accurate norms are obtained, the interpolation of the analytical and numerical solutions into new spatial domains of length 500 nodes/element is performed. Because the error can be found at each time step, for comparison it is only evaluated and compared for the last time step.
 
+The {\tt errors} matrix returned by {\tt dgconvect\_convergence} reports errors in the format such that each row corresponds to the errors for a given \(p\). Fig. \ref{fig:errors_raw} shows the raw data obtained for the requested points (and more to obtain better slope estimates) for all five of the polynomial orders. As can be seen, points below a logarithm of the \(L^2\) norm of about \(10^{-8}\) are affected by numerical rounding, since theoretically the error should monotonically decrease. Fig. \ref{fig:errors} shows the same data, but with points with an \(L^2\) norm less that \(10^{-8}\) removed from the data set. As can be seen, once these spurious data points are removed, all polynomial orders except 16 obtain fairly close to theoretical convergence rates. Like the continuous Galerkin method, the rate of convergence in the \(L^2\) norm should be the order of the polynomial expansion plus one. A poor rate of convergence is observed for \(p=16\) (and somewhat also for \(p=8\), which converges at a slope less than theoretical) because at such a fine solution, the time error associated with the Runge-Kutta stepping likely dominates the total error. To completely eliminate the time error, a method of manufactured solutions test could be performed to show that for an analytical, \textit{linear}, dependence on time, all of the polynomial orders should obtain theoretical convergences. All  of the code for this section is included in the Appendix. For the purpose of replicating these convergence results, the plotting section of {\tt dgconvect} should be commented out.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/errors_raw.jpg}
+\caption{\(L^2\) norm as a function of the number of nodes.}
+\label{fig:errors_raw}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/errors.jpg}
+\caption{\(L^2\) norm as a function of the number of nodes with data points with an \(L^2\) norm less that \(10^{-9}\) removed from the data.}
+\label{fig:errors}
+\end{figure}
 
 
-% won't get theoretical because there is time errors
+
+
+
 
 \section{}
 
 This problem modifies the code developed in the first part by solving the convection-diffusion equation:
 
 \beq
-\frac{\partial u}{\partial t}+\frac{\partial u}{\partial x}+\frac{\partial^2 u}{\partial x^2}=0
+\frac{\partial u}{\partial t}+\frac{\partial f(u)}{\partial x}-k\frac{\partial^2 u}{\partial x^2}=0
 \eeq
 
+The solution approach follows that in question 1, where again \(f(u)=u\), except that the above will be split into a system of two first-order equations, because otherwise we would need to determine a numerical ``flux function'' for specifying \(\partial u/\partial x\) on the boundary, which can be difficult.
+
+\beqa
+\frac{\partial u}{\partial t}+\frac{\partial f(u)}{\partial x}-k\frac{\partial \sigma}{\partial x}=0\\
+\sigma=\frac{\partial u}{\partial x}\\
+\eeqa
+
+Then, the approach from here is similar to that taken in the first problem. Express \(u\) and the test function \(v\) as an expansion, integrate over space, and integrate by parts when possible. The shape function used in the equation for \(\sigma\) is denoted as \(\tau\).
+
+\beqa
+\int_{\Omega}\frac{\partial u_h}{\partial t}v_hdx+\int_{\Omega}\frac{\partial f(u_h)}{\partial x}v_hdx-\int_{\Omega}k\frac{\partial \sigma_h}{\partial x}v_h=0\\
+\int_{\Omega}\sigma_h\tau_hdx=\int_{\Omega}\frac{\partial u_h}{\partial x}\tau_hdx\\
+\eeqa
+
+Now, integrate by parts to give:
+
+\beqa
+\int_{\Omega}\frac{\partial u_h}{\partial t}v_hdx-\int_{\Omega}\frac{\partial v_h}{\partial x}f(u_h)dx+\int_{\Omega}k\frac{\partial v_h}{\partial x}\sigma_h+\left\lbrack f(u_h)v_h\cdot\hat{n}\right\rbrack_0^1-\left\lbrack k\sigma_hv_h\cdot\hat{n}\right\rbrack_0^1=0\\
+\int_{\Omega}\sigma_h\tau_hdx=-\int_{\Omega}\frac{\partial \tau_h}{\partial x}u_hdx+\left\lbrack u_h\tau_h\cdot\hat{n}\right\rbrack_0^1\\
+\eeqa
+
+Next, we assume that \(u_h\), \(v_h\), \(\sigma_h\), and \(\tau_h\) all come from the same space of functions. Inserting these expansions into the above gives:g
 
 
 
 
-\begin{comment}
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.6\textwidth]{figures/difference1.png}
-\caption{Difference between the Godunov solution and the Roe solution at various time steps.}
-\end{figure}
-\end{comment}
 
 
-
-
-
-
-
-
-
-\begin{comment}
 \section{Appendix}
 \subsection{Question 1}
-\subsubsection{{\tt flux.m}}
-This function calculates the flux given a density.
-\lstinputlisting[language=Matlab]{flux.m}
-\end{comment}
+\subsubsection{{\tt dgconvect.m}}
+\lstinputlisting[language=Matlab]{dgconvect.m}
+\subsubsection{{\tt dgconvect\_convergence.m}}
+\lstinputlisting[language=Matlab]{dgconvect_convergence.m}
+
 
 \end{document}
