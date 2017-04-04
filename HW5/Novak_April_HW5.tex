@@ -91,7 +91,7 @@
 \setcounter{tocdepth}{4}
 \begin{document}
 
-\title{MATH 228b: HW5... 1a(2, 3, 4), b, 2ab}
+\title{MATH 228b: HW5... 1b, 2ab}
 \author{April Novak}
 
 \maketitle
@@ -172,11 +172,7 @@ Then a system of equations that holds for a single element is:
 M_{ij}^k\dot{u_j}^k-K_{ij}^ku_j^k+u_P^k\phi_i^k(x_{k})-u_P^{k-1}\phi_i^k(x_{k-1})=0
 \eeq
 
-%Because we will use nodal basis functions, \(\phi_i^k(x_k)\) and \(\phi_i^k(x_{k-1})\) are zero at all nodes except a single node. Hence, all of these extra terms will drop out except for one term each. Alternatively, if using Legendre polynomial expansions, then all of the polynomials are equal to either 1 or -1 at \(\xi=-1\) and \(xi=1\). 
-
-%\beq
-%M_{ij}^k\dot{u_j}^k-K_{ij}^ku_j^k+u_P^k-u_P^{k-1}=0
-%\eeq
+Because we will use nodal basis functions, \(\phi_i^k(x_k)\) and \(\phi_i^k(x_{k-1})\) are zero at all nodes except a single node. Hence, all of these extra terms will drop out except for one term each, and the shape function at that node will be unity.
 
 Finally, to implement arbitrary order polynomials, the mass and stiffness matrices must be computed. Because very high order polynomials will be used, these should be computed in a domain over \([-1,1]\) so that Gaussian quadrature can easily be used. These matrices transform according to:
 
@@ -259,9 +255,9 @@ u_1^2
 \end{bmatrix}
 \eeq
 
-This is then repeated for every element until the solution over each element is fully specified. Then, the monomial defined using the coefficients \(A\) is sampled at the desired interpolation points for plotting purposes. 
+This is then repeated for every element until the solution over each element is fully specified. Then, the monomial defined using the coefficients \(A\) is sampled at the desired interpolation points for plotting purposes (at \(3P\) points). 
 
-Finally, to compute the error, the \(L^2\) norm is computed over the entire domain. Because the solution is discontinuous, this is straightforward, and the solution over each element is integrated from \(x_{k-1}\) to \(x_k\) and then summed (and then square-rooted). To compute the norm, the exact solution is interpolated into a discontinuous Galerkin basis (i.e. it is expressed in the same form as {\tt u} from the original {\tt dgconvect0.m} code), and then trapezoidal integration is performed over each element by simply taking the square of the difference entry-wise between the discontinuous Galerkin solution and the analytical solution. To ensure that accurate norms are obtained, the interpolation of the analytical and numerical solutions into new spatial domains of length 100 nodes/element is performed. 
+Finally, to compute the error, the \(L^2\) norm is computed over the entire domain. Because the solution is discontinuous, this is straightforward, and the solution over each element is integrated from \(x_{k-1}\) to \(x_k\) and then summed (and then square-rooted). To compute the norm, the exact solution is interpolated into a discontinuous Galerkin basis (i.e. it is expressed in the same form as {\tt u} from the original {\tt dgconvect0.m} code), and then trapezoidal integration is performed over each element by simply taking the square of the difference entry-wise between the discontinuous Galerkin solution and the analytical solution. To ensure that accurate norms are obtained, the interpolation of the analytical and numerical solutions into new spatial domains of length 500 nodes/element is performed. 
 
 
 
