@@ -360,6 +360,8 @@ M_{ij}^k\sigma_j^k=-K_{ij}^ku_j^k+\begin{bmatrix}-u_0^k\\\vdots\\u_0^{k+1}\end{b
 
 where the \(\cdots\) notation indicates that all of the other entries are zero due to the use of a nodal basis. From here, the same general process is performed as done in question 1. After calculating the mass and stiffness matrices, Eq. \eqref{eq:sigma} is solved for \(\sigma_j\) using the initial condition for \(u_h\). Then, Eq. \eqref{eq:u} is solved to determine \(u_j\). This process is repeated for every time step. So, the only part of {\tt dgconvect.m} that must be modified is the time-stepping loop.
 
+The exact solution provided must be shifted in space corresponding to the local velocity in order to account for the convective part of the solution. The diffusive kernel causes the solution to spread, while the convection kernel causes this entire spreading to move to the right at velocity \(u=1\). 
+
 
 
 \section{Appendix}

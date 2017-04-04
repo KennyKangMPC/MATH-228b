@@ -1,11 +1,12 @@
-%function [u, error] = dgconvdiff(n, p, T, dt)
+%function [u, error] = dgconvdiff(n, p, T, dt, k)
 % n = number of elements
 % p = polynomial order
 % T = end time
 % dt = time step
+% k = thermal conductivity
 n = 5;
 p = 3;
-T = 0.25;
+T = 0.5;
 dt = 1e-4;
 k = 0.1; % thermal conductivity
 
@@ -78,7 +79,16 @@ for it = 1:T/dt
     u = u + (k1 + 2*k2 + 2*k3 + k4) / 6;
 
     if mod(it, T/dt/500) == 0                 % 1000 frames
-        uexact = uinit(mod(xx - dt*it, 1.0));  % Exact solution
+        %uexact = uinit(mod(xx - dt*it, 1.0));  % Exact solution
+        uexact = zeros(1, length(xx));
+        
+        for z = -1:1:1
+            tt = it * dt;
+            xxx = mod(xx - tt, 1.0);
+            term = 1 + 400 * k * tt;
+            uexact = uexact + (1 / sqrt(term)) * exp(-100 .* ((xxx - 0.5 + z).^ 2) ./ term);
+        end
+        
         u_plot = []; A = []; coeff_plot = [];
 
         for el = 1:n
@@ -93,15 +103,22 @@ for it = 1:T/dt
             end
         end
 
-        plot(x_plot, u_plot, 'b*-', x, u, 'r', xx, uexact, 'k', horiz, vert, '--')
+        plot(x_plot, u_plot, 'b*-', xx, uexact, 'k', horiz, vert, '--')
         grid on
         axis([0, 1, -0.1, 1.1])
         drawnow
     end
 end
 
-uexact = uinit(mod(x - T, 1.0));               % Exact final solution
-error = max(abs(u(:) - uexact(:)));            % Discrete inf-norm error
+% exact final solution
+uexact = zeros(1, length(xx));
+
+for z = -1:1:1
+    tt = T;
+    xxx = mod(xx - tt, 1.0);
+    term = 1 + 400 * k * tt;
+    uexact = uexact + (1 / sqrt(term)) * exp(-100 .* ((xxx - 0.5 + z).^ 2) ./ term);
+end
 
 % determines the solution in the physical domain for plotting
 x_norm = [];

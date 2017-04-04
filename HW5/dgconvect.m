@@ -89,7 +89,6 @@ for it = 1:T/dt
 end
 
 uexact = uinit(mod(x - T, 1.0));               % Exact final solution
-error = max(abs(u(:) - uexact(:)));            % Discrete inf-norm error
 
 % determines the solution in the physical domain for plotting
 x_norm = [];
