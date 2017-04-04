@@ -5,7 +5,7 @@ function [u, error] = dgconvect(n, p, T, dt)
 % dt = time step
 
 % number of points to resolve per discontinuous element
-fine_el = 500;
+fine_el = 1000;
 % number of points to resolve for analytical solution
 exact_el = fine_el * n - (n - 1); 
 
@@ -127,7 +127,6 @@ for el = 1:n
     L2_elem(el) = trapz(x_norm(:, el), (u_exact_norm(:, el)' - u_norm(:, el)') .^ 2);
 end
 
-% sum over all the elements
 error = sqrt(sum(L2_elem));
 
 end
