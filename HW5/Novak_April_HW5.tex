@@ -326,8 +326,7 @@ Because \(\tau_i\) is arbitrary, it can be ``cancelled'' from every term in the 
 \int_{x_{k-1}}^{x_k}\frac{\partial}{\partial t}\left(\sum_{j=0}^{P}u_j\phi_j\right)\sum_{i=0}^{P}\phi_idx-\int_{x_{k-1}}^{x_k}\frac{\partial}{\partial x}\left(\sum_{i=0}^{P}\phi_i\right)\sum_{j=0}^{P}u_j\phi_jdx+\quad\\
 \int_{x_{k-1}}^{x_k}k\frac{\partial}{\partial x}\left(\sum_{i=0}^{P}\phi_i\right)\sum_{j=0}^{P}\sigma_j\phi_j+\left\lbrack \sum_{j=0}^{P}u_j\phi_j\sum_{i=0}^{P}\phi_i\cdot\hat{n}\right\rbrack_{x_{k-1}}^{x_k}-\left\lbrack k\sum_{j=0}^{P}\sigma_j\phi_j\sum_{i=0}^{P}\phi_i\cdot\hat{n}\right\rbrack_{x_{k-1}}^{x_k}=0\\
 \\
-\int_{x_{k-1}}^{x_k}\frac{\partial}{\partial t}\left(u_j\phi_j\right)\phi_idx-\int_{x_{k-1}}^{x_k}\frac{\partial\phi_i}{\partial x}u_j\phi_jdx+\quad\\
-\int_{x_{k-1}}^{x_k}k\frac{\partial\phi_i}{\partial x}\sigma_j\phi_j+\left\lbrack u_j\phi_j\phi_i\cdot\hat{n}\right\rbrack_{x_{k-1}}^{x_k}-\left\lbrack k\sigma_j\phi_j\phi_i\cdot\hat{n}\right\rbrack_{x_{k-1}}^{x_k}=0\\
+\int_{x_{k-1}}^{x_k}\frac{\partial u_j}{\partial t}\phi_j\phi_idx-\int_{x_{k-1}}^{x_k}\frac{\partial\phi_i}{\partial x}u_j\phi_jdx+\int_{x_{k-1}}^{x_k}k\frac{\partial\phi_i}{\partial x}\sigma_j\phi_j+\left\lbrack u_j\phi_j\phi_i\cdot\hat{n}-k\sigma_j\phi_j\phi_i\cdot\hat{n}\right\rbrack_{x_{k-1}}^{x_k}=0\\
 \eeqa
 
 \beqa
@@ -347,13 +346,19 @@ and a stiffness matrix as:
 K_{ij}^k=\int_{x_{k-1}}^{x_k}\frac{\partial\phi_i}{\partial x}\phi_jdx
 \eeq
 
-
-
-Then, the system of equations becomes, for a single element:
+I assume that the method shown in the DG slides on BCourses show the way to interpret the cryptic instructions that \(C_{11}=0\) and \(C_{12}=1/2\). This corresponds to pure upwinding in the first equation and pure downwinding in the second equation. With these specifications for the numerical fluxes, the system of equations becomes, for a single element:
 
 \beq
-M_{ij}^k\sigma_j^k=-K_{ij}^ku_j^k+\begin{bmatrix}\end{bmatrix}
+\label{eq:u}
+M_{ij}^k\dot{u_j}^k=K_{ij}^k\left(u_j-k\sigma_j\right)-\begin{bmatrix}-(u_p^{k-1}-k\sigma_p^{k-1})\\\vdots\\u_p^k-k\sigma_p^k\end{bmatrix}
 \eeq
+
+\beq
+\label{eq:sigma}
+M_{ij}^k\sigma_j^k=-K_{ij}^ku_j^k+\begin{bmatrix}-u_0^k\\\vdots\\u_0^{k+1}\end{bmatrix}
+\eeq
+
+where the \(\cdots\) notation indicates that all of the other entries are zero due to the use of a nodal basis. From here, the same general process is performed as done in question 1. After calculating the mass and stiffness matrices, Eq. \eqref{eq:sigma} is solved for \(\sigma_j\) using the initial condition for \(u_h\). Then, Eq. \eqref{eq:u} is solved to determine \(u_j\). This process is repeated for every time step. So, the only part of {\tt dgconvect.m} that must be modified is the time-stepping loop.
 
 
 
