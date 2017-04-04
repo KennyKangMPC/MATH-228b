@@ -7,6 +7,7 @@ n = 5;
 p = 3;
 T = 0.25;
 dt = 1e-4;
+k = 0.1; % thermal conductivity
 
 % number of points to resolve per discontinuous element
 if n <= 4
@@ -70,10 +71,10 @@ for it = 1:T/dt
     sigma = Mel \ r;
     
     % solve for u
-    k1 = dt * rhsdiff(u, Kel, Mel, sigma);
-    k2 = dt * rhsdiff(u + k1/2, Kel, Mel, sigma);
-    k3 = dt * rhsdiff(u + k2/2, Kel, Mel, sigma);
-    k4 = dt * rhsdiff(u + k3, Kel, Mel, sigma);
+    k1 = dt * rhsdiff(u, Kel, Mel, sigma, k);
+    k2 = dt * rhsdiff(u + k1/2, Kel, Mel, sigma, k);
+    k3 = dt * rhsdiff(u + k2/2, Kel, Mel, sigma, k);
+    k4 = dt * rhsdiff(u + k3, Kel, Mel, sigma, k);
     u = u + (k1 + 2*k2 + 2*k3 + k4) / 6;
 
     if mod(it, T/dt/500) == 0                 % 1000 frames
@@ -92,7 +93,7 @@ for it = 1:T/dt
             end
         end
 
-        plot(x_plot, u_plot, 'b*-', x, u, 'r', xx, uexact, 'k', horiz, vert, '--', x, sigma, 'g')
+        plot(x_plot, u_plot, 'b*-', x, u, 'r', xx, uexact, 'k', horiz, vert, '--')
         grid on
         axis([0, 1, -0.1, 1.1])
         drawnow
