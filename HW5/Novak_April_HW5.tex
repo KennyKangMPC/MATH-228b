@@ -309,10 +309,51 @@ Now, integrate by parts to give:
 \int_{\Omega}\sigma_h\tau_hdx=-\int_{\Omega}\frac{\partial \tau_h}{\partial x}u_hdx+\left\lbrack u_h\tau_h\cdot\hat{n}\right\rbrack_0^1\\
 \eeqa
 
-Next, we assume that \(u_h\), \(v_h\), \(\sigma_h\), and \(\tau_h\) all come from the same space of functions. Inserting these expansions into the above gives:g
+Next, we assume that \(u_h\), \(v_h\), \(\sigma_h\), and \(\tau_h\) all come from the same space of functions. Inserting these expansions into the above gives, for a single element:
+
+\beqa
+\int_{x_{k-1}}^{x_k}\frac{\partial}{\partial t}\left(\sum_{j=0}^{P}u_j\phi_j\right)\sum_{i=0}^{P}v_i\phi_idx-\int_{x_{k-1}}^{x_k}\frac{\partial}{\partial x}\left(\sum_{i=0}^{P}v_i\phi_i\right)\sum_{j=0}^{P}u_j\phi_jdx+\quad\\
+\int_{x_{k-1}}^{x_k}k\frac{\partial}{\partial x}\left(\sum_{i=0}^{P}v_i\phi_i\right)\sum_{j=0}^{P}\sigma_j\phi_j+\left\lbrack \sum_{j=0}^{P}u_j\phi_j\sum_{i=0}^{P}v_i\phi_i\cdot\hat{n}\right\rbrack_{x_{k-1}}^{x_k}-\left\lbrack k\sum_{j=0}^{P}\sigma_j\phi_j\sum_{i=0}^{P}v_i\phi_i\cdot\hat{n}\right\rbrack_{x_{k-1}}^{x_k}=0\\
+\eeqa
+
+\beq
+\int_{x_{k-1}}^{x_k}\sum_{j=0}^{P}\sigma_j\phi_j\sum_{i=0}^{P}\tau_i\phi_idx=-\int_{x_{k-1}}^{x_k}\frac{\partial}{\partial x}\left(\sum_{i=0}^{P}\tau_i\phi_i\right)\sum_{j=0}^{P}u_j\phi_jdx+\left\lbrack \sum_{j=0}^{P}u_j\phi_j\sum_{i=0}^{P}\tau_i\phi_i\cdot\hat{n}\right\rbrack_{x_{k-1}}^{x_k}\\
+\eeq
+
+Because \(\tau_i\) is arbitrary, it can be ``cancelled'' from every term in the second equation by grouping all of the terms such that \(\tau_i\) multiplies an integrand. Then, that integrand must be zero, allowing \(\tau_i\) to be cancelled. The same argument applies for \(v_i\). Then, while the equations are true when using the entire summation, it is also true for each individual \(p\). 
+
+\beqa
+\int_{x_{k-1}}^{x_k}\frac{\partial}{\partial t}\left(\sum_{j=0}^{P}u_j\phi_j\right)\sum_{i=0}^{P}\phi_idx-\int_{x_{k-1}}^{x_k}\frac{\partial}{\partial x}\left(\sum_{i=0}^{P}\phi_i\right)\sum_{j=0}^{P}u_j\phi_jdx+\quad\\
+\int_{x_{k-1}}^{x_k}k\frac{\partial}{\partial x}\left(\sum_{i=0}^{P}\phi_i\right)\sum_{j=0}^{P}\sigma_j\phi_j+\left\lbrack \sum_{j=0}^{P}u_j\phi_j\sum_{i=0}^{P}\phi_i\cdot\hat{n}\right\rbrack_{x_{k-1}}^{x_k}-\left\lbrack k\sum_{j=0}^{P}\sigma_j\phi_j\sum_{i=0}^{P}\phi_i\cdot\hat{n}\right\rbrack_{x_{k-1}}^{x_k}=0\\
+\\
+\int_{x_{k-1}}^{x_k}\frac{\partial}{\partial t}\left(u_j\phi_j\right)\phi_idx-\int_{x_{k-1}}^{x_k}\frac{\partial\phi_i}{\partial x}u_j\phi_jdx+\quad\\
+\int_{x_{k-1}}^{x_k}k\frac{\partial\phi_i}{\partial x}\sigma_j\phi_j+\left\lbrack u_j\phi_j\phi_i\cdot\hat{n}\right\rbrack_{x_{k-1}}^{x_k}-\left\lbrack k\sigma_j\phi_j\phi_i\cdot\hat{n}\right\rbrack_{x_{k-1}}^{x_k}=0\\
+\eeqa
+
+\beqa
+\int_{x_{k-1}}^{x_k}\sum_{j=0}^{P}\sigma_j\phi_j\sum_{i=0}^{P}\phi_idx=&-\int_{x_{k-1}}^{x_k}\frac{\partial}{\partial x}\left(\sum_{i=0}^{P}\phi_i\right)\sum_{j=0}^{P}u_j\phi_jdx+\left\lbrack \sum_{j=0}^{P}u_j\phi_j\sum_{i=0}^{P}\phi_i\cdot\hat{n}\right\rbrack_{x_{k-1}}^{x_k}\\
+\int_{x_{k-1}}^{x_k}\sigma_j\phi_j\phi_idx=&-\int_{x_{k-1}}^{x_k}\frac{\partial\phi_i}{\partial x}u_j\phi_jdx+\left\lbrack u_j\phi_j\phi_i\cdot\hat{n}\right\rbrack_{x_{k-1}}^{x_k}\\
+\eeqa
+
+Define a mass matrix as:
+
+\beq
+M_{ij}^k=\int_{x_{k-1}}^{x_k}\phi_j\phi_idx
+\eeq
+
+and a stiffness matrix as:
+
+\beq
+K_{ij}^k=\int_{x_{k-1}}^{x_k}\frac{\partial\phi_i}{\partial x}\phi_jdx
+\eeq
 
 
 
+Then, the system of equations becomes, for a single element:
+
+\beq
+M_{ij}^k\sigma_j^k=-K_{ij}^ku_j^k+\begin{bmatrix}\end{bmatrix}
+\eeq
 
 
 
