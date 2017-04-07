@@ -91,7 +91,7 @@
 \setcounter{tocdepth}{4}
 \begin{document}
 
-\title{MATH 228b: HW5... 2ab}
+\title{MATH 228b: HW5}
 \author{April Novak}
 
 \maketitle
@@ -360,8 +360,14 @@ M_{ij}^k\sigma_j^k=-K_{ij}^ku_j^k+\begin{bmatrix}-u_0^k\\\vdots\\u_0^{k+1}\end{b
 
 where the \(\cdots\) notation indicates that all of the other entries are zero due to the use of a nodal basis. From here, the same general process is performed as done in question 1. After calculating the mass and stiffness matrices, Eq. \eqref{eq:sigma} is solved for \(\sigma_j\) using the initial condition for \(u_h\). Then, Eq. \eqref{eq:u} is solved to determine \(u_j\). This process is repeated for every time step. So, the only part of {\tt dgconvect.m} that must be modified is the time-stepping loop.
 
-The exact solution provided must be shifted in space corresponding to the local velocity in order to account for the convective part of the solution. The diffusive kernel causes the solution to spread, while the convection kernel causes this entire spreading to move to the right at velocity \(u=1\). 
+The exact solution provided must be shifted in space corresponding to the local velocity in order to account for the convective part of the solution. The diffusive kernel causes the solution to spread, while the convection kernel causes this entire spreading to move to the right at velocity \(u=1\). The higher the thermal conductivity, the faster the solution spreads out to reach a flat profile. For the convergence study, the plotting should again be commented out to save time. The same basic structure of the convergence program is used to assess convergence here. Fig. \ref{fig:errors2} shows the convergence rates obtained using my code - as can be seen, optimal convergence rates are not obtained (and I'm not sure why they are not). 
 
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/error2_raw.png}
+\caption{\(L^2\) norm as a function of the number of nodes.}
+\label{fig:errors2_raw}
+\end{figure}
 
 
 \section{Appendix}
@@ -370,6 +376,13 @@ The exact solution provided must be shifted in space corresponding to the local 
 \lstinputlisting[language=Matlab]{dgconvect.m}
 \subsubsection{{\tt dgconvect\_convergence.m}}
 \lstinputlisting[language=Matlab]{dgconvect_convergence.m}
+\subsection{Question 2}
+\subsubsection{{\tt dgconvdiff.m}}
+\lstinputlisting[language=Matlab]{dgconvdiff.m}
+\subsubsection{{\tt rhsdiff.m}}
+\lstinputlisting[language=Matlab]{rhsdiff.m}
+\subsubsection{{\tt dgconvdiff\_convergence.m}}
+\lstinputlisting[language=Matlab]{dgconvdiff_convergence.m}
 
 
 \end{document}

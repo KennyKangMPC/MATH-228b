@@ -1,14 +1,9 @@
-%function [u, error] = dgconvdiff(n, p, T, dt, k)
+function [u, error] = dgconvdiff(n, p, T, dt, k)
 % n = number of elements
 % p = polynomial order
 % T = end time
 % dt = time step
 % k = thermal conductivity
-n = 5;
-p = 3;
-T = 0.5;
-dt = 1e-4;
-k = 0.1; % thermal conductivity
 
 % number of points to resolve per discontinuous element
 if n <= 4
@@ -64,22 +59,15 @@ end
 horiz = [[0, x(end, :)]; [0, x(end, :)]];
 vert = [0; 1] * ones(1, length([0, x(end, :)]));
 
-for it = 1:T/dt
-    % solve for sigma
-    r = - Kel * u;
-    r(end, :) = r(end, :) + u(1, [2:end, 1]);   % right-end flux
-    r(1, :) = r(1, :) - u(1, :);                % left-end flux
-    sigma = Mel \ r;
-    
+for it = 1:T/dt    
     % solve for u
-    k1 = dt * rhsdiff(u, Kel, Mel, sigma, k);
-    k2 = dt * rhsdiff(u + k1/2, Kel, Mel, sigma, k);
-    k3 = dt * rhsdiff(u + k2/2, Kel, Mel, sigma, k);
-    k4 = dt * rhsdiff(u + k3, Kel, Mel, sigma, k);
+    k1 = dt * rhsdiff(u, Kel, Mel, k);
+    k2 = dt * rhsdiff(u + k1/2, Kel, Mel, k);
+    k3 = dt * rhsdiff(u + k2/2, Kel, Mel, k);
+    k4 = dt * rhsdiff(u + k3, Kel, Mel, k);
     u = u + (k1 + 2*k2 + 2*k3 + k4) / 6;
 
     if mod(it, T/dt/500) == 0                 % 1000 frames
-        %uexact = uinit(mod(xx - dt*it, 1.0));  % Exact solution
         uexact = zeros(1, length(xx));
         
         for z = -1:1:1
@@ -112,7 +100,6 @@ end
 
 % exact final solution
 uexact = zeros(1, length(xx));
-
 for z = -1:1:1
     tt = T;
     xxx = mod(xx - tt, 1.0);
@@ -140,8 +127,9 @@ for el = 1:n
 end
 
 % u_norm : DG solution
-% u_exact_norm : exact solution
-u_exact_n = uinit(mod(xx - T, 1.0));
+% u_exact_norm : exact solution in a DG basis
+% u_exact_n : exact solution in a continuous basis
+u_exact_n = uexact;
 u_exact_norm = [];
 
 i = 1;
@@ -161,4 +149,4 @@ end
 
 error = sqrt(sum(L2_elem));
 
-%end
+end
