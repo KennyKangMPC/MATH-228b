@@ -1,4 +1,4 @@
-function [u] = fempoi(p, t, e)
+function [u, K, F] = fempoi(p, t, e)
 %  p = coordinates in mesh
 %  t = triangulation
 %  e = Dirichlet boundary nodes
@@ -70,6 +70,6 @@ end
 K = sparse(K);
 u = K \ F;
 
-tplot(p, t, u)
+%tplot(p, t, u)
 
 end

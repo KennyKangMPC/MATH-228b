@@ -85,7 +85,6 @@
 \def\l@subparagraph{\@dottedtocline{6}{14em}{6em}}
 \makeatother
 
-\newcommand{\volume}{\mathop{\ooalign{\hfil$V$\hfil\cr\kern0.08em--\hfil\cr}}\nolimits}
 
 \setcounter{secnumdepth}{4}
 \setcounter{tocdepth}{4}
@@ -100,7 +99,9 @@
 
 \section{}
 
+\textbf{(a)}
 
+The first part of this question develops a Gauss-Seidel solver given a matrix system \(Au=b\) for an initial guess \(u_0\). This method is very similar to the Jacobi method, where instead of solving the time-independent problem of interest, we insert a time derivative term and iterate until the solution converges to a steady-state result (with the assumption that this steady-state result is therefore also equivalent to the solution to the problem with no time derivative at all). Gauss-Seidel differs from the Jacobi method in that the most recent iterate is used to perform the update. The code developed for this section is included in the Appendix.
 
 
 
@@ -133,13 +134,9 @@
 
 
 \section{Appendix}
-\begin{comment}
 \subsection{Question 1}
-\subsubsection{{\tt dgconvect.m}}
-\lstinputlisting[language=Matlab]{dgconvect.m}
-\subsubsection{{\tt dgconvect\_convergence.m}}
-\lstinputlisting[language=Matlab]{dgconvect_convergence.m}
-\end{comment}
+\subsubsection{{\tt gauss\_seidel.m}}
+\lstinputlisting[language=Matlab]{gauss_seidel.m}
 
 
 \end{document}
