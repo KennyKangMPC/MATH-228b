@@ -69,7 +69,4 @@ end
 
 K = sparse(K);
 u = K \ F;
-
-%tplot(p, t, u)
-
 end

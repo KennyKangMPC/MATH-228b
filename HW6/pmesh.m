@@ -1,7 +1,9 @@
-function [p,t,e] = pmesh(pv, hmax, nref)
-%PMESH  Delaunay refinement mesh generator.
-
+function [p,t,e, data] = pmesh(pv, hmax, nref)
+% PMESH  Delaunay refinement mesh generator.
 % UC Berkeley Math 228B, Per-Olof Persson <persson@berkeley.edu>
+
+field1 = 'p'; field2 = 't'; field3 = 'e';
+data = struct(field1, {}, field2, {}, field3, {});
 
 p = [];
 for i = 1:size(pv,1)-1
@@ -26,14 +28,26 @@ while 1
   p(end+1,:) = pc;
 end
 
+e = boundary_nodes(t);
+
+% save the first field
+data(1).p = p;
+data(1).t = t;
+data(1).e = e;
+
 for iref = 1:nref
   p = [p; edgemidpoints(p,t)];
   t = delaunayn(p);
   t = removeoutsidetris(p, t, pv);
+  e = boundary_nodes(t);
   %tplot(p,t)
+  
+  data(iref + 1).p = p;
+  data(iref + 1).t = t;
+  data(iref + 1).e = e;
 end
 
-e = boundary_nodes(t);
+
 
 function pmid = edgemidpoints(p, t)
   

@@ -90,7 +90,7 @@
 \setcounter{tocdepth}{4}
 \begin{document}
 
-\title{MATH 228b: HW6 1a,b,c, 2a, ba,b,c,d,e}
+\title{MATH 228b: HW6 1a,b,c, 2 bb,c,d,e}
 \author{April Novak}
 
 \maketitle
@@ -102,6 +102,11 @@
 \textbf{(a)}
 
 The first part of this question develops a Gauss-Seidel solver given a matrix system \(Au=b\) for an initial guess \(u_0\). This method is very similar to the Jacobi method, where instead of solving the time-independent problem of interest, we insert a time derivative term and iterate until the solution converges to a steady-state result (with the assumption that this steady-state result is therefore also equivalent to the solution to the problem with no time derivative at all). Gauss-Seidel differs from the Jacobi method in that the most recent iterate is used to perform the update. The code developed for this section is included in the Appendix.
+
+\textbf{(b)}
+
+This question solves the Poisson equation using the multigrid method. The first step is a modification to Professor Persson's {\tt pmesh} function (which I assume is okay because we were told for assignment 3 that we could use his function moving forward to avoid points being lost across multiple assignments) such that it outputs the {\tt data} structured array data structure containing {\tt data.p}, {\tt data.t}, and {\tt data.e} members. This is performed by manipulating the contents of the original {\tt pmesh} function, so make sure to use the {\tt pmesh} function that I submit with this assignment! This edited function is included in the Appendix.
+
 
 
 
@@ -134,9 +139,11 @@ The first part of this question develops a Gauss-Seidel solver given a matrix sy
 
 
 \section{Appendix}
-\subsection{Question 1}
+\subsection{Question 2, part a}
 \subsubsection{{\tt gauss\_seidel.m}}
 \lstinputlisting[language=Matlab]{gauss_seidel.m}
-
+\subsection{Question 2, part b}
+\subsubsection{{\tt pmesh.m}}
+\lstinputlisting[language=Matlab]{pmesh.m}
 
 \end{document}
