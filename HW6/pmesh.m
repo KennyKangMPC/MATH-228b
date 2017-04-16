@@ -17,7 +17,7 @@ end
 while 1
   t = delaunayn(p);
   t = removeoutsidetris(p, t, pv);
-  tplot(p,t)
+  %tplot(p,t)
 
   area = triarea(p,t);
   [maxarea, ix] = max(area);
@@ -30,7 +30,7 @@ for iref = 1:nref
   p = [p; edgemidpoints(p,t)];
   t = delaunayn(p);
   t = removeoutsidetris(p, t, pv);
-  tplot(p,t)
+  %tplot(p,t)
 end
 
 e = boundary_nodes(t);

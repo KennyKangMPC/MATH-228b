@@ -1,12 +1,11 @@
-function [a] = fempoi(p, t, e)
+function [u] = fempoi(p, t, e)
 %  p = coordinates in mesh
 %  t = triangulation
 %  e = Dirichlet boundary nodes
 %  --- To use this function, you must have already run pmesh()
 
-LM = t;
-num_elem = length(LM(:,1)); 
-dirichlet_nodes(1,:) = e;
+num_elem = length(t(:,1)); 
+dirichlet_nodes(1, :) = e;
 num_nodes_per_elem = 3;         % linear triangular elements
 
 % form the permutation matrix for assembling the global matrices
@@ -14,24 +13,21 @@ num_nodes_per_elem = 3;         % linear triangular elements
 
 % specify the boundary conditions - homogeneous neumann and dirichlet
 dirichlet_nodes(2,:) = zeros .* dirichlet_nodes(1,:);
-a_k = dirichlet_nodes(2,:);
 num_nodes = length(p(:,1));
 
 % assemble the elemental k and elemental f
-K = zeros(num_nodes);
-F = zeros(num_nodes, 1);
+K = zeros(num_nodes); F = zeros(num_nodes, 1);
 
 for elem = 1:num_elem
-    k = 0;
-    f = 0;
+    k = 0; f = 0;
 
-    X = [p(LM(elem,1),1) p(LM(elem,2),1) p(LM(elem,3),1);
-         p(LM(elem,1),2) p(LM(elem,2),2) p(LM(elem,3),2);
-         1               1               1               ];
+    X = [p(t(elem,1),1) p(t(elem,2),1) p(t(elem,3),1);
+         p(t(elem,1),2) p(t(elem,2),2) p(t(elem,3),2);
+         1              1              1            ];
     C = inv(X);
     
     % compute area of triangle based on hard-coded formula
-    area = polyarea([p(LM(elem,1),1) p(LM(elem,2),1) p(LM(elem,3),1)], [p(LM(elem,1),2) p(LM(elem,2),2) p(LM(elem,3),2)]);
+    area = polyarea([p(t(elem,1),1) p(t(elem,2),1) p(t(elem,3),1)], [p(t(elem,1),2) p(t(elem,2),2) p(t(elem,3),2)]);
     
     for l = 1:3
         f(l, 1) = area / 3;
@@ -44,12 +40,12 @@ for elem = 1:num_elem
     for m = 1:length(perm(:,1))
        i = perm(m,1);
        j = perm(m,2);
-       K(LM(elem, i), LM(elem, j)) = K(LM(elem, i), LM(elem, j)) + k(i,j);
+       K(t(elem, i), t(elem, j)) = K(t(elem, i), t(elem, j)) + k(i,j);
     end
 
     % place the elemental f matrix into the global F matrix
     for i = 1:length(f)
-       F(LM(elem, i)) = F((LM(elem, i))) + f(i);
+       F(t(elem, i)) = F((t(elem, i))) + f(i);
     end
 end
 
@@ -71,8 +67,9 @@ for node = 1:num_nodes
     end
 end
 
-a = K \ F;
+K = sparse(K);
+u = K \ F;
 
-tplot(p, LM, a)
+tplot(p, t, u)
 
 end
