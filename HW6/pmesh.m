@@ -1,9 +1,8 @@
-function [p,t,e, data] = pmesh(pv, hmax, nref)
+function [p,t,e, data, pmid, ia] = pmesh(pv, hmax, nref)
 % PMESH  Delaunay refinement mesh generator.
 % UC Berkeley Math 228B, Per-Olof Persson <persson@berkeley.edu>
 
-field1 = 'p'; field2 = 't'; field3 = 'e';
-data = struct(field1, {}, field2, {}, field3, {});
+data = struct('p', {}, 't', {}, 'e', {}, 'T', {});
 
 p = [];
 for i = 1:size(pv,1)-1
@@ -36,25 +35,30 @@ data(1).t = t;
 data(1).e = e;
 
 for iref = 1:nref
-  p = [p; edgemidpoints(p,t)];
+  [pmid, ia] = edgemidpoints(p,t);
+  p = [p; pmid];
   t = delaunayn(p);
   t = removeoutsidetris(p, t, pv);
   e = boundary_nodes(t);
   %tplot(p,t)
   
+  % save all subsequent fields
   data(iref + 1).p = p;
   data(iref + 1).t = t;
   data(iref + 1).e = e;
 end
 
+% compute the interpolation matrices
 
 
-function pmid = edgemidpoints(p, t)
+function [pmid, ia] = edgemidpoints(p, t)
   
 pmid = [(p(t(:,1),:) + p(t(:,2),:)) / 2;
         (p(t(:,2),:) + p(t(:,3),:)) / 2;
         (p(t(:,3),:) + p(t(:,1),:)) / 2];
-pmid = unique(pmid, 'rows');
+
+[pmid, ia, ic] = unique(pmid, 'rows');
+
 
 function a = triarea(p, t)
 
