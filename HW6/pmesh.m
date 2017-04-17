@@ -1,8 +1,9 @@
-function [p,t,e, data, pmid, ia] = pmesh(pv, hmax, nref)
+function [p,t,e, data] = pmesh(pv, hmax, nref)
 % PMESH  Delaunay refinement mesh generator.
 % UC Berkeley Math 228B, Per-Olof Persson <persson@berkeley.edu>
 
-data = struct('p', {}, 't', {}, 'e', {}, 'T', {});
+data = struct('p', {}, 't', {}, 'e', {}, 'T', {}, 'R', {}, ...
+              'A', {}, 'b', {}, 'u', {});
 
 p = [];
 for i = 1:size(pv,1)-1
@@ -52,7 +53,7 @@ for iref = 1:nref
     new_pts = length(data(iref + 1).p);
     data(iref).T  = zeros(new_pts, old_pts);
 
-    T(1:old_pts, 1:old_pts) = eye(old_pts);
+    data(iref).T(1:old_pts, 1:old_pts) = eye(old_pts);
     num_tri = length(data(iref).t(:, 1)); % number of triangles from previous
 
     for i = 1:(new_pts - old_pts) % for each row in T that is _new_
@@ -72,6 +73,13 @@ for iref = 1:nref
             data(iref).T(i + old_pts, data(iref).t(subrow, 1)) = 0.5;
         end
     end
+    
+    % compute the reduction matrix as the transpose of T, with rows 
+    % scaled to unity
+    data(iref).R = transpose(data(iref).T);
+    for i = 1:length(data(iref).R(:, 1)) % loop over the rows
+        data(iref).R(i, :) = data(iref).R(i, :) ./ sum(data(iref).R(i, :));
+    end   
 end
 
 function [pmid, ia] = edgemidpoints(p, t)
