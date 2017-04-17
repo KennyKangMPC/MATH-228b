@@ -5,41 +5,16 @@ clear all
 pv = [0,0; 1,0; 1,1; 0,1; 0,0];
 [p, t, e, data, pmid, ia] = pmesh(pv, 0.75, 1);
 
-ref = 1;
 
-old_pts = length(data(ref).p);
-new_pts = length(data(ref + 1).p);
-interp  = zeros(new_pts, old_pts);
 
-interp(1:old_pts, 1:old_pts) = eye(old_pts);
-num_tri = length(data(ref).t(:, 1)); % number of triangles from previous
-
-for i = 1:(new_pts - old_pts) % for each row in interp that is _new_
-    row = ia(i); % row from _entire_ pmid
-    
-    if row <= num_tri % on side 1-2
-        subrow = row;
-        interp(i + old_pts, data(ref).t(subrow, 1)) = 0.5;
-        interp(i + old_pts, data(ref).t(subrow, 2)) = 0.5;
-    elseif ((num_tri < row) && (row <= 2*num_tri)) % on side 2-3
-        subrow = row - num_tri;
-        interp(i + old_pts, data(ref).t(subrow, 2)) = 0.5;
-        interp(i + old_pts, data(ref).t(subrow, 3)) = 0.5;
-    else % on side 3-1
-        subrow = row - 2*num_tri;
-        interp(i + old_pts, data(ref).t(subrow, 3)) = 0.5;
-        interp(i + old_pts, data(ref).t(subrow, 1)) = 0.5;
-    end
-end
-
-% test out the interp matrix acting on a linear function z = x + y
-x = data(ref).p(:, 1);
-y = data(ref).p(:, 2);
-funct = x.*x + y.*y; 
-
-%tplot(data(ref).p, data(ref).t, funct)
-
-funct_interp = interp * funct;
+% % test out the T matrix acting on a linear function z = x + y
+% x = data(ref).p(:, 1);
+% y = data(ref).p(:, 2);
+% funct = x.*x + y.*y; 
+% 
+% %tplot(data(ref).p, data(ref).t, funct)
+% 
+% funct_interp = T * funct;
 %tplot(data(ref + 1).p, data(ref + 1).t, funct_interp)
 
 %plot(1:length(funct), funct, 'o-', 1:length(funct_interp), funct_interp, '*-')

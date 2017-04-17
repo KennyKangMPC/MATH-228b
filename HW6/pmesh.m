@@ -35,21 +35,44 @@ data(1).t = t;
 data(1).e = e;
 
 for iref = 1:nref
-  [pmid, ia] = edgemidpoints(p,t);
-  p = [p; pmid];
-  t = delaunayn(p);
-  t = removeoutsidetris(p, t, pv);
-  e = boundary_nodes(t);
-  %tplot(p,t)
-  
-  % save all subsequent fields
-  data(iref + 1).p = p;
-  data(iref + 1).t = t;
-  data(iref + 1).e = e;
+    [pmid, ia] = edgemidpoints(p,t);
+    p = [p; pmid];
+    t = delaunayn(p);
+    t = removeoutsidetris(p, t, pv);
+    e = boundary_nodes(t);
+    %tplot(p,t)
+
+    % save all subsequent fields
+    data(iref + 1).p = p;
+    data(iref + 1).t = t;
+    data(iref + 1).e = e;
+
+    % compute the interpolation matrix to upgrade refinement iref
+    old_pts = length(data(iref).p);
+    new_pts = length(data(iref + 1).p);
+    data(iref).T  = zeros(new_pts, old_pts);
+
+    T(1:old_pts, 1:old_pts) = eye(old_pts);
+    num_tri = length(data(iref).t(:, 1)); % number of triangles from previous
+
+    for i = 1:(new_pts - old_pts) % for each row in T that is _new_
+        row = ia(i); % row from _entire_ pmid
+
+        if row <= num_tri % on side 1-2
+            subrow = row;
+            data(iref).T(i + old_pts, data(iref).t(subrow, 1)) = 0.5;
+            data(iref).T(i + old_pts, data(iref).t(subrow, 2)) = 0.5;
+        elseif ((num_tri < row) && (row <= 2*num_tri)) % on side 2-3
+            subrow = row - num_tri;
+            data(iref).T(i + old_pts, data(iref).t(subrow, 2)) = 0.5;
+            data(iref).T(i + old_pts, data(iref).t(subrow, 3)) = 0.5;
+        else % on side 3-1
+            subrow = row - 2*num_tri;
+            data(iref).T(i + old_pts, data(iref).t(subrow, 3)) = 0.5;
+            data(iref).T(i + old_pts, data(iref).t(subrow, 1)) = 0.5;
+        end
+    end
 end
-
-% compute the interpolation matrices
-
 
 function [pmid, ia] = edgemidpoints(p, t)
   
