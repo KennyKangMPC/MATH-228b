@@ -90,12 +90,47 @@
 \setcounter{tocdepth}{4}
 \begin{document}
 
-\title{MATH 228b: HW6 1a,b,c, 2 be, c}
+\title{MATH 228b: HW6 1a,b,c, 2c}
 \author{April Novak}
 
 \maketitle
 
 \section{}
+The level set method propagates an implicit curve through a domain by solving a time-dependent convection equation, where the velocity in this equation is directly related to the physical processes that would move such a surface. Tracking the location of a surface is essential for numerical applications with moving boundaries, since the surface location must be known in order to apply boundary conditions correctly. For an implicit surface given by \(\phi(\vv{x})\), where \(\phi=0\) on the surface, \(\phi<0\) within the surface, and \(\phi>0\) outside, the convection equation that propagates the surface is:
+
+\beq
+\frac{\partial\phi}{\partial t}+\vv{V}\cdot\nabla\phi=0
+\eeq
+
+where \(\vv{V}\) is the speed of the surface. In physical applications, it is often the case that the velocity of the surface is in the normal direction \(\vv{n}\) of the curve, dictated by some speed function \(F\):
+
+\beq
+\vv{V}=F\vv{n}
+\eeq
+
+Inserting this speed into the convection equation gives the differential equation that propagates the implicit surface:
+
+\beq
+\frac{\partial\phi}{\partial t}+F|\nabla\phi|=0
+\eeq
+
+For cases where \(F\) is always positive, this initial value problem can be restated as a boundary value problem in terms of an arrival function \(T\), where \(T(\vv{x})\) represents the time for the interface to reach location \(\vv{x}\) from its initial location \(\Gamma\). This equation is:
+
+\beq
+|\nabla T|F=0
+\eeq
+
+where \(T=0\) on \(\Gamma\), since it takes zero time to arrive at the initial condition. Because \(T\) represents the time to reach the arrival point, \(T(x_{arrival}, y_{arrival})=t\). The level set with \(T=t\) represents the furthest point that can be reached in time \(t\) from the initial condition. Individual points move in the normal direction to these level sets, which allows this formulation to determine the optimal travel paths to the arrival location given an initial position. 
+
+Instead of solving the above equation, we will use a time-dependent method that assumes that the solution will converge to the steady-state result in a sufficient number of iterations. Hence, we will solve:
+
+\beq
+\frac{\partial T}{\partial t}+|\nabla T|F=1
+\eeq
+
+for initial condition \(T(x_0, y_0)=0\), where \(x_0\) and \(y_0\) are on the initial curve \(\Gamma\). Integrating the above equation in time until steady-state is reached will give the solution to the Eikonal equation. 
+
+
 
 \section{}
 
@@ -107,7 +142,7 @@ The first part of this question develops a Gauss-Seidel solver given a matrix sy
 
 This question solves the Poisson equation using the multigrid method. The first step is a modification to Professor Persson's {\tt pmesh} function (which I assume is okay because we were told for assignment 3 that we could use his function moving forward to avoid points being lost across multiple assignments) such that it outputs the {\tt data} structured array data structure containing {\tt data.p}, {\tt data.t}, and {\tt data.e} members. This is performed by manipulating the contents of the original {\tt pmesh} function, so make sure to use the {\tt pmesh} function that I submit with this assignment! This edited function is included in the Appendix.
 
-In order to simplify the multigrid method, which relies upon repeated applications of interpolation (expanding a coarse solution to a finer mesh) and reduction (removing elements from a solution to coarsen), these interpolation and reduction matrices are pre-computed. The matrices \(A\) and vectors \(b\) are also saved for each refinement level. 
+In order to simplify the multigrid method, which relies upon repeated applications of interpolation (expanding a coarse solution to a finer mesh) and reduction (removing elements from a solution to coarsen), these interpolation and reduction matrices are pre-computed. The matrices \(A\) and vectors \(b\) are then saved for the finest refinement level by running {\tt fempoi} only a single time, and then using the expansion and reduction matrices to project the finest matrix onto the coarser meshes.
 
 
 
