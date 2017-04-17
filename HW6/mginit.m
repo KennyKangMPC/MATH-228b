@@ -7,7 +7,7 @@ function data = mginit(pv, hmax, nref)
     fempoi(data(nref + 1).p, data(nref + 1).t, data(nref + 1).e);
 
 % reduce the finest-mesh A and b 
-for i = 1:nref
+for i = fliplr(1:nref)
     data(i).A = data(i).R * data(i + 1).A * data(i).T;
 end
 
