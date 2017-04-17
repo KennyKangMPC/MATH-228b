@@ -9,6 +9,7 @@ function data = mginit(pv, hmax, nref)
 % reduce the finest-mesh A and b 
 for i = fliplr(1:nref)
     data(i).A = data(i).R * data(i + 1).A * data(i).T;
+    data(i).b = data(i).R * data(i + 1).b;
 end
 
 end
