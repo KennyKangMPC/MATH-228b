@@ -67,11 +67,13 @@ while res(loop_iter) > tol
         e = data(i).T * e;
         
         % adjust the solution on this mesh
-        data(i + 1).u = data(i).T * data(i).u + e;
+        %data(i + 1).u = data(i).T * data(i).u + e;
         
         % perform G-S iterations to improve projected-up answer
-        [data(i + 1).u] = gauss_seidel(data(i + 1).A, data(i + 1).b, data(i + 1).u, vup);
+        %[data(i + 1).u] = gauss_seidel(data(i + 1).A, data(i + 1).b, data(i + 1).u, vup);
     end
+    
+    data(nref + 1).u = data(nref + 1).u + e;
     
     % perform G-S post-processing to obtain closer solution
     [data(i + 1).u] = gauss_seidel(data(i + 1).A, data(i + 1).b, data(i + 1).u, vup);
@@ -80,6 +82,7 @@ while res(loop_iter) > tol
     
     % compute the residual for this newest iterate
     res(loop_iter) = max(abs(data(nref + 1).b - data(nref + 1).A * data(i + 1).u));
+    res
 end
 
 
