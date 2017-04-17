@@ -1,21 +1,23 @@
-clear all
-
+%clear all
+function [u, res] = mgsolve(data, vdown, vup, tol, nref)
 % data  - structured array containing problem information
 % vdown - pre-smoothing G-S iterations
 % vup   - post-smoothing G-S iterations
 % tol   - res convergence tolerance
 
 % specify the mesh
-pv   = [0,0; 1,0; 1,1; 0,1; 0,0];
-hmax = 0.75;
-nref = 4;
+%pv   = [0,0; 1,0; 1,1; 0,1; 0,0];
+%hmax = 0.75;
+%nref = 4;
 
-tol = 1e-10;
-vdown = 100;
-vup = 100;
+%tol = 1e-10;
+%vdown = 100;
+%vup = 100;
 
 % precompute all necessary matrices
-data = mginit(pv, hmax, nref);
+%data = mginit(pv, hmax, nref);
+
+%nref = fieldCount(data);
 
 % compute the backslash solution for comparison
 soln = data(nref + 1).A \ data(nref + 1).b;
@@ -52,7 +54,6 @@ while res(loop_iter) > tol
 
     e = data(i + 1).A \ r;
 
-
     % now that we are at the coarsest mesh, we need to interpolate upwards the 
     % error so that we can add it to the solution iterate
     for i = 1:nref
@@ -63,7 +64,6 @@ while res(loop_iter) > tol
     
     % perform G-S post-processing to obtain closer solution
     [u] = gauss_seidel(data(i + 1).A, data(i + 1).b, u, vup);
-    
     
     loop_iter = loop_iter + 1;
     
@@ -77,4 +77,4 @@ end
 %tplot(data(nref + 1).p, data(nref + 1).t, abs(u - soln))
 
 
-
+end
