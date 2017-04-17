@@ -11,35 +11,52 @@ data = mginit(pv, hmax, nref);
 % data(i).T promotes from i to i + 1
 % data(i).R reduces from i + 1 to i
 
+% vector to hold V-cycle residuals
+residual = [];
 
+loop_iter = 0;
+u = 0 .* data(nref + 1).b;
 
-% begin by solving the actual equation (A * u = b) on the finest mesh
-i = nref;
-[u] = gauss_seidel(data(i + 1).A, data(i + 1).b, 0 .* data(i + 1).b, niter);
-
-% compute a residual, then restrict
-r = data(i + 1).b - data(i + 1).A * u;
-r = data(i).R * r;
-
-
-% continually solve G-S and then coarsen using recursion. We want to output
-% the error vector of the coarsest mesh using recursion.
-i = i - 1;
-%[e] = restrict(data, r, niter, i);
-
-% function that performs some G-S iterations to solve A * u = rhs
-% and then computes a residual r = rhs - A * u, and then restricts it
-
-while i > 0
-    [e] = gauss_seidel(data(i + 1).A, r, 0 .* r, niter);
+while loop_iter < 5
+    % begin by solving the actual equation (A * u = b) on the finest mesh
+    i = nref;
+    [u] = gauss_seidel(data(i + 1).A, data(i + 1).b, u, niter);
 
     % compute a residual, then restrict
-    r = r - data(i + 1).A * e;
+    r = data(i + 1).b - data(i + 1).A * u;
     r = data(i).R * r;
+
+    % continually solve G-S and then coarsen using recursion. We want to output
+    % the error vector of the coarsest mesh using recursion.
     i = i - 1;
+    while i > 0
+        [e] = gauss_seidel(data(i + 1).A, r, 0 .* r, niter);
+
+        % compute a residual, then restrict
+        r = r - data(i + 1).A * e;
+        r = data(i).R * r;
+        i = i - 1;
+    end
+
+    e = data(i + 1).A \ r;
+
+
+    % now that we are at the coarsest mesh, we need to interpolate upwards the 
+    % error so that we can add it to the solution iterate
+    for i = 1:nref
+        e = data(i).T * e;
+    end
+
+    u = u + e;
+    loop_iter = loop_iter + 1;
+    
+    % compute the residual for this newest iterate
+    residual(loop_iter) = max(abs(data(nref + 1).b - data(nref + 1).A * u));
+    
+    
 end
 
-ge = data(i + 1).A \ r;
+
 
 % if i == 1
 %     e = data(i).A \ r;
