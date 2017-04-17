@@ -1,10 +1,6 @@
-% mginit
-clear all
+function data = mginit(pv, hmax, nref)
 
-nref = 1;
-% specify the mesh
-pv = [0,0; 1,0; 1,1; 0,1; 0,0];
-[p, t, e, data] = pmesh(pv, 0.75, 1);
+[p, t, e, data] = pmesh(pv, hmax, nref);
 
 % determine the A and b matrices at the finest mesh by calling fempoi
 [data(nref + 1).u, data(nref + 1).A, data(nref + 1).b] = ...
@@ -15,8 +11,5 @@ for i = 1:nref
     data(i).A = data(i).R * data(i + 1).A * data(i).T;
 end
 
-%tplot(p, t, u_true)
-
-%[u, res] = gauss_seidel(A, b, 0 .* u_true, 100);
-%semilogy(0:niter, res)
+end
 
