@@ -4,7 +4,7 @@ function [p,t,e, data] = pmesh(pv, hmax, nref)
 % then, modified by April Novak
 
 data = struct('p', {}, 't', {}, 'e', {}, 'T', {}, 'R', {}, ...
-              'A', {}, 'b', {}, 'u', {});
+              'A', {}, 'b', {}, 'u', {}, 'err', {}, 'r', {});
 
 p = [];
 for i = 1:size(pv,1)-1
