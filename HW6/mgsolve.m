@@ -9,6 +9,7 @@ clear all
 pv    = [0,0; 1,0; 1,1; 0,1; 0,0];
 hmax  = 0.75;
 nref  = 4;
+
 tol   = 1e-10;
 vdown = 10;
 vup   = 10;
@@ -19,23 +20,23 @@ soln = data(nref + 1).A \ data(nref + 1).b;
 
 res            = [];
 loop_iter      = 1;
-u              = 0 .* data(nref + 1).b;
-res(loop_iter) = max(abs(data(nref + 1).b - data(nref + 1).A * u));
+data(nref + 1).u = 0 .* data(nref + 1).b;
+res(loop_iter) = max(abs(data(nref + 1).b - data(nref + 1).A * data(nref + 1).u));
 
 while res(loop_iter) > tol
     i = nref;
     
     % perform G-S on the original equation (A * u = b)
-    [u] = gauss_seidel(data(i + 1).A, data(i + 1).b, u, vdown);
+    [data(i + 1).u] = gauss_seidel(data(i + 1).A, data(i + 1).b, data(i + 1).u, vdown);
     
     % compute a residual
-    r = data(i + 1).b - data(i + 1).A * u;
+    r = data(i + 1).b - data(i + 1).A * data(i + 1).u;
     
     % restrict to a coarser mesh
     r = data(i).R * r;
     
     % restrict the solution down in prep for upwards v-cycle
-    u = data(i).R * u;
+    data(i).u = data(i).R * data(i + 1).u;
 
     % continually solve G-S and then coarsen using recursion. We want to output
     % the error vector of the coarsest mesh using recursion.
@@ -51,7 +52,7 @@ while res(loop_iter) > tol
         r = data(i).R * r;
         
         % project the solution down in prep for the upwards v-cycle
-        u = data(i).R * u;
+        data(i).u = data(i).R * data(i + 1).u;
         
         i = i - 1;
     end
@@ -66,21 +67,19 @@ while res(loop_iter) > tol
         e = data(i).T * e;
         
         % adjust the solution on this mesh
-        u = data(i).T * u + e;
+        data(i + 1).u = data(i).T * data(i).u + e;
         
         % perform G-S iterations to improve projected-up answer
-        [u] = gauss_seidel(data(i + 1).A, data(i + 1).b, u, vup);
+        [data(i + 1).u] = gauss_seidel(data(i + 1).A, data(i + 1).b, data(i + 1).u, vup);
     end
     
     % perform G-S post-processing to obtain closer solution
-    [u] = gauss_seidel(data(i + 1).A, data(i + 1).b, u, vup);
+    [data(i + 1).u] = gauss_seidel(data(i + 1).A, data(i + 1).b, data(i + 1).u, vup);
     
     loop_iter = loop_iter + 1;
     
     % compute the residual for this newest iterate
-    res(loop_iter) = max(abs(data(nref + 1).b - data(nref + 1).A * u));
-    plot(u)
-    drawnow
+    res(loop_iter) = max(abs(data(nref + 1).b - data(nref + 1).A * data(i + 1).u));
 end
 
 
