@@ -34,13 +34,16 @@ end
 
 % test out the interp matrix acting on a linear function z = x + y
 x = data(ref).p(:, 1);
-y = data(ref).p(:, 2);g
-funct = x.*x; 
+y = data(ref).p(:, 2);
+funct = x.*x + y.*y; 
 
 %tplot(data(ref).p, data(ref).t, funct)
 
 funct_interp = interp * funct;
-tplot(data(ref + 1).p, data(ref + 1).t, funct_interp)
+%tplot(data(ref + 1).p, data(ref + 1).t, funct_interp)
+
+%plot(1:length(funct), funct, 'o-', 1:length(funct_interp), funct_interp, '*-')
+
 % perform the solve to get the true solution u0
 %[u_true, A, b] = fempoi(p, t, e);
 %tplot(p, t, u_true)
