@@ -90,7 +90,7 @@
 \setcounter{tocdepth}{4}
 \begin{document}
 
-\title{MATH 228b: HW6 1a,b,c, 2c}
+\title{MATH 228b: HW6 2c}
 \author{April Novak}
 
 \maketitle
@@ -128,9 +128,39 @@ Instead of solving the above equation, we will use a time-dependent method that 
 \frac{\partial T}{\partial t}+|\nabla T|F=1
 \eeq
 
-for initial condition \(T(x_0, y_0)=0\), where \(x_0\) and \(y_0\) are on the initial curve \(\Gamma\). Integrating the above equation in time until steady-state is reached will give the solution to the Eikonal equation. 
+for initial condition \(T(x_0, y_0)=0\), where \(x_0\) and \(y_0\) are on the initial curve \(\Gamma\). Integrating the above equation in time until steady-state is reached will give the solution to the Eikonal equation. A first-order upwinded scheme is used in space, and a simple forward Euler method in time. The initial condition for all cases is set to 0.0, and after every iteration, the sole boundary condition of \(\phi(0.2, 0.2)=0\) is strictly implied. A layer of ghost cells of a large value of \(\phi\) are inserted on the periphery in order to simplify the application of the one-sided upwind differencing. For this time-stepping solution, a time step of 0.0001 seconds is chosen, and appears sufficient.
 
+Figures \ref{fig:case1} through \ref{fig:case4} show contours of the solution to \(\phi\) after reaching an iteration tolerance (defined based on successive differences in the L-2 norm of \(\phi\) from one iteration to the next) of \(1e-10\) for the various cases given. The optimal path from the starting point and the given arrival point is calculated using a simple stepping scheme. Starting at the arrival point, a local gradient is computed using Matlab's {\tt interp2} function applied to the results of Matlab's {\tt gradient} function. The starting point is propagated for a small time step of {\tt 0.001} in the direction of this normal. After this short time, the gradient of this new location is re-computed, the point moved again, and the process continued until the point is within a distance of \(h\) from the starting point. The optimal paths are shown in the figures below as black lines, with the direction of travel beginning at \((0.2, 0.2)\) and ending at the given arrival point. Also shown as blue arrows are the normal vectors. As can be seen, the optimal path follows the local normal of \(\phi\), and reaches the starting point since this method is essentially a type of steepest-descent method. 
 
+Case 4 places a square of width 0.2 centered on \((0.2, 0.2)\), where the speed inside the square is 0.01 and outside is 1.0. Because issues were encountered with tracking the path with sharp corners of this box, the corners of the box are rounded-out so that the exact corner values are reset from 0.01 to 1.0.
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/case1.png}
+\caption{Contours of \(\phi(x, y)\) and the optimal travel path for case 1.}
+\label{fig:case1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/case2.png}
+\caption{Contours of \(\phi(x, y)\) and the optimal travel path for case 2.}
+\label{fig:case2}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/case3.png}
+\caption{Contours of \(\phi(x, y)\) and the optimal travel path for case 3.}
+\label{fig:case3}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/case4.png}
+\caption{Contours of \(\phi(x, y)\) and the optimal travel path for case 4.}
+\label{fig:case4}
+\end{figure}
 
 \section{}
 
@@ -176,6 +206,11 @@ In order to simplify the multigrid method, which relies upon repeated applicatio
 
 
 \section{Appendix}
+\subsection{Question 1}
+\subsubsection{{\tt eikonal.m}}
+\lstinputlisting[language=Matlab]{eikonal.m}
+\subsubsection{{\tt grad\_plus.m}}
+\lstinputlisting[language=Matlab]{grad_plus.m}
 \subsection{Question 2, part a}
 \subsubsection{{\tt gauss\_seidel.m}}
 \lstinputlisting[language=Matlab]{gauss_seidel.m}
