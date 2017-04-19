@@ -10,14 +10,35 @@ x = 0:dx:X;         % Cartesian grid
 y = 0:dy:Y;         % Cartesian grid
 [XX, YY] = meshgrid(x, y);
 numx = length(x);   
-numy = length(y);   
+numy = length(y); 
 
-F   = 1.0 .* ones(numx, numy);
-phi = 0.0 .* ones(numx, numy);
+opt = 3;
+F = ones(numx, numy);
 initx = 0.2;
 inity = 0.2;
+
+switch opt
+    case 1
+    case 2
+        for i = 1:numy
+            if y(i) < 0.5
+                F(i, :) = 0.5;
+            end
+        end
+    case 3
+        for i = 1:numx
+            for j = 1:numy
+                F(i, j) = 1 - 0.9 * cos(4 .* pi .* x(i)) ...
+                    .* exp(-10 .* ((x(i) - 0.5) .^ 2 + (y(j) - 0.5).^2));
+            end
+        end
+    otherwise
+        disp('Problem selection undefined.')
+end
+        
+phi = 0.0 .* ones(numx, numy);
 norm = 1.0; % arbitrary initial value
-tol = 1e-6; % iteration tolerance
+tol = 1e-7; % iteration tolerance
 ifig = 0;
 
 while norm > tol
@@ -31,12 +52,12 @@ while norm > tol
     end
     
     ifig = ifig + 1;
-    if ifig == 10 % plot every 10 frames
+    if ifig == 20 % plot every 10 frames
         ifig = 0;
         % plot the contours
-        %contour(XX, YY, phi)
+        contour(XX, YY, phi)
         % plot the surface
-        hSurf = surf(XX,YY,phi,'EdgeColor','none','LineStyle','none','FaceLighting','phong');
+        %hSurf = surf(XX,YY,phi,'EdgeColor','none','LineStyle','none','FaceLighting','phong');
         drawnow
     end
     
