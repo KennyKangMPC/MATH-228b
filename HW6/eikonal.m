@@ -10,8 +10,7 @@ x  = 0:dx:X; y = 0:dy:Y;    % Cartesian grid
 numx = length(x); 
 numy = length(y); 
 
-opt   = 1;                  % flag to select which case to run
-plot  = 0;                  % flag to select real-time plot
+opt   = 4;                  % flag to select which case to run
 initx = 0.2;                % x-coordinate of starting point
 inity = 0.2;                % y-coordinate of starting point
 norm = 1.0; ifig = 0;       % arbitrary initial values
@@ -41,10 +40,11 @@ switch opt
                     .* exp(-10 .* ((x(j) - 0.5) .^ 2 + (y(i) - 0.5).^2));
             end
         end
-        %F = 1 - 0.9 * cos(4.*pi.*XX)*exp(-10.*((XX - 0.5).^2 + (YY - 0.5).^2));
         arrivx = 0.8;
         arrivy = 0.8;
     case 4
+        initx = 0.05;
+        inity = 0.05;
         arrivx = 0.8;
         arrivy = 0.8;
         low = [0.1, 0.3];
@@ -55,14 +55,13 @@ switch opt
                         F(i, j) = 0.01;
                     end
                 end
+                if (low(1) + 0.4 < x(i)) && (x(i) < low(2) + 0.4)
+                    if (low(1) + 0.4 < y(j)) && (y(j) < low(2) + 0.4)
+                        F(i, j) = 0.01;
+                    end
+                end
             end
         end
-        
-        % round out the corners of the box
-        F(low(1)/dx, low(1)/dy) = 1.0;
-        F(low(1)/dx, low(2)/dy) = 1.0;
-        F(low(2)/dx, low(1)/dy) = 1.0;
-        F(low(2)/dx, low(2)/dy) = 1.0;
     otherwise
         disp('Problem selection undefined.')
 end
@@ -77,60 +76,44 @@ while norm > tol
         end
     end
     
-    ifig = ifig + 1;
-    if (mod(ifig, 20) == 0) && (plot) % plot every 20 frames
-        % plot the contours
-        contour(XX, YY, phi)
-        % plot the surface
-        %hSurf = surf(XX,YY,phi,'EdgeColor','none','LineStyle','none','FaceLighting','phong');
-        drawnow
-    end
-    
     % apply the only boundary condition
     phi(initx/dx, inity/dy) = 0.0;
     
-    % find the L2-norm of the solution
-    norm = sum(sum(abs(phi_prev - phi) .^ 2));
+    % find the infinity norm of the difference
+    norm = max(max(abs(phi_prev - phi)));
 end
 
-if (~plot)
-    contour(XX, YY, phi)
-end
+contour(XX, YY, phi)
+hold on
 
 % compute gradients, then find the normal vectors
 [fx, fy] = gradient(phi, dx, dy);
 nx       = fx ./ sqrt(fx .^ 2 + fy .^ 2);
 ny       = fy ./ sqrt(fx .^ 2 + fy .^ 2);
 
-hold on
-% only plot a subsection of the normals so it's easier to see
-%quiver(XX(1:8:end, 1:8:end), YY(1:8:end, 1:8:end), ...
-%    nx(1:8:end, 1:8:end), ny(1:8:end, 1:8:end))
-
 dn   = 0.01; % time step for tracing out the shortest path
 xc   = [x(arrivx/dx)];
 yc   = [y(arrivy/dy)];
-dist = sqrt((xc - arrivx).^2 + (yc - arrivy).^2);
-i    = 0;
+dist = sqrt((xc - initx).^2 + (yc - inity).^2);
 
-% find the optimal path
-while ((dist > dx) && (i < 1000))
+% find the optimal path by moving in direction opposite the gradient
+i = 1;
+while ((dist > 2*dx) && (i < 2000))
     nx_loc = interp2(XX, YY, nx, xc(end), yc(end));
     ny_loc = interp2(XX, YY, ny, xc(end), yc(end));
 
-    % move in the direction opposite the gradient
+    i = i + 1;
+    if i > 2000
+        break;
+    end
+    
     xc = [xc, xc(end) - nx_loc * dn];
     yc = [yc, yc(end) - ny_loc * dn];
-    
-    i = i + 1;
-    %if (mod(i, 1) == 0) % only plot every x points
-    %    plot(xc, yc, 'ko')
-    %    hold on
-    %end
     
     dist = sqrt((xc(end) - initx).^2 + (yc(end) - inity).^2);
 end
 
+hold on
 scatter(xc, yc, 'ko')
 
 saveas(gcf, sprintf('case%i.png',opt))
