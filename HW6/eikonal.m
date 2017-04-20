@@ -4,14 +4,14 @@ X = 1;
 Y = 1;
 
 dx = 0.01;  dy = 0.01;      % mesh spacing = 1/100
-dt = 1e-4;                  % time step
+dt = 1e-3;                  % time step
 x  = 0:dx:X; y = 0:dy:Y;    % Cartesian grid
 [XX, YY] = meshgrid(x, y);
 numx = length(x); 
 numy = length(y); 
 
-opt   = 3;                  % flag to select which case to run
-plot  = 1;                  % flag to select real-time plot
+opt   = 1;                  % flag to select which case to run
+plot  = 0;                  % flag to select real-time plot
 initx = 0.2;                % x-coordinate of starting point
 inity = 0.2;                % y-coordinate of starting point
 norm = 1.0; ifig = 0;       % arbitrary initial values
@@ -37,10 +37,11 @@ switch opt
     case 3
         for i = 1:numx
             for j = 1:numy
-                F(i, j) = 1 - 0.9 * cos(4 .* pi .* x(i)) ...
-                    .* exp(-10 .* ((x(i) - 0.5) .^ 2 + (y(j) - 0.5).^2));
+                F(i, j) = 1 - 0.9 * cos(4 .* pi .* x(j)) ...
+                    .* exp(-10 .* ((x(j) - 0.5) .^ 2 + (y(i) - 0.5).^2));
             end
         end
+        %F = 1 - 0.9 * cos(4.*pi.*XX)*exp(-10.*((XX - 0.5).^2 + (YY - 0.5).^2));
         arrivx = 0.8;
         arrivy = 0.8;
     case 4
@@ -103,8 +104,8 @@ ny       = fy ./ sqrt(fx .^ 2 + fy .^ 2);
 
 hold on
 % only plot a subsection of the normals so it's easier to see
-quiver(XX(1:2:end, 1:2:end), YY(1:2:end, 1:2:end), ...
-    nx(1:2:end, 1:2:end), ny(1:2:end, 1:2:end))
+%quiver(XX(1:8:end, 1:8:end), YY(1:8:end, 1:8:end), ...
+%    nx(1:8:end, 1:8:end), ny(1:8:end, 1:8:end))
 
 dn   = 0.01; % time step for tracing out the shortest path
 xc   = [x(arrivx/dx)];
