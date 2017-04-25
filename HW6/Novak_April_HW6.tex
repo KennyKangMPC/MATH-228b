@@ -90,7 +90,7 @@
 \setcounter{tocdepth}{4}
 \begin{document}
 
-\title{MATH 228b: HW6 2c}
+\title{MATH 228b: HW6}
 \author{April Novak}
 
 \maketitle
@@ -174,28 +174,16 @@ This question solves the Poisson equation using the multigrid method. The first 
 
 In order to simplify the multigrid method, which relies upon repeated applications of interpolation (expanding a coarse solution to a finer mesh) and reduction (removing elements from a solution to coarsen), these interpolation and reduction matrices are pre-computed. The matrices \(A\) and vectors \(b\) are then saved for the finest refinement level by running {\tt fempoi} only a single time, and then using the expansion and reduction matrices to project the finest matrix onto the coarser meshes.
 
+\textbf{(c)}
+The last part of this question solves the Poisson equation using the multigrid method, as shown in the {\tt mgsolve} function. A feature of the multigrid method is that the number of iterations required is independent of the mesh refinement. Convergence rates are shown in Fig. \ref{fig:question2c}, where it can indeed be seen that the number of iterations required to reach an infinity norm error of \(1e-10\) is roughly constant except for the coarsest mesh (and I'm not sure why that one converges faster). However, this is somewhat misleading, since the work per iteration does {\it not} stay constant with mesh spacing.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-\begin{comment}
 \begin{figure}[H]
 \centering
-\includegraphics[width=0.8\textwidth]{figures/errors_raw.jpg}
-\caption{\(L^2\) norm as a function of the number of nodes.}
-\label{fig:errors_raw}
+\includegraphics[width=1.0\textwidth]{figures/question2c.png}
+\caption{Infinity norm as a function of iteration number for various refinement levels}
+\label{fig:question2c}
 \end{figure}
-\end{comment}
+
 
 
 
@@ -217,5 +205,10 @@ In order to simplify the multigrid method, which relies upon repeated applicatio
 \subsection{Question 2, part b}
 \subsubsection{{\tt pmesh.m}}
 \lstinputlisting[language=Matlab]{pmesh.m}
+\subsubsection{{\tt mginit.m}}
+\lstinputlisting[language=Matlab]{mginit.m}
+\subsection{Question 2, part c}
+\subsubsection{{\tt mgsolve.m}}
+\lstinputlisting[language=Matlab]{mgsolve.m}
 
 \end{document}
