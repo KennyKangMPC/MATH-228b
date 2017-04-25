@@ -9,14 +9,26 @@ dirichlet_nodes(1, :) = e;
 num_nodes_per_elem = 3;         % linear triangular elements
 
 % form the permutation matrix for assembling the global matrices
-[perm] = permutation(num_nodes_per_elem);
+perm = zeros(num_nodes_per_elem ^ 2, 2);
+
+r = 1;
+c = 1;
+for i = 1:num_nodes_per_elem^2
+    perm(i,:) = [r, c];
+    if c == num_nodes_per_elem
+        c = 1;
+        r = r + 1;
+    else
+        c = c + 1;
+    end
+end
 
 % specify the boundary conditions - homogeneous neumann and dirichlet
 dirichlet_nodes(2,:) = zeros .* dirichlet_nodes(1,:);
 num_nodes = length(p(:,1));
 
 % assemble the elemental k and elemental f
-K = zeros(num_nodes); F = zeros(num_nodes, 1);
+K = spalloc(num_nodes, num_nodes, num_nodes_per_elem * num_elem); F = zeros(num_nodes, 1);
 
 for elem = 1:num_elem
     k = 0; f = 0;
@@ -67,6 +79,5 @@ for node = 1:num_nodes
     end
 end
 
-K = sparse(K);
 u = K \ F;
 end
