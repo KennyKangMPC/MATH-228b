@@ -90,7 +90,7 @@
 \setcounter{tocdepth}{4}
 \begin{document}
 
-\title{MATH 228b: HW7, e, f, g}
+\title{MATH 228b: HW7, g}
 \author{April Novak}
 
 \maketitle
@@ -107,15 +107,26 @@ Similar to the use of the Bubnov-Galerkin formulation for convection-diffusion p
 \section{(d)}
 The right-hand side of the Euler equations (the divergence of the flux vector) is computed using {\tt euler\_rhs.m} by calling {\tt euler\_fluxes} followed by {\tt spectral\_divergence} once for each of the four equations present.
 
+\section{(e)}
+Given an initial condition from the {\tt euler\_vortex.m} function, {\tt euler\_rk4step} steps the solutions once using the RK-4 time stepping method and applies filtering to all solution components.
 
-\begin{comment}
+\section{(f)}
+Fig. \ref{fig:convergence} shows the infinity norm errors as a function of the grid spacing \(h\) for the four solution components for the Euler vortex. As can be seen, spectral convergence is obtained, since the rate of convergence is not constant as a function of \(h\), but rather dramatically increases as \(h\) is refined. Fig. \ref{fig:100dt} shows the solution at 1.5615 seconds for \(N=32\). The code used to perform this convergence test is shown in {\tt script.m} in the Appendix.
+
+
 \begin{figure}[H]
 \centering
-\includegraphics[width=1.0\textwidth]{figures/question2c.png}
-\caption{Infinity norm as a function of iteration number for various refinement levels}
-\label{fig:question2c}
+\includegraphics[width=0.8\textwidth]{figures/convergence.png}
+\caption{Infinity norm as a function of mesh spacing \(h\) for the four solution components.}
+\label{fig:convergence}
 \end{figure}
-\end{comment}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/100dt.png}
+\caption{Solution for \(N=32\) at \(t=1.5615\).}
+\label{fig:100dt}
+\end{figure}
 
 
 
@@ -131,5 +142,11 @@ The right-hand side of the Euler equations (the divergence of the flux vector) i
 \lstinputlisting[language=Matlab]{spectral_divergence.m}
 \subsection{{\tt spectral\_filter.m}}
 \lstinputlisting[language=Matlab]{spectral_filter.m}
+\subsection{{\tt euler\_rhs.m}}
+\lstinputlisting[language=Matlab]{euler_rhs.m}
+\subsection{{\tt euler\_rk4step.m}}
+\lstinputlisting[language=Matlab]{euler_rk4step.m}
+\subsection{{\tt script.m}}
+\lstinputlisting[language=Matlab]{script.m}
 
 \end{document}

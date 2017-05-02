@@ -14,4 +14,4 @@ dy = fft(Fy, [], 1);
 w_hat_y = 1i * k' .* dy;
 wy = real(ifft(w_hat_y, [], 1));
 
-divF = (wx + wy) * L / (2*pi);
+divF = (wx + wy) * (2*pi) / L;
