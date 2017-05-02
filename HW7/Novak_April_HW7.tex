@@ -90,7 +90,7 @@
 \setcounter{tocdepth}{4}
 \begin{document}
 
-\title{MATH 228b: HW7, b, c, d, e, f, g}
+\title{MATH 228b: HW7, e, f, g}
 \author{April Novak}
 
 \maketitle
@@ -101,6 +101,11 @@ The {\tt euler\_fluxes.m} function returns the Euler fluxes \(F\) given inputs o
 \section{(b)}
 The {\tt spectral\_divergence.m} function calculates the divergence of a grid function using the FFT. Given a function \(v(x)\), first \(\hat{v}\) is computed, where \(\hat{v}\) is the Fourier transform of \(v\). Then, because the derivative of a Fourier transform is simply equal to the Fourier transform multiplied by \(ik\), where \(k\) are the discrete frequencies, the derivative in the Fourier transform space can be computed as \(\hat{w}=ik\hat{v}\). Finally, an inverse Fourier transform is performed to obtained \(w\), where \(w\) is the derivative of \(v\). This is the approach used to compute the divergence of a grid function. Note that this function only works for periodic grid functions - otherwise, the divergence ``blows up,'' especially near the domain boundaries.
 
+\section{(c)}
+Similar to the use of the Bubnov-Galerkin formulation for convection-diffusion problems, stabilization is required for spectral methods. This is achieved by using a filter, which essentially filters the grid solution by damping out high frequencies by multiplying low frequencies by a number very close to 1.0 and high frequencies by numbers close to 0.0. This is not a conservative method. The spectral filter is implemented by first filtering in the \(x\) direction, and then using this semi-filtered result as input for filtering in the \(y\) direction.
+
+\section{(d)}
+The right-hand side of the Euler equations (the divergence of the flux vector) is computed using {\tt euler\_rhs.m} by calling {\tt euler\_fluxes} followed by {\tt spectral\_divergence} once for each of the four equations present.
 
 
 \begin{comment}
@@ -122,6 +127,9 @@ The {\tt spectral\_divergence.m} function calculates the divergence of a grid fu
 \section{Appendix}
 \subsection{{\tt euler\_fluxes.m}}
 \lstinputlisting[language=Matlab]{euler_fluxes.m}
-
+\subsection{{\tt spectral\_divergence.m}}
+\lstinputlisting[language=Matlab]{spectral_divergence.m}
+\subsection{{\tt spectral\_filter.m}}
+\lstinputlisting[language=Matlab]{spectral_filter.m}
 
 \end{document}
