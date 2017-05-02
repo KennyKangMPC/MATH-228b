@@ -90,7 +90,7 @@
 \setcounter{tocdepth}{4}
 \begin{document}
 
-\title{MATH 228b: HW7, g}
+\title{MATH 228b: HW7}
 \author{April Novak}
 
 \maketitle
@@ -113,7 +113,6 @@ Given an initial condition from the {\tt euler\_vortex.m} function, {\tt euler\_
 \section{(f)}
 Fig. \ref{fig:convergence} shows the infinity norm errors as a function of the grid spacing \(h\) for the four solution components for the Euler vortex. As can be seen, spectral convergence is obtained, since the rate of convergence is not constant as a function of \(h\), but rather dramatically increases as \(h\) is refined. Fig. \ref{fig:100dt} shows the solution at 1.5615 seconds for \(N=32\). The code used to perform this convergence test is shown in {\tt script.m} in the Appendix.
 
-
 \begin{figure}[H]
 \centering
 \includegraphics[width=0.8\textwidth]{figures/convergence.png}
@@ -128,9 +127,15 @@ Fig. \ref{fig:convergence} shows the infinity norm errors as a function of the g
 \label{fig:100dt}
 \end{figure}
 
+\section{(g)}
+Fig. \ref{fig:kh} shows the Kelvin-Helmholtz instability at 2 seconds, where the maximum and minimum values of \(\rho\) are 2.3312 and 0.5243, respectively. The script developed for this section is shown in the Appendix as {\tt kh.m}.
 
-
-
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.8\textwidth]{figures/kh.png}
+\caption{Density solution to the Kelvin-Helmholtz instability at 2 seconds.}
+\label{fig:kh}
+\end{figure}
 
 
 
@@ -148,5 +153,7 @@ Fig. \ref{fig:convergence} shows the infinity norm errors as a function of the g
 \lstinputlisting[language=Matlab]{euler_rk4step.m}
 \subsection{{\tt script.m}}
 \lstinputlisting[language=Matlab]{script.m}
+\subsection{{\tt kh.m}}
+\lstinputlisting[language=Matlab]{kh.m}
 
 \end{document}
