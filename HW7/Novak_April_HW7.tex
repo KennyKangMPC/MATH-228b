@@ -98,6 +98,8 @@
 \section{(a)}
 The {\tt euler\_fluxes.m} function returns the Euler fluxes \(F\) given inputs of the four conserved variables - density, two components of momentum, and total energy.
 
+\section{(b)}
+The {\tt spectral\_divergence.m} function calculates the divergence of a grid function using the FFT. Given a function \(v(x)\), first \(\hat{v}\) is computed, where \(\hat{v}\) is the Fourier transform of \(v\). Then, because the derivative of a Fourier transform is simply equal to the Fourier transform multiplied by \(ik\), where \(k\) are the discrete frequencies, the derivative in the Fourier transform space can be computed as \(\hat{w}=ik\hat{v}\). Finally, an inverse Fourier transform is performed to obtained \(w\), where \(w\) is the derivative of \(v\). This is the approach used to compute the divergence of a grid function. Note that this function only works for periodic grid functions - otherwise, the divergence ``blows up,'' especially near the domain boundaries.
 
 
 

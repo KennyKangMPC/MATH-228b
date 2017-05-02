@@ -1,15 +1,16 @@
 function divF = spectral_divergence(Fx, Fy, h)
-N = length(Fx);     % number of nodes
-L = N * h;          % domain length
+
+N = length(Fx(1, :));
+k = ones(N, 1) * [0:N/2-1 0 -N/2+1:-1];
 
 % compute x derivative
-dx = fft(Fx);
-w_hat_x = 1i * [0:N/2-1 0 -N/2+1:-1] .* dx;
-wx = real(ifft(w_hat_x));
+dx = fft(Fx, [], 2);
+w_hat_x = 1i * k .* dx;
+wx = real(ifft(w_hat_x, [], 2));
 
 % compute y derivative
-dy = fft(Fy);
-w_hat_y = 1i * [0:N/2-1 0 -N/2+1:-1] .* dy;
-wy = real(ifft(w_hat_y));
+dy = fft(Fy, [], 1);
+w_hat_y = 1i * k' .* dy;
+wy = real(ifft(w_hat_y, [], 1));
 
 divF = wx + wy;
